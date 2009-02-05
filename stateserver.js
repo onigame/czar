@@ -11,7 +11,7 @@ var stateserver = {
     var current_version = 0;
     var queued_data = null;
     var sent_data = null;
-
+ 
     var reset = function() {
       if (script_tag != null) head_tag.removeChild(script_tag);
       script_tag = null;
