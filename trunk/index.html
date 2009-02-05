@@ -31,6 +31,7 @@ span.tooltip {
 
 </style>
 <script language="JavaScript" src="json2.js"></script>
+<script language="JavaScript" src="hash.js"></script>
 <script language="JavaScript" src="stateserver.js"></script>
 <script language="JavaScript" src="config_strings.js"></script>
 
@@ -91,7 +92,13 @@ span.tooltip {
           input.value = input.czar_oldvalue;
           send_value(this, "deadline", new Date().getTime() + 20000);
         } else {
+          if (input.name == "tags") {
+            input.value = tag_cleanup(input.value);
+          }
           send_value(this, input, input.value);
+          if (input.name == "tags") {
+            update_tags();
+          }
           if (!input.className)
 	    input.className = "inflight";
         }
@@ -214,6 +221,7 @@ span.tooltip {
           parent.insertBefore(form, next);
       }
     }
+    update_tags();
   }
 
   var bind_input = function(input, prompt) {
@@ -296,14 +304,15 @@ span.tooltip {
 
   var the_form_html =
     "<form name=@NAME@>" +
-    "<input type=text name=label size=50 style='font-weight: bold'>" +
+    "<input type=text name=label size=35 style='font-weight: bold'>" +
     "<a class=missing target=@NAME@.puzzle id=@NAME@.puzzle>puzzle</a>" +
     "<span class=tooltip><input type=text name=puzzle size=30></span>" +
     "<a class=missing target=@NAME@.wiki id=@NAME@.wiki>wiki</a>" +
     "<span class=tooltip><input type=text name=wiki size=30></span>" +
     "<a class=missing target=@NAME@.sheet id=@NAME@.sheet>sheet</a>" +
     "<span class=tooltip><input type=text name=sheet size=30></span>" +
-    "<input type=text name=status size=55>" +
+    "<input type=text name=status size=50>" +
+    "<input type=text id=@NAME@.tags name=tags size=20>" +
     "</form>";
 
   var make_form = function(name) {
@@ -315,6 +324,7 @@ span.tooltip {
     document.getElementById("unsorted").appendChild(form);
     bind_input(form.label, "");
     bind_input(form.status, "Click to enter puzzle status");
+    bind_input(form.tags, "No tags");
     bind_link(form, "puzzle", "Click to enter puzzle URL");
     bind_link(form, "wiki", "Click to enter WikiWord");
     bind_link(form, "sheet", "Click to enter spreadsheet URL");
@@ -406,8 +416,9 @@ span.tooltip {
     }
 
     var dot = key.indexOf(".");
-    if (dot >= 0) 
+    if (dot >= 0) {
       on_value(key.substring(0, dot), key.substring(dot + 1), value);
+    }
   };
 
   var load_anchors = function() {
@@ -415,6 +426,87 @@ span.tooltip {
     document.getElementById("huntpage_anchor").href = puzzle_hunt_url;
     document.getElementById("email").innerHTML = email;
   };
+
+
+/////////// Tag Manipulation
+
+  var tag_cleanup = function(str) {
+    return str.toLowerCase().replace(/[^a-z0-9\,]/g,"")
+       .replace(/\,+/g,",").replace(/\,$/,"");
+  };
+
+  var counter = 0;
+  var inverted = false;
+  var tag_count = 0;
+  var tag_list = "";
+
+  var all_checkboxes_unchecked = function() {
+    for (var i=0; i<tag_count; ++i) {
+      if (document.getElementById("checkbox." + i).checked)
+        return false;
+    }
+    return true;
+  }; 
+
+  var invert_box = function() {
+    inverted = document.getElementById("invert").checked;
+    filter_tags();
+  }
+
+  var filter_tags = function() {
+    var keep = new Hash();
+    for (var node=document.getElementById("items").firstChild; 
+         node != null; node=node.nextSibling) {
+      keep.addItem(node.name);
+    }
+
+    for (var i in tag_list.items) {
+      if (document.getElementById("checkbox." + i).checked) {
+        var tag_group = tag_list.items[i].split(',');
+        for (var j in tag_group) {
+          if (keep.hasItem(tag_group[j]))
+            keep.addItem(tag_group[j]);
+        }
+        keep.subtractOneOfEachItem();
+      }
+    }
+    for (var node=document.getElementById("items").firstChild; 
+         node != null; node=node.nextSibling) {
+      node.style.display = inverted ? "block" : "none";
+    }
+    for (var i in keep.items) {
+      document.forms[i].style.display = inverted ? "none" : "block";
+    }
+  };
+
+  var update_tags = function() {
+    var result = "";
+    // result = counter++;
+
+    tag_list = new Hash();
+
+    for (var node=document.getElementById("items").firstChild; 
+         node != null; node=node.nextSibling) {
+      var tag_group = document.getElementById(node.name + ".tags").value.split(',');
+      for (var i in tag_group) {
+        if (tag_list.hasItem(tag_group[i])) {
+          tag_list.setItem(tag_group[i], tag_list.items[tag_group[i]] + "," + node.name);
+        } else {
+          tag_list.setItem(tag_group[i], node.name);
+        }
+      }
+    }
+    for (var i in tag_list.items) {
+      // result += i + " : " + tag_list.items[i] + "<br>";
+      result += "<strong>" + i + "</strong>(" + (tag_list.items[i].replace(/[^\,]/g,"").length + 1) + ")";
+      result += '<input type="checkbox" onchange="filter_tags()" id="checkbox.' 
+                 + i + '" value="' + i + '"> ';
+    }
+    result += 'invert <input type="checkbox" onchange="invert_box()" id="invert">';
+    document.getElementById("tags").innerHTML = result;
+  };
+
+/////////// end Tag Manipulation
 
   var on_load = function() {
     the_server = stateserver.open("http://czar*." + domain + ":8888/" + hunt_id, on_server);
@@ -452,6 +544,8 @@ span.tooltip {
 <input type=text name=label size=30 style='font-weight: bold'>
 </form>
 
+<div id=tags></div>
+<hr>
 <div id=items></div>
 <div id=unsorted class=internal></div>
 <div id=tmp class=internal></div>
