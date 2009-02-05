@@ -51,7 +51,13 @@ def document(server, title, url):
 
 if __name__ == "__main__":
   if len(sys.argv) != 2:
-    sys.stderr.write("czarmail.py http://stateserver:port/path < message\n")
+    sys.stderr.write("Command-line Usage (for debugging):\n")
+    sys.stderr.write("   czarmail.py http://stateserver:port/path < message\n")
+    sys.stderr.write("Practical Usage:\n")
+    sys.stderr.write("   Set an alias that forwards email to this script.\n")
+    sys.stderr.write("   For example, set a postfix alias:\n")
+    sys.stderr.write("     czar: \"|/path/to/czarmail.py http://stateserver:port/path\"\n")
+
     sys.exit(2)
 
   server = sys.argv[1]

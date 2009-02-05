@@ -32,11 +32,12 @@ span.tooltip {
 </style>
 <script language="JavaScript" src="json2.js"></script>
 <script language="JavaScript" src="stateserver.js"></script>
+<script language="JavaScript" src="config_strings.js"></script>
+
 <script language="JavaScript">
   var the_server = null;
   var the_debug_textarea = null;
   var the_sort_timeout = null;
-  var the_wiki_url = "http://teamleftout.org/wiki/Puzzles2009/";
 
   var on_blur = function(event) {
     if (this.className == "dirty") {
@@ -372,7 +373,7 @@ span.tooltip {
       if (node.nodeName == "A") {
         if (value) {
 	  if (field == "wiki")
-	    node.href = the_wiki_url + encodeURIComponent(value);
+	    node.href = team_wiki_url + encodeURIComponent(value);
           else
             node.href = value;
           node.className = "";
@@ -409,9 +410,16 @@ span.tooltip {
       on_value(key.substring(0, dot), key.substring(dot + 1), value);
   };
 
-  var on_load = function() {
-    the_server = stateserver.open("http://czar*.teamleftout.org:8888/mh09", on_server);
+  var load_anchors = function() {
+    document.getElementById("teampage_anchor").href = team_homepage_url;
+    document.getElementById("huntpage_anchor").href = puzzle_hunt_url;
+    document.getElementById("email").innerHTML = email;
+  };
 
+  var on_load = function() {
+    the_server = stateserver.open("http://czar*." + domain + ":8888/" + hunt_id, on_server);
+
+    load_anchors();
     bind_input(document.forms.create.label, "Click to enter new puzzle name");
     document.forms.create.label.czar_autosubmit = false;
     document.forms.create.onsubmit = on_submit_create;
@@ -423,15 +431,20 @@ span.tooltip {
 <body onload="on_load()">
 <img src=czar.jpeg style="float: left; margin-right: 10; margin-bottom: 15;">
 <div style="margin-left: 10">
-  <h2 style="margin-top: 0">Czar</h2>
-  Quick puzzle creation: Make a
-  <a target="docs" href="http://docs.google.com/">Google spreadsheet</a>
-  (or doc) and invite <em>czar@ofb.net</em>. <br>
-  The doc's title will be the puzzle's name.
-  If it already exists, your spreadsheet will be linked to it.<br>
+  <a href="http://code.google.com/p/czar/"><h2 style="margin-top: 0">Czar</h2></a>
+<!--
+  Creating a Puzzle: Click on "Click to enter new puzzle name" below, type in the puzzle name.
+  <br>Deleting a Puzzle: Click on the puzzle name and delete it.
+  <br>
+-->
+  Linking a Google Spreadsheet:
+  (1) Make a <a target="docs" href="http://docs.google.com/">spreadsheet</a> with <em>exactly</em>
+    the same title as the puzzle.  
+    (2) Invite <em><span id="email">something@something.net</span></em> to edit.
+  <br>
   See also:
-  <a target="wiki" href="http://teamleftout.org/wiki/">Left Out wiki</a>,
-  <a target="zyzzl" href="http://www.zyzzl.com/">ZyzzlCon puzzle site</a>.
+  <a target="teampage" id="teampage_anchor">Team Homepage</a>,
+  <a target="huntpage" id="huntpage_anchor">Puzzle Hunt site</a>.
 </div>
 <br clear=left>
 
