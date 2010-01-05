@@ -1,3 +1,59 @@
+// stateserver.js: Javascript browser client library for stateserver.py servers.
+// Provides real-time synchronized access to key-value JSON storage.
+//
+// Individual "channels" (databases) are opened separately; when a channel is
+// opened, every key/value in the channel is retrieved.  Changes may be sent
+// to the server; callbacks are invoked for changes received from the server.
+//
+// To use, import the JSON library followed by this file:
+//
+//   <script language="JavaScript" src="json2.js"></script>
+//   <script language="JavaScript" src="stateserver.js"></script>
+//
+// Then, within your Javascript, open a channel:
+//
+//   var callback = function(key, value) {
+//     ... do something with update ...
+//   };
+//   channel = stateserver.open("http://some.url:1234/your.channel", callback);
+//
+// The server/port must be a running stateserver.py.  Once a connection is
+// established to the server, your callback will be invoked in succession for
+// all existing key/value pairs in the channel.  It will be invoked later for
+// any changes made by any client (including this one).
+//
+// If the URL host includes a "*" -- e.g. "http://czar*.ofb.net:8888/mydata" --
+// the * will be replaced with numbers to avoid the two-connection-per-host
+// problem that otherwise blocks updates as stale connections slowly time out.
+// This requires that all such hostnames are valid for the server, which
+// implies that you should have a wildcard DNS record (as *.ofb.net does).
+//
+// The object returned by stateserver.open() can be used to make updates:
+//
+//   channel.set(some_key, some_value);
+//
+// Keys must be strings; values can be any legal JSON value (strings, numbers,
+// null, lists, or maps of JSON values).  Updates will be reflected by the
+// server and the callback re-invoked on all clients, including this one (which
+// may be used as confirmation that it made it to the server).
+//
+// Setting null as a key's value deletes the key.  When a key is deleted, the
+// callback is invoked with the key's name and a null value.
+//
+// If multiple updates to the same key happen in succession, only the most
+// recent value is guaranteed to be sent to any given client (intermediate
+// values may be skipped).
+//
+// When a channel is no longer needed, it must be closed:
+//
+//   channel.close()
+//
+// After being closed, the server will no longer be polled for updates, and the
+// channel's callback will not be invoked.  Clients may have multiple channels
+// open at once, though this is not necessary or common.  Internally, channels
+// use script-tag-insertion long-polling, have no same-site restrictions, and
+// automatically retry and reconnect as necessary.
+
 var stateserver = {
   R: [],
 
@@ -44,7 +100,7 @@ var stateserver = {
       request_url += "&jsona=" + current_token;
 
       if (sent_data != null) {
-	var set = encodeURIComponent(JSON.stringify(sent_data));
+        var set = encodeURIComponent(JSON.stringify(sent_data));
         request_url += "&time=0&set=" + set;
       } else {
         request_url += "&time=20";
