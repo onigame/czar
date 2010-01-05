@@ -11,6 +11,59 @@ import threading
 import time
 import urlparse
 
+"""
+Self-contained HTTP server supplying JSON key/value state maps to long-polling
+browser clients (see stateserver.js).  Listens on a port and handles multiple
+"channels" (each channel is a self-contained key/value database, stored in a
+separate disk file).
+
+To use, run with the port number:
+
+  stateserver.py :8888  # (or your favorite port)
+
+State files will be created and served from the current directory.
+
+The server protocol uses GET requests:
+
+  GET /your-channel-name?jsona=...&jsonp=...&set=...&time=...&v=...
+
+The path (/your-channel-name) identifies the channel to access, which will
+be created if it does not exist.  Each channel's data is stored in a file with
+".state" appended, so a request to /test will access the channel "test.state".
+
+All request arguments are optional:
+
+  jsona - arbitrary JSON argument to copy into the response (see below)
+  jsonp - arbitrary JSON prefix to copy into the response (see below)
+  set - JSON object with key/value map to modify this channel with
+  time - timeout, in seconds, to respond even if no new data is present
+  v - version last known to the client
+
+The response format is JSON text:
+
+  [jsonp]([jsona,]version,{key:value,...})
+
+The 'jsonp' and 'jsona' values are copied verbatim, if present.  These are
+normally used when accessing the server via <script src=...> to arrange for
+the JSON to invoke the correct JavaScript function to handle the data.
+
+The version is an integer value associated with the current state of the
+channel.  Every time the channel is modified (any key/value updated) the
+version number increases.
+
+If the 'v' request argument is present, only keys which changed since the
+supplied version number are returned.
+
+If the 'time' request argument is present, *and* nothing has changed since
+the supplied version, then the server will not respond until something does
+change (at which point it will return the new value immediately) or the
+supplied number of seconds elapses (at which point it returns an empty result). 
+Without the 'time' request, an empty result is returned immediately.
+
+If the 'set' argument is used to send new values, the supplied keys will be
+updated immediately, and the new values will be returned in the response.
+"""
+
 
 CHANNELS = {}
 

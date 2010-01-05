@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 """
+Test suite for stateserver.py.
+
 Start with an empty state:
 
 >>> try: os.remove("test.state")
