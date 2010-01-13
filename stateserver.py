@@ -2,7 +2,7 @@
 
 import BaseHTTPServer
 import cgi
-import json
+import json  # New in python 2.6.
 import os
 import socket
 import SocketServer

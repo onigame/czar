@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>who</title>
+<style>
+.active {background-color:#0f0; font-weight: normal;}
+.nonactive {background-color:#ccc; color:#666 }
+.nonexclusive {background-color:#c3f; color:#000; }
+.never { background-color:#fff; }
+td.active {text-align:right}
+td.nonactive {text-align: right }
+td.nonexclusive {text-align: right }
+td.nonpuzzle { background-color:#fc9; }
+td.focused { border: 1px solid #AAAAAA; }
+
+td.smaller { font-size:68%; }
+
+.popup {
+  border: thin solid black;
+  position:absolute;
+  background-color: white;
+  visibility: hidden;
+}
+
+.title {
+  text-align: center;
+  font-size: 200%;
+  padding-bottom: 1ex;
+}
+
+
+</style>
+
+<script language="JavaScript" src="json2.js"></script>
+<script language="JavaScript" src="log.js"></script>
+<script language="JavaScript" src="stateserver.js"></script>
+<script language="JavaScript" src="tags.js"></script>
+<script language="JavaScript" src="who-data.js"></script>
+<script language="JavaScript" src="who.js"></script>
+
+</head>
+
+
+<body onLoad=Init('http://czar*.ofb.net:8888/mh10')>
+
+<div class=title>Who's doing what</div>
+
+<!-- The dialog that appears when you click on any person/puzzle cell. -->
+<div id=divUpdateWidget class=popup>
+Working on this activity...
+<table>
+  <tr><td><button class=active id=btnCurrently>Currently</button></td>
+      <td><button class=active id=btnRecently>Recently</button></td></tr>
+  <tr><td><button class=nonactive id=btnNoLonger>No longer</button></td>
+      <td><button class=never id=btnNever>Never</button></td></tr>
+</table>
+  <label>
+    See advanced options <input type=checkbox id=checkboxToggleAdvanced
+    onchange="var d = document.getElementById('divAdvanced');  if (d.style.display == 'block') d.style.display = 'none'; else d.style.display = 'block';">
+  </label>
+  <div id=divAdvanced style="display:none">
+    <button style="display:none" class=active
+     id=btnMakeExclusive>Make exclusive of other assignments</button>
+    <button style="display:none" class=nonexclusive
+     id=btnMakeNonExclusive>Make non-exclusive of other assignments</button>
+  </div>
+<br>
+  <center><button id=btnCancel><small>Cancel</small></button></center>
+</div>
+
+<!-- The dialog that appears when you click on any person/puzzle header. -->
+<div id=divRenameWidget class=popup>
+Rename: <input id=inputName>
+  <button id=btnCancelRename><small>cancel</small></button>
+</div>
+
+<!-- Div that's populated by the javascript. -->
+<center>
+<div style="font-size:68%" id="data"></div>
+<div id="tags"></div>
+
+<div style="padding:10px">
+<span style="border: thin solid blue; padding: 8px">
+Sort:
+	    <label for=radioAlpha>
+	    <input type=radio name="sortOrder" id=radioAlpha checked
+	    onchange=RedrawTable()>Alphabetically</label>
+	    <label for=radioRecency>
+	    <input type=radio name="sortOrder" id=radioRecency
+	    onchange=RedrawTable()>By&nbsp;recency</label>
+	   <label for=radioRecencyReverse>
+	    <input type=radio name="sortOrder" id=radioRecencyReverse
+	    onchange=RedrawTable()>By&nbsp;recency&nbsp;(reverse)</label>
+</span>
+</div>
+
+<div style="padding:10px">
+<span style="border: thin solid blue; padding: 8px">
+<label for=checkboxToggleAutoUpdate>Update every minute:
+<input type=checkbox checked id=checkboxToggleAutoUpdate
+ onchange="ToggleAutoUpdate(this);"></label>
+</span>
+</div>
+
+
+<br><br><br>
+
+<table width=80%>
+  <tr><th width=50%>Edit</th><th>Legend</th></tr>
+  <tr>
+    <td valign=top>
+Add person: <input onchange="AddPerson(this);"><br>
+Add activity: <input onchange="AddActivity(this);"><br>
+
+    <ul>
+      <li>You can rename any person or activity by clicking their name
+	  in the table.
+      <li>You cannot delete any person or activity.  Contact Corey if
+	  you added something you didn't mean to.
+      <li>New activities, new people, and changes in work assignments
+	  appear automatically.  The Update every minute checkbox is
+	  useful only to update the minutes-ago time in the table.
+    </ul>
+    </td>
+
+    <td valign=top>
+
+<center>
+<table rules=all frame=outline>
+  <tr>
+    <td></td>
+    <td>Charlie</td>
+    <td>Juliet</td>
+    <td>Mike</td>
+    <td>Oscar</td>
+  </tr>
+  <tr>
+    <td>First puzzle</td>
+    <td class=active>1:30</td>
+    <td class=active>:05</td>
+    <td></td>
+    <td class=active>:23</td>
+  </tr>
+  <tr>
+    <td>Second puzzle</td>
+    <td></td>
+    <td class=nonactive>1:12</td>
+    <td class=nonactive>1:07</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Third puzzle</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td class=nonexclusive>:05</td>
+  </tr>
+  <tr>
+    <td class=nonpuzzle>Sleeping</td>
+    <td></td>
+    <td></td>
+    <td class=active>:15</td>
+    <td></td>
+  </tr>
+</table>
+</center>
+
+<ul>
+  <li>Each row is an activity, each column a person.  Non-puzzle
+      activities are orange.
+  <li>Each cell shows when this person was last performing this
+      activity.  It's hours and minutes.
+  <li>Marking one assignment as "current" (green) marks all other assignments
+      as "no longer" (grey).  The exception are non-exclusive
+      assignments, shown in purple.  Choose "See advanced options" to
+      enable this feature.  Non-exclusive assignments for puzzles will
+      be rare -- it would suggest you're actively working on more than
+      one puzzle simultaneously.
+</ul>
+
+	</td>
+      </tr>
+</table>
+
+
+
+</center>
+
+
+
+
+</body> </html>

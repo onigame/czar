@@ -82,6 +82,8 @@ var stateserver = {
     var send_request = function() {
       reset();
 
+      log('send_request');
+
       if (sent_data == null) {
         sent_data = queued_data;
       } else if (queued_data != null) {
@@ -98,6 +100,9 @@ var stateserver = {
       request_url += "?v=" + current_version;
       request_url += "&jsonp=" + jsonp;
       request_url += "&jsona=" + current_token;
+      // Is Chrome not honoring the cache headers?  Add an extra CGI arg
+      // to change the URL.
+      request_url += "&now=" + (new Date()).valueOf();
 
       if (sent_data != null) {
         var set = encodeURIComponent(JSON.stringify(sent_data));
@@ -105,6 +110,8 @@ var stateserver = {
       } else {
         request_url += "&time=20";
       }
+
+      log('request_url: ' + request_url);
 
       script_tag = document.createElement("script");
       script_tag.type = "text/javascript";
@@ -146,7 +153,15 @@ var stateserver = {
         reset();
         queued_data = null;
         sent_data = null;
-      }
+      },
+
+      make_boolean: function(v) {
+	if (v) { return 't'; } else { return 'f'; }
+      },
+
+      parse_boolean: function(v) {
+	return v == 't';
+      },
     };
   }
 };

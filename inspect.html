@@ -100,6 +100,14 @@ var on_server = function(key, value) {
     td.className = "modified";
     td.appendChild(document.createTextNode(value));
     tr.appendChild(td);
+
+    td = document.createElement("td");
+    var b = document.createElement("button");
+    b.onclick = function() { the_server.set(key, null); };
+    b.appendChild(document.createTextNode("delete"));
+    td.appendChild(b);
+
+    tr.appendChild(td);
   }
 }
 

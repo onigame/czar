@@ -31,8 +31,10 @@ span.tooltip {
 
 </style>
 <script language="JavaScript" src="json2.js"></script>
-<script language="JavaScript" src="hash.js"></script>
 <script language="JavaScript" src="stateserver.js"></script>
+<script language="JavaScript" src="log.js"></script>
+<script language="JavaScript" src="tags.js"></script>
+<script language="JavaScript" src="who-data.js"></script>
 <script language="JavaScript" src="czar.js"></script>
 </head>
 
@@ -52,7 +54,8 @@ span.tooltip {
   <br>
   See also:
   <a target="teampage" href="http://teamleftout.org/wiki/">Team Homepage</a>,
-  <a target="huntpage" href="http://www.mit.edu/~puzzle/currhunt.html">Puzzle Hunt site</a>.
+  <a target="huntpage" href="http://www.mit.edu/~puzzle/currhunt.html">Puzzle Hunt site</a>,
+  <a target="whopage" href="who.html">Who's doing what</a>.
 </div>
 <br clear=left>
 
@@ -62,8 +65,15 @@ span.tooltip {
 
 <div id=tags></div>
 <hr>
+
+<!-- The "items" div holds the sorted list of puzzles.  It's the list -->
+<!-- that's actually visible. -->
 <div id=items></div>
+
+<!-- The "unsorted" div holds a list of puzzles.  Each puzzle is -->
+<!-- represented by a <form> tag -->
 <div id=unsorted class=internal></div>
+
 <div id=tmp class=internal></div>
 <hr>
 </body>
