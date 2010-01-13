@@ -1,4 +1,10 @@
-var the_server = null;
+// Each puzzle is represented by a <form> object.  The form has fields
+// for the puzzle name, status, etc.  <form>s are stored in a hidden div
+// on the host HTML page.
+
+// Data is stored in stateserver as form.field = value.
+
+var gStateServer = null;
 var the_sort_timeout = null;
 
 var on_blur = function(event) {
@@ -24,6 +30,8 @@ var on_change = function(event) {
 }
 
 var on_focus = function(event) {
+  // Handler for <input> onFocus event.
+
   if (this.form.czar_deadline)
     send_value(this.form, "deadline", null);
 
@@ -45,6 +53,8 @@ var on_keypress = function(event) {
 }
 
 var on_submit_edit = function() {
+  // Callback for when any field of the puzzle form is changed.
+
   for (var i = 0; i < this.length; ++i) {
     var input = this.elements[i];
     if (input.className == "dirty") {
@@ -54,11 +64,11 @@ var on_submit_edit = function() {
         send_value(this, "deadline", new Date().getTime() + 20000);
       } else {
         if (input.name == "tags") {
-          input.value = tag_cleanup(input.value);
+          input.value = SanitizeTagList(input.value);
         }
         send_value(this, input, input.value);
         if (input.name == "tags") {
-          update_tags();
+          UpdateTagsSelector();
         }
         if (!input.className)
           input.className = "inflight";
@@ -69,6 +79,9 @@ var on_submit_edit = function() {
 }
 
 var on_submit_create = function() {
+  // Callback for creating a new puzzle by means of the link at the top
+  // of the page.
+
   if (this.label.className == "dirty") {
     var label = this.label.value;
     this.label.className = "empty";
@@ -77,7 +90,8 @@ var on_submit_create = function() {
 
     if (label) {
       var name = null;
-      do name = "x" + Math.floor(Math.random() * 10000);
+      // p is for puzzle.
+      do name = "p" + Math.floor(Math.random() * 10000);
       while (document.forms[name]);
 
       send_value(name, "label", label);
@@ -93,6 +107,8 @@ var on_submit_create = function() {
 }
 
 var watch_deadline = function(form) {
+  // Dunno what this is all about.
+
   if (form.czar_timeout) {
     window.clearTimeout(form.czar_timeout);
     form.czar_timeout = null;
@@ -172,10 +188,12 @@ var sort_forms = function() {
         parent.insertBefore(form, next);
     }
   }
-  update_tags();
+  UpdateTagsSelector();
 }
 
 var bind_input = function(input, prompt) {
+  // Add event handlers for an <input> field.
+
   input.className = "empty";
   input.czar_autosubmit = true;
   input.czar_oldvalue = "";
@@ -190,6 +208,9 @@ var bind_input = function(input, prompt) {
 }
 
 var bind_link = function(form, name, prompt) {
+  // Handler for adding a link to a puzzle.  Includes adding a tooltip for
+  // this field.
+
   var link = document.getElementById(form.name + "." + name);
   var input = form[name];
   var tooltip = input.parentNode;
@@ -262,24 +283,91 @@ var the_form_html =
   "<span class=tooltip><input type=text name=sheet size=30></span>" +
   "<input type=text name=status size=50>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
+  "<select id=@NAME@.assign><option disabled>Assign</option></select>" +
+  "<span id=@NAME@.actives>(0 actives)</span>" +
   "</form>";
 
+var add_users_to_select = function(select) {
+  //var select = document.createElement('select');
+
+  // Get a sorted list of users.
+  var compare_by_name = function(id1, id2) {
+    if (id1 == id2) return 0;
+    // If item 2 doesn't have a name then item 1 wins by default.  And vice
+    // versa.
+    if (!gUsers[id2] || !gUsers[id2].name) return -1;
+    if (!gUsers[id1] || !gUsers[id1].name) return 1;
+
+    // TODO(corin): precompute this key.
+    var name1 = gUsers[id1].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+    var name2 = gUsers[id2].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+    if (name1 < name2) return -1;
+    if (name1 > name2) return 1;
+    return 0;
+  };
+
+  var sorted_users = new Array();
+  for (u in gUsers) {
+    // Show a user only if they have a name.
+    if (gUsers[u].name) {
+      sorted_users.push(u);
+    }
+  }
+  sorted_users.sort(compare_by_name);
+
+  select.innerHTML = '';
+  var option = document.createElement('option');
+  option.appendChild(document.createTextNode('Assign'));
+  option.disabled = true;
+  select.appendChild(option);
+
+  for (var i = 0; i < sorted_users.length; i++) {
+    var user = gUsers[sorted_users[i]];
+    var option = document.createElement('option');
+    option.appendChild(document.createTextNode(user.name));
+    option.value = user.id;
+    select.appendChild(option);
+  }
+};
+
 var make_form = function(name) {
+  // Makes a new form to represent a single puzzle.
+
   var tmp = document.getElementById("tmp");
   tmp.innerHTML = the_form_html.replace(/@NAME@/g, name);
 
+  var assign = document.getElementById(name + '.assign');
+  //add_users_to_select(assign);
+  assign.onfocus = function() { log('onfocus'); add_users_to_select(assign); };
+  assign.onchange = function() {
+    var uid = assign.options[assign.selectedIndex].value;
+    log('uid is ' + uid);
+    UpdateStatus(gUsers[uid], gActivities[name],
+		 (new Date()).valueOf(), true, true);
+  };
+
   var form = tmp.firstChild;
   form.onsubmit = on_submit_edit;
+  // Move the newly minted form to the "unsorted" div for permanent storage.
   document.getElementById("unsorted").appendChild(form);
   bind_input(form.label, "");
+  // One-line status.
   bind_input(form.status, "Click to enter puzzle status");
   bind_input(form.tags, "No tags");
+  // Direct link to the puzzle on GC's site.
   bind_link(form, "puzzle", "Click to enter puzzle URL");
+  // Link to the spreadsheet.
   bind_link(form, "sheet", "Click to enter spreadsheet URL");
+
+  UpdateActives(name);
+
   return form;
 }
 
 var on_label_change = function(form, value) {
+  // Callback for changing the name of a puzzle.
+
   if (!value) {
     document.getElementById("items").removeChild(form);
     return;
@@ -294,9 +382,33 @@ var on_label_change = function(form, value) {
   form.czar_sortkey = padded.toLowerCase().replace(/[^a-z0-9]+/g, "");
   if (the_sort_timeout) window.clearTimeout(the_sort_timeout);
   the_sort_timeout = window.setTimeout(sort_forms, 0);
-}
+};
+
+var UpdateAssignmentHack = function(uid, aid, when, active, exclusive) {
+  UpdateActives(aid);
+};
+
+var UpdateActives = function(name) {
+  log('UpdateActives for ' + name);
+
+  var actives = 0;
+  for (u in gUsers) {
+    if (IsActiveAssignment(gUsers[u].id, name)) actives++;
+  }
+  var span = document.getElementById(name + '.actives');
+  if (span) {
+    span.innerHTML = '(' + actives + ' active' + (actives == 1 ? '' : 's') + ')';
+  }
+};
 
 var on_value = function(key, field, value) {
+  // Called whenever key.field changes value.  key is the id of an HTML
+  // form on this page.  field is any key, although some keys have special
+  // significance.
+
+  // Care only about puzzles (key starts with p).
+  if (key[0] != "p" && key[0] != "x") return;
+
   var form = document.forms[key];
   if (!form) {
     if (!value) return;
@@ -341,103 +453,81 @@ var on_value = function(key, field, value) {
 }
 
 var send_value = function(form, field, value) {
+  // Update form.field = value on the server and take immediate action for
+  // this update.
+
   form = form.name ? form.name : form;
   field = field.name ? field.name : field;
-  the_server.set(form + "." + field, value);
+  gStateServer.set(form + "." + field, value);
   on_value(form, field, value);
 }
 
+// Called on every update of a key=value pair.
 var on_server = function(key, value) {
   var dot = key.indexOf(".");
   if (dot >= 0) {
+    // Keys, apparently, have two parts: the part before the . and the part
+    // after the dot.
     on_value(key.substring(0, dot), key.substring(dot + 1), value);
   }
+
+  // From who-data.js.
+  HandleUpdateFromStateserver(key, value);
 };
 
 
 /////////// Tag Manipulation
 
-var tag_cleanup = function(str) {
-  return str.toLowerCase().replace(/[^a-z0-9\,]/g,"")
-     .replace(/\,+/g,",").replace(/\,$/,"");
-};
-
-var counter = 0;
-var inverted = false;
-var tag_count = 0;
-var tag_list = "";
-
-var all_checkboxes_unchecked = function() {
-  for (var i=0; i<tag_count; ++i) {
-    if (document.getElementById("checkbox." + i).checked)
-      return false;
-  }
-  return true;
-}; 
-
-var invert_box = function() {
-  inverted = document.getElementById("invert").checked;
-  filter_tags();
-}
-
 var filter_tags = function() {
-  var keep = new Hash();
-  for (var node=document.getElementById("items").firstChild; 
-       node != null; node=node.nextSibling) {
-    keep.addItem(node.name);
-  }
+  // Selectively hide puzzles based on their tags.
 
-  for (var i in tag_list.items) {
-    if (document.getElementById("checkbox." + i).checked) {
-      var tag_group = tag_list.items[i].split(',');
-      for (var j in tag_group) {
-        if (keep.hasItem(tag_group[j]))
-          keep.addItem(tag_group[j]);
-      }
-      keep.subtractOneOfEachItem();
-    }
-  }
+  log('filter_tags called');
+
+  var selected = GetSelectedTags();
+
+  // Examine each puzzle being displayed.  Take action only if all the
+  // selected tags appear in the puzzle as well.  Note that "no tags selected"
+  // selects all puzzles.
   for (var node=document.getElementById("items").firstChild; 
        node != null; node=node.nextSibling) {
-    node.style.display = inverted ? "block" : "none";
-  }
-  for (var i in keep.items) {
-    document.forms[i].style.display = inverted ? "none" : "block";
+    if (TagsMatch(selected,
+		  document.getElementById(node.name + ".tags").value)) {
+      node.style.display = IsSelectionInverted() ? "none" : "block";
+    } else {
+      node.style.display = IsSelectionInverted() ? "block" : "none";
+    }
   }
 };
 
-var update_tags = function() {
-  var result = "";
-  // result = counter++;
 
-  tag_list = new Hash();
+var UpdateTagsSelector = function() {
+  // Called when any puzzle has had its tags field changed.  Updates the
+  // list of tags at the top of the page.
 
+  log('UpdateTagsSelector called.');
+
+  ResetTags();
+
+  // Iterate through the list of puzzles, in order that they appear (items,
+  // rather than unsorted).
   for (var node=document.getElementById("items").firstChild; 
        node != null; node=node.nextSibling) {
-    var tag_group = document.getElementById(node.name + ".tags").value.split(',');
-    for (var i in tag_group) {
-      if (tag_list.hasItem(tag_group[i])) {
-        tag_list.setItem(tag_group[i], tag_list.items[tag_group[i]] + "," + node.name);
-      } else {
-        tag_list.setItem(tag_group[i], node.name);
-      }
-    }
+
+    log('node.name is [' + node.name + ']');
+
+    UpdateTagCounts(document.getElementById(node.name + ".tags").value);
   }
-  for (var i in tag_list.items) {
-    // result += i + " : " + tag_list.items[i] + "<br>";
-    result += "<strong>" + i + "</strong>(" + (tag_list.items[i].replace(/[^\,]/g,"").length + 1) + ")";
-    result += '<input type="checkbox" onchange="filter_tags()" id="checkbox.' 
-               + i + '" value="' + i + '"> ';
-  }
-  result += 'invert <input type="checkbox" onchange="invert_box()" id="invert">';
-  document.getElementById("tags").innerHTML = result;
+
+  MakeTagSelector(document.getElementById("tags"), filter_tags);
 };
+
 
 /////////// end Tag Manipulation
 
 var start_czar = function(stateserver_url) {
-  the_server = stateserver.open(stateserver_url, on_server);
+  gStateServer = stateserver.open(stateserver_url, on_server);
   bind_input(document.forms.create.label, "Click to enter new puzzle name");
   document.forms.create.label.czar_autosubmit = false;
   document.forms.create.onsubmit = on_submit_create;
 }
+
