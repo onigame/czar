@@ -8,8 +8,8 @@ import sys
 import urllib
 
 TITLE_RE = re.compile("""I've shared a document with you called "(.*)":""")
-URL_RE = re.compile("""(http://spreadsheets.google.com/ccc[\\S]*)""")
-NEW_RE = re.compile("""I've shared a document with you: *(.*) *(http://spreadsheets.google.com/ccc[\\S]*)""")
+URL_RE = re.compile("""(https?://spreadsheets.google.com/ccc[\\S]*)""")
+NEW_RE = re.compile("""I've shared a document with you: *(.*) *(https?://spreadsheets.google.com/ccc[\\S]*)""")
 JUNK_RE = re.compile("""\\W+""")
 
 
