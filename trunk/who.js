@@ -92,15 +92,6 @@ var SchedulePeriodicRedrawTable = function() {
   gPeriodicTimer = window.setTimeout(PeriodicRedrawTable, 60 * 1000);
 };
 
-var PadWithZeroes = function(x, len) {
-  var s = String(x);
-  if (s.length < len) {
-    s = '0' * (len - s.length) + s;
-  }
-
-  return s;
-};
-
 var DisplayTime = function(d) {
   if (!d)
     return 'never';
@@ -306,23 +297,6 @@ var RedrawTable = function() {
   d.innerHTML = ''
   d.appendChild(table);
 };
-
-
-var MakeAgoString = function(now, then) {
-  var ms_ago = now - then;  // Milliseconds.
-  var minutes_ago = parseInt(ms_ago / 1000.0 / 60.0);
-  var hours_ago = parseInt(minutes_ago / 60);
-  minutes_ago = minutes_ago - (hours_ago * 60);
-
-  var ago = '';
-  if (hours_ago > 0) {
-    ago += hours_ago;
-  }
-
-  ago += ':' + PadWithZeroes(minutes_ago, 2);
-
-  return ago;
-}
 
 var BindShowUpdateWidget = function(td, user, activity) {
   // Returns a wrapper around ShowUpdateWidget for this user and activity.

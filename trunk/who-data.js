@@ -267,3 +267,29 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
   }
 };
 
+var MakeAgoString = function(now, then) {
+  var ms_ago = now - then;  // Milliseconds.
+  var minutes_ago = parseInt(ms_ago / 1000.0 / 60.0);
+  var hours_ago = parseInt(minutes_ago / 60);
+  minutes_ago = minutes_ago - (hours_ago * 60);
+
+  var ago = '';
+  if (hours_ago > 0) {
+    ago += hours_ago;
+  }
+
+  ago += ':' + PadWithZeroes(minutes_ago, 2);
+
+  return ago;
+};
+
+
+var PadWithZeroes = function(x, len) {
+  var s = String(x);
+  if (s.length < len) {
+    s = '0' * (len - s.length) + s;
+  }
+
+  return s;
+};
+
