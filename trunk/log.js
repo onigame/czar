@@ -1,4 +1,6 @@
 var log = function(s) {
+  return;
+
   var now = new Date();
 
   if (s[s.length-1] != '\n') {
