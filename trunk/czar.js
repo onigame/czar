@@ -283,53 +283,37 @@ var the_form_html =
   "<span class=tooltip><input type=text name=sheet size=30></span>" +
   "<input type=text name=status size=50>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
-  "<select id=@NAME@.assign><option disabled>Assign</option></select>" +
+  "<input type=submit id=@NAME@.assignbutton value='Accept'>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
       "title='Nobody is working on this task.'>(0p)</span>" +
   "</form>";
 
-var add_users_to_select = function(select) {
-  //var select = document.createElement('select');
 
-  // Get a sorted list of users.
-  var compare_by_name = function(id1, id2) {
-    if (id1 == id2) return 0;
-    // If item 2 doesn't have a name then item 1 wins by default.  And vice
-    // versa.
-    if (!gUsers[id2] || !gUsers[id2].name) return -1;
-    if (!gUsers[id1] || !gUsers[id1].name) return 1;
+var add_user_to_whoami = function(whoami, user_key, user_name) {
 
-    // TODO(corin): precompute this key.
-    var name1 = gUsers[id1].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
-    var name2 = gUsers[id2].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  log("adding " + user_key + " " + user_name + " to whoami");
 
-    if (name1 < name2) return -1;
-    if (name1 > name2) return 1;
-    return 0;
-  };
+  // Create a canonical name used for sorting.  We hide this
+  // in the "id" tag of the option.
+  var canon_name = "whoami_sortkey_" + user_name.toLowerCase().replace(/[^a-z0-9]+/g, "");
 
-  var sorted_users = new Array();
-  for (u in gUsers) {
-    // Show a user only if they have a name.
-    if (gUsers[u].name) {
-      sorted_users.push(u);
-    }
-  }
-  sorted_users.sort(compare_by_name);
-
-  select.innerHTML = '';
+  // Create an option element for the new user.
   var option = document.createElement('option');
-  option.appendChild(document.createTextNode('Assign'));
-  option.disabled = true;
-  select.appendChild(option);
+  option.appendChild(document.createTextNode(user_name));
+  option.id = canon_name;
+  option.value = user_key;
 
-  for (var i = 0; i < sorted_users.length; i++) {
-    var user = gUsers[sorted_users[i]];
-    var option = document.createElement('option');
-    option.appendChild(document.createTextNode(user.name));
-    option.value = user.id;
-    select.appendChild(option);
+  var i = 0;
+  while (i < whoami.childNodes.length && whoami.childNodes[i].id < canon_name) {
+    i++;
   }
+  if (i == whoami.childNodes.length) {
+    // past the last element
+    whoami.appendChild(option);
+  } else {
+    whoami.insertBefore(option, whoami.childNodes[i]);
+  }
+
 };
 
 var make_form = function(name) {
@@ -338,15 +322,21 @@ var make_form = function(name) {
   var tmp = document.getElementById("tmp");
   tmp.innerHTML = the_form_html.replace(/@NAME@/g, name);
 
-  var assign = document.getElementById(name + '.assign');
-  //add_users_to_select(assign);
-  assign.onfocus = function() { log('onfocus'); add_users_to_select(assign); };
-  assign.onchange = function() {
-    var uid = assign.options[assign.selectedIndex].value;
-    log('uid is ' + uid);
-    UpdateStatus(gUsers[uid], gActivities[name],
-		 (new Date()).valueOf(), true, true);
-  };
+  // deal with the assign button.
+  var assignbutton = document.getElementById(name + '.assignbutton');
+  assignbutton.onclick = function() {
+    log('assignbutton for ' + name + ' clicked');
+    var whoami = document.getElementById('whoami');
+    var uid = whoami.options[whoami.selectedIndex].value;
+    if (uid == "") {
+      log('no valid name');
+      alert("Please tell me who you are first! (upper-left of page)");
+    } else {
+      log('assigning uid ' + uid);
+      UpdateStatus(gUsers[uid], gActivities[name],
+                   (new Date()).valueOf(), true, true);
+    }
+  }
 
   var form = tmp.firstChild;
   form.onsubmit = on_submit_edit;
@@ -414,6 +404,11 @@ var on_value = function(key, field, value) {
   // Called whenever key.field changes value.  key is the id of an HTML
   // form on this page.  field is any key, although some keys have special
   // significance.
+
+  // Do we have information about a new user?  If so, update the "whoami" list.
+  if (key[0] == "u" && field == "name") {
+    add_user_to_whoami(document.getElementById("whoami"), key, value);
+  }
 
   // Care only about puzzles (key starts with p).
   if (key[0] != "p" && key[0] != "x") return;

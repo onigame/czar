@@ -56,6 +56,8 @@ Array.prototype.has = function(v) {
 var gStateServer = null;
 var gPeriodicTimer = null;
 var gLastServerUpdate = null;
+var gTableFontSize = 83;  // percentage of font-size for the table as
+                          // compared to the rest of the document.
 
 var Init = function(stateserver_url) {
   UpdateTagsSelector();
@@ -128,7 +130,8 @@ var RedrawTable = function() {
   var table = document.createElement("table");
   table.frame = 'outline';
   table.rules = 'all';
-  table.style.fontSize = '83%';
+  table.id = 'the_big_table';
+  table.style.fontSize = gTableFontSize + '%';
 
   // Record that we're redrawing now and when the last data update was.
   var caption = table.createCaption();
@@ -463,3 +466,9 @@ var ToggleAutoUpdate = function(input) {
   }
 };
 
+var AdjustTableFontSize = function(factor) {
+  gTableFontSize = Math.floor(gTableFontSize * factor);
+  document.getElementById('the_big_table').style.fontSize = gTableFontSize + '%';
+  // Don't bother redrawing it because we're resizing it directly.
+  //  RedrawTable();
+};
