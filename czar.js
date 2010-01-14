@@ -283,9 +283,11 @@ var the_form_html =
   "<span class=tooltip><input type=text name=sheet size=30></span>" +
   "<input type=text name=status size=50>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
-  "<input type=submit id=@NAME@.assignbutton value='Accept'>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
       "title='Nobody is working on this task.'>(0p)</span>" +
+  "<input type=submit id=@NAME@.assignbutton value='WhoRU?'" +
+      " style='background-color:#888;color:#555;width:5em'" +
+      " title='Please tell me who you are (upper-left).'>" +
   "</form>";
 
 
@@ -334,7 +336,7 @@ var make_form = function(name) {
     } else {
       log('assigning uid ' + uid);
       UpdateStatus(gUsers[uid], gActivities[name],
-                   (new Date()).valueOf(), true, true);
+                   (new Date()).valueOf(), true, null);
     }
   }
 
@@ -377,6 +379,7 @@ var on_label_change = function(form, value) {
 
 var UpdateAssignmentHack = function(uid, aid, when, active, exclusive) {
   UpdateActives(aid);
+  UpdateAssignButtons();
 };
 
 var UpdateActives = function(name) {
@@ -397,6 +400,71 @@ var UpdateActives = function(name) {
     } else {
       span.title = "There are " + actives.length + " people working on this task: " + actives.join(', ');
     }
+  }
+};
+
+var UpdateBackgroundColors = function() {
+  // We don't really have a great way of iterating through all
+  // the puzzles on the page without just looking at the HTML DOM.
+  var itemList = document.getElementById('items');
+  for (var i=0; i < itemList.childNodes.length; ++i) {
+    // do stuff with alternating background colors.
+    var puzzle = itemList.childNodes[i];
+    var color = (i % 2 == 0) ? "#DDDDDD" : "#FFFFFF";
+    puzzle.style.backgroundColor = color;
+    for (var j=0; j < puzzle.childNodes.length; ++j) {
+      var child = puzzle.childNodes[j];
+      if (child.name == "label" || child.name == "status" || child.name == "tags") {
+        child.style.backgroundColor = color;
+      }
+    }
+  }
+};
+
+var UpdateAssignButtons = function() {
+  // We don't really have a great way of iterating through all
+  // the puzzles on the page without just looking at the HTML DOM.
+  var itemList = document.getElementById('items');
+  for (var i=0; i < itemList.childNodes.length; ++i) {
+    // we should be checking that each item is really a form, but we'll be lazy.
+ 
+    var assignbuttonName = itemList.childNodes[i].name + ".assignbutton";
+    var assignbutton = document.getElementById(assignbuttonName);
+    assignbutton.style.border = '1px solid';
+
+    var puzzle = assignbutton.id.split('.')[0];
+
+    var whoami = document.getElementById('whoami');
+    var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+
+    var now = (new Date()).valueOf();
+
+    if (! uid) {
+      // Disabled the buttons.
+      assignbutton.style.backgroundColor = "#888";
+      assignbutton.style.color = "#555";
+      assignbutton.value = "WhoRU?";
+      assignbutton.title = "Please tell me who you are (upper-left)."
+    } else if (IsActiveAssignment(uid, puzzle) && IsExclusiveAssignment(uid, puzzle)) {
+      // Exclusive and Active == "green" on who
+      assignbutton.style.backgroundColor = "#0F0";
+      assignbutton.style.color = "#000";
+      assignbutton.value = MakeAgoString(now, LastSeenTime(uid, puzzle)) + ' ago';
+      assignbutton.title = "Click here to indicate that you are still working on this puzzle."
+    } else if (! IsExclusiveAssignment(uid, puzzle)) {
+      // non-exclusive, but assigned == "purple" on who
+      assignbutton.style.backgroundColor = "#C3F";
+      assignbutton.style.color = "#000";
+      assignbutton.value = MakeAgoString(now, LastSeenTime(uid, puzzle)) + ' ago';
+      assignbutton.title = "Click here to indicate that you're still thinking of this puzzle."
+    } else {
+      // not engaged == "gray" on who
+      assignbutton.style.backgroundColor = "#EEE";
+      assignbutton.style.color = "#000";
+      assignbutton.value = "Do This";
+      assignbutton.title = "Click here to indicate you are moving to this puzzle."
+    }
+
   }
 };
 
@@ -533,5 +601,6 @@ var start_czar = function(stateserver_url) {
   bind_input(document.forms.create.label, "Click to enter new puzzle name");
   document.forms.create.label.czar_autosubmit = false;
   document.forms.create.onsubmit = on_submit_create;
+  document.getElementById('whoami').onchange = UpdateAssignButtons;
 }
 
