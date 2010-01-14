@@ -279,6 +279,18 @@ var RedrawTable = function() {
 	if (IsActiveAssignment(user.id, activity.id) &&
 	    IsExclusiveAssignment(user.id, activity.id)) {
 	  td.className = 'active';
+
+          // Color hack -- if we haven't seen someone in a while,
+          // start turning their color to red.  They start losing
+          // their green at 2 hours and get to full red at 6 hours.
+          var ago = now - LastSeenTime(user.id, activity.id); // milliseconds
+          ago = ago / 1000 / 60.0 / 60.0 / 4.0;  // 6 hours is 1.5, 0 hours is 0
+          ago -= 0.5;  // 6 hours is 1.0, 2 hours is 0
+          if (ago < 0) { ago = 0; }  // range > 0 (float)
+          if (ago > 1) { ago = 1; }  // range 0-1 (float)
+          ago = parseInt(255 * ago);  // range 0-255 (int)
+          td.style.backgroundColor = "rgb(" + (ago) + "," + (256-ago) + ",0)";
+
 	} else if (IsActiveAssignment(user.id, activity.id)) {
 	  td.className = 'nonexclusive';
 	} else {

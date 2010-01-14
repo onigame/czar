@@ -42,7 +42,9 @@ td.smaller { font-size:68%; }
 
 <body onLoad=Init('http://czar*.ofb.net:8888/mh10')>
 
-<div class=title>Who's doing what</div>
+<div class=title>Who's Doing What
+<a style="font-size:50%" href=".">(Back to Czar)</a>
+</div>
 
 <!-- The dialog that appears when you click on any person/puzzle cell. -->
 <div id=divUpdateWidget class=popup>
@@ -180,6 +182,9 @@ Add activity: <input onchange="AddActivity(this);"><br>
       enable this feature.  Non-exclusive assignments for puzzles will
       be rare -- it would suggest you're actively working on more than
       one puzzle simultaneously.
+  <li>At the two-hour mark, green starts "decaying" to red, turning
+      into full red at 6 hours.  When someone starts losing their
+      color, it means we haven't heard from them in a while.
 </ul>
 
 	</td>
