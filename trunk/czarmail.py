@@ -9,15 +9,12 @@ import urllib
 
 TITLE_RE = re.compile("""I've shared a document with you called "(.*)":""")
 URL_RE = re.compile("""(http://spreadsheets.google.com/ccc[\\S]*)""")
+NEW_RE = re.compile("""I've shared a document with you: *(.*) *(http://spreadsheets.google.com/ccc[\\S]*)""")
 JUNK_RE = re.compile("""\\W+""")
 
 
 def crunch(s):
   return JUNK_RE.sub("", s).lower()
-
-
-def wikify(s):
-  return "".join([w[:1].upper() + w[1:] for w in re.split(JUNK_RE, s)])
 
 
 def document(server, title, url):
@@ -38,11 +35,10 @@ def document(server, title, url):
 
   else:
     while 1:
-      key = "s%05d" % (random.random() * 10000)
+      key = "p%05d" % (random.random() * 10000)
       if not state.get(key + ".label"):
         out[key + ".label"] = title
         out[key + ".sheet"] = url
-        out[key + ".wiki"] = wikify(title)
         break
 
   seturl = "%s?%s" % (server, urllib.urlencode({"set": json.write(out)}))
@@ -69,6 +65,11 @@ if __name__ == "__main__":
       url = URL_RE.search(body)
       if title and url:
         document(server, title.group(1), url.group(1))
+        sys.exit(0)
+
+      both = NEW_RE.search(body)
+      if both:
+        document(server, both.group(1), both.group(2))
         sys.exit(0)
 
   sys.stderr.write("error: No document reference found!\n")
