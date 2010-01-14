@@ -56,7 +56,7 @@ Array.prototype.has = function(v) {
 var gStateServer = null;
 var gPeriodicTimer = null;
 var gLastServerUpdate = null;
-var gTableFontSize = 83;  // percentage of font-size for the table as
+var gTableFontSize = 100;  // percentage of font-size for the table as
                           // compared to the rest of the document.
 
 var Init = function(stateserver_url) {
@@ -131,6 +131,7 @@ var RedrawTable = function() {
   table.frame = 'outline';
   table.rules = 'all';
   table.id = 'the_big_table';
+  table.style.fontFamily = 'Arial';
   table.style.fontSize = gTableFontSize + '%';
 
   // Record that we're redrawing now and when the last data update was.
@@ -222,22 +223,34 @@ var RedrawTable = function() {
   sorted_activities.sort(compare_activities);
   
   // Header row showing each user name.
-  tr = document.createElement("tr");
-  tr.appendChild(document.createElement("td"));
-  for (var u = 0; u < sorted_users.length; u++) {
-    var user = gUsers[sorted_users[u]];
-    var td = document.createElement("td");
-    td.innerHTML = user.name;
-    td.onclick = BindRenameWidget(td, user);
-    tr.appendChild(td);
-  }
-  table.appendChild(tr);
+  var AddHeaderRow = function() {
+    tr = document.createElement("tr");
+    tr.appendChild(document.createElement("td"));
+    for (var u = 0; u < sorted_users.length; u++) {
+      var user = gUsers[sorted_users[u]];
+      var td = document.createElement("td");
+      td.style.verticalAlign = 'top';
+      td.style.fontSize = '68%';
+      td.style.whiteSpace = 'nowrap';
+      td.innerHTML = user.name;
+      td.onclick = BindRenameWidget(td, user);
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  };
+
+  AddHeaderRow();
 
   var selected_tags = GetSelectedTags();
   var shade_this_row = false;
 
   // One row per activity.
   for (var a = 0; a < sorted_activities.length; a++) {
+    if (a % 30 == 29) {
+      // Every 30 activities show the header row again.
+      AddHeaderRow();
+    }
+
     var activity = gActivities[sorted_activities[a]];
     var tags_match = TagsMatch(selected_tags, activity.tags);
     
@@ -341,7 +354,6 @@ var ShowUpdateWidget = function(td, user, activity) {
     UpdateStatusAndRedraw(user, activity, now - 15 * 60 * 1000, true, null);
   };
   if (!IsExclusiveAssignment(user.id, activity.id)) {
-    log('setting class to nonexclusive');
     document.getElementById('btnCurrently').className = 'nonexclusive';
     document.getElementById('btnRecently').className = 'nonexclusive';
   }
@@ -383,6 +395,11 @@ var ShowUpdateWidget = function(td, user, activity) {
 
   var left = table.offsetLeft + td.offsetLeft + 10;
   var top = table.offsetTop + td.offsetTop + 10;
+
+  // Don't show the widget beyond the right side of the page.
+  if (left + div.offsetWidth > document.body.clientWidth) {
+    left = document.body.clientWidth - div.offsetWidth;
+  }
 
   div.style.left = left;
   div.style.top = top;
@@ -471,4 +488,35 @@ var AdjustTableFontSize = function(factor) {
   document.getElementById('the_big_table').style.fontSize = gTableFontSize + '%';
   // Don't bother redrawing it because we're resizing it directly.
   //  RedrawTable();
+};
+
+var CreateTestData = function() {
+  // For safety's sake.  Remove this return to actually create test data.
+  // Note that it sends this data to the stateserver so you need to create
+  // it only once per channel you want to test with.
+  return;
+
+  // Make puzzles with metas.  Expect about 11 metas with 7 puzzles each.
+  for (var m = 0; m < 11; m++) {
+    for (var p = 0; p < 7; p++) {
+      var id;
+      // p is for puzzle.
+      do id = "p" + Math.floor(Math.random() * 10000);
+      while (gActivities[id]);
+      
+      gStateServer.set(id + '.label', 'Puzzle ' + m + '.' + p);
+      gStateServer.set(id + '.tags', 'meta' + m);
+    }
+  }
+
+  // Some non-puzzle activities.
+  for (var a = 0; a < 8; a++) {
+    InternalUpdateActivity(-1, 'Activity ' + a);
+  }
+
+  // Create some people.
+  for (var u = 0; u < 20; u++) {
+    InternalAddPerson(-1, 'Person ' + u);
+  }
+
 };
