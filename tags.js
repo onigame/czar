@@ -3,6 +3,9 @@
 // a client to decide what to do in response to filtering items.  See czar.js
 // for an example client usage.
 
+// TODOs
+// x Selector should look okay when there's lots of tags.
+
 var SanitizeTagList = function(str) {
   // Sanitize the list of tags the user gave us.
 
@@ -119,7 +122,20 @@ var MakeTagSelector = function(parent, filter_tags) {
   parent.style.padding = '10px';
   span.style.padding = '8px';
 
-  span.appendChild(document.createTextNode('Filter by tags: '));
+  var table = document.createElement('table');
+  table.style.backgroundColor = '#ffffcc';
+  table.style.border = 'thin solid #ffcc00';
+  parent.style.padding = '10px';
+  table.style.padding = '8px';
+
+  var tr = document.createElement('tr');
+  var td = document.createElement('td');
+  td.style.verticalAlign = 'top';
+  td.innerHTML = 'Filter by tags:';
+  tr.appendChild(td);
+
+  td = document.createElement('td');
+  td.style.verticalAlign = 'top';
 
   for (var i = 0; i < gTags.length; i++) {
     var tag = gTags[i];
@@ -141,7 +157,11 @@ var MakeTagSelector = function(parent, filter_tags) {
     label.style.paddingRight = '0.5em';
     label.appendChild(input);
 
-    span.appendChild(label);
+    td.appendChild(label);
+
+    if (i % 8 == 7) {
+      td.appendChild(document.createElement('br'));
+    }
   }
 
   var label = document.createElement('label');
@@ -152,7 +172,10 @@ var MakeTagSelector = function(parent, filter_tags) {
   input.onchange = filter_tags;
   input.id = 'invert';
   label.appendChild(input);
-  span.appendChild(label);
+  td.appendChild(label);
 
-  parent.appendChild(span);
+  tr.appendChild(td);
+  table.appendChild(tr);
+
+  parent.appendChild(table);
 };
