@@ -91,10 +91,8 @@ class Channel:
       for key, value in values.items():
         version = self.__version + 1
         if self.__update(key, value, version, version):
-          self.__file.write("%d\t%s\t%s\n" % (
-              version,
-              json.write(key),
-              json.write(value)))
+          self.__file.write(("%d\t%s\t%s\n" % (
+              version, json.write(key), json.write(value))).encode("utf-8"))
 
       self.__file.flush()
 
@@ -152,7 +150,7 @@ class Channel:
 
         start_version = self.__version
         if catchups == 5 or not data:
-          for line in data: tmpfile.write(line)
+          for line in data: tmpfile.write(line.encode("utf-8"))
           tmpfile.close()
           self.__file.close()
           os.rename(tmpname, self.__filename)
@@ -164,7 +162,7 @@ class Channel:
       finally:
         self.__condition.release()
 
-      for line in data: tmpfile.write(line)
+      for line in data: tmpfile.write(line.encode("utf-8"))
       tmpfile.flush()
       catchups += 1
 
@@ -212,7 +210,7 @@ class Channel:
 
     try:
       for line in self.__file:
-        version, key, value = line.strip().split("\t")
+        version, key, value = line.decode("utf-8").strip().split("\t")
         if ":" in version:
           create, modify = map(int, version.split(":"))
         else:
@@ -280,7 +278,12 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
   def do_GET(self):
     scheme, host, path, params, query, fragment = urlparse.urlparse(self.path)
-    args = dict(cgi.parse_qsl(query))
+
+    try:
+      args = dict([(k, v.decode("utf-8")) for k, v in cgi.parse_qsl(query)])
+    except Exception, e:
+      self.send_error(400, "Invalid query encoding: " + query)
+      return
 
     if path[:1] != "/" or "/" in path[1:]:
       self.send_error(400, "Invalid path: " + path)
@@ -294,6 +297,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
       timeout = int(args.get("time", 0))
       update = json.read(args.get("set", "null"))
     except Exception, e:
+      print "*** Invalid args (%s):" % e, args
       self.send_error(400, str(e))
       return
 
@@ -307,21 +311,17 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
       new_version, data = channel.get(old_version, timeout)
     except Exception, e:
       self.send_error(500, str(e))
-      raise e
+      raise
 
-    try:
-      if jsona: jsona = "%s," % jsona
-      output = "%s(%s%d,%s)\n" % (jsonp, jsona, new_version, json.write(data))
-      self.send_response(200)
-      self.send_header("Content-type", "text/javascript")
-      self.send_header("Pragma", "no-cache")
-      self.send_header("Cache-control", "no-cache")
-      self.end_headers()
-      self.wfile.write(output)
-      self.wfile.close()
-    except Exception, e:
-      print "***", args
-
+    if jsona: jsona = "%s," % jsona
+    output = "%s(%s%d,%s)\n" % (jsonp, jsona, new_version, json.write(data))
+    self.send_response(200)
+    self.send_header("Content-type", "text/javascript; charset=utf-8")
+    self.send_header("Pragma", "no-cache")
+    self.send_header("Cache-control", "no-cache")
+    self.end_headers()
+    self.wfile.write(output.encode("utf-8"))
+    self.wfile.close()
 
 
 class Server(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
