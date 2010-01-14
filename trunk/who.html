@@ -93,6 +93,11 @@ Sort:
 	   <label for=radioRecencyReverse>
 	    <input type=radio name="sortOrder" id=radioRecencyReverse
 	    onchange=RedrawTable()>By&nbsp;recency&nbsp;(reverse)</label>
+	    <input type=radio name="sortOrder" id=radioUser
+	    onchange=RadioUserSelected()>By&nbsp;User:</label>
+            <select disabled id=sortUserSelect>
+              <option value="">Select...</option>
+            </select>
 </span>
 </div>
 
