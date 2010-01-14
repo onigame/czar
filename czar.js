@@ -158,7 +158,6 @@ var watch_deadline = function(form) {
   } else {
     var delay = 60000 + Math.random() * 60000;
     form.className = "deleted";
-    UpdateBackgroundColors();
     form.czar_timeout = window.setTimeout(callme, delay);
   }
 }
@@ -194,7 +193,6 @@ var sort_forms = function() {
     }
   }
   UpdateTagsSelector();
-  UpdateBackgroundColors();
 }
 
 var bind_input = function(input, prompt) {
@@ -409,30 +407,6 @@ var UpdateActives = function(name) {
   }
 };
 
-var UpdateBackgroundColors = function() {
-  // We don't really have a great way of iterating through all
-  // the puzzles on the page without just looking at the HTML DOM.
-  var itemList = document.getElementById('items');
-  var is_dark = false;
-  for (var i=0; i < itemList.childNodes.length; ++i) {
-    // do stuff with alternating background colors.
-    var puzzle = itemList.childNodes[i];
-    if (puzzle.style.display != "none" && puzzle.className != "deleted") {
-      // only toggle color if the user can see it.
-      is_dark = !(is_dark);
-      var color = (is_dark) ? "#DDDDDD" : "#FFFFFF";
-      puzzle.style.backgroundColor = color;
-      for (var j=0; j < puzzle.childNodes.length; ++j) {
-        var child = puzzle.childNodes[j];
-        if (child.name == "label" || child.name == "status" || child.name == "tags") {
-          child.style.backgroundColor = color;
-          child.style.borderColor = color;
-        }
-      }
-    }
-  }
-};
-
 var UpdateAssignButtons = function() {
   // We don't really have a great way of iterating through all
   // the puzzles on the page without just looking at the HTML DOM.
@@ -583,7 +557,6 @@ var filter_tags = function() {
       node.style.display = IsSelectionInverted() ? "block" : "none";
     }
   }
-  UpdateBackgroundColors();
 };
 
 
