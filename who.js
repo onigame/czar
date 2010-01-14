@@ -129,6 +129,7 @@ var RedrawTable = function() {
   var table = document.createElement("table");
   table.frame = 'outline';
   table.rules = 'all';
+  table.id = 'the_big_table';
   table.style.fontSize = gTableFontSize + '%';
 
   // Record that we're redrawing now and when the last data update was.
@@ -465,11 +466,15 @@ var ToggleAutoUpdate = function(input) {
 };
 
 var TableFontSizeBigger = function() {
-  gTableFontSize = Math.Floor(gTableFontSize * 1.25);
-  RedrawTable();
+  gTableFontSize = Math.floor(gTableFontSize * 1.25);
+  document.getElementById('the_big_table').style.fontSize = gTableFontSize + '%';
+  // Don't bother redrawing it because we're resizing it directly.
+  //  RedrawTable();
 };
 
 var TableFontSizeSmaller = function() {
-  gTableFontSize = Math.Floor(gTableFontSize * 0.8);
-  RedrawTable();
+  gTableFontSize = Math.floor(gTableFontSize * 0.8);
+  document.getElementById('the_big_table').style.fontSize = gTableFontSize + '%';
+  // Don't bother redrawing it because we're resizing it directly.
+  //  RedrawTable();
 };
