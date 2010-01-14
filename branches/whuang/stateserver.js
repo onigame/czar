@@ -82,8 +82,6 @@ var stateserver = {
     var send_request = function() {
       reset();
 
-      log('send_request');
-
       if (sent_data == null) {
         sent_data = queued_data;
       } else if (queued_data != null) {
@@ -110,8 +108,6 @@ var stateserver = {
       } else {
         request_url += "&time=20";
       }
-
-      log('request_url: ' + request_url);
 
       script_tag = document.createElement("script");
       script_tag.type = "text/javascript";
