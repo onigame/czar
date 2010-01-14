@@ -33,10 +33,6 @@ var IsActiveAssignment = function(user, activity) {
 var UpdateAssignmentHack = null;
 
 var UpdateAssignment = function(user, activity, when, active, exclusive) {
-  log('uid ' + user + ' aid ' + activity +
-      ' when is ' + when + ' active is ' + active +
-      ' exclusive is ' + exclusive);
-
   if (when == null && active == null && exclusive == null) {
     // Delete this assignment.
     delete gLastSeenTime[user][activity];
@@ -212,7 +208,6 @@ var InternalUpdateActivity = function(id, name, tags) {
     activity.exclusive = true;
   }
   if (tags != null) {
-    log('Updating ' + id + ' with tags [' + tags + ']');
     activity.tags = tags;
   } else if (tags == null && activity.IsNonPuzzleActivity()) {
     activity.tags = 'activity';
@@ -220,7 +215,6 @@ var InternalUpdateActivity = function(id, name, tags) {
 };
 
 var ForgetPerson = function(id) {
-  log('Forgetting about ' + id + ' (' + gUsers[id].name + ')');
   delete gUsers[id];
 }
 var ForgetActivity = function(id) {
@@ -257,7 +251,6 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
       if (otherActivity != activity &&
 	  IsActiveAssignment(user.id, otherActivity.id) &&
 	  IsExclusiveAssignment(user.id, otherActivity.id)) {
-	log('Marking ' + user.id + '.' + otherActivity.id + ' as inactive.');
 	UpdateStatus(user, otherActivity, null, false, true);
       }
     }
