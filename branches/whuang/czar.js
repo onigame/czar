@@ -283,10 +283,39 @@ var the_form_html =
   "<span class=tooltip><input type=text name=sheet size=30></span>" +
   "<input type=text name=status size=50>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
-  "<select id=@NAME@.assign><option disabled>Assign</option></select>" +
+  "<select style='display:none' id=@NAME@.assign><option disabled>Assign</option></select>" +
+  "<input type=submit id=@NAME@.assignbutton value='Accept'>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
       "title='Nobody is working on this task.'>(0p)</span>" +
   "</form>";
+
+
+var add_user_to_whoami = function(whoami, user_key, user_name) {
+
+  log("adding " + user_key + " " + user_name + " to whoami");
+
+  // Create a canonical name used for sorting.  We hide this
+  // in the "id" tag of the option.
+  var canon_name = "whoami_sortkey_" + user_name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+  // Create an option element for the new user.
+  var option = document.createElement('option');
+  option.appendChild(document.createTextNode(user_name));
+  option.id = canon_name;
+  option.value = user_key;
+
+  var i = 0;
+  while (i < whoami.childNodes.length && whoami.childNodes[i].id < canon_name) {
+    i++;
+  }
+  if (i == whoami.childNodes.length) {
+    // past the last element
+    whoami.appendChild(option);
+  } else {
+    whoami.insertBefore(option, whoami.childNodes[i]);
+  }
+
+};
 
 var add_users_to_select = function(select) {
   //var select = document.createElement('select');
@@ -338,8 +367,8 @@ var make_form = function(name) {
   var tmp = document.getElementById("tmp");
   tmp.innerHTML = the_form_html.replace(/@NAME@/g, name);
 
+  // deal with the assign drop-down box.
   var assign = document.getElementById(name + '.assign');
-  //add_users_to_select(assign);
   assign.onfocus = function() { log('onfocus'); add_users_to_select(assign); };
   assign.onchange = function() {
     var uid = assign.options[assign.selectedIndex].value;
@@ -347,6 +376,22 @@ var make_form = function(name) {
     UpdateStatus(gUsers[uid], gActivities[name],
 		 (new Date()).valueOf(), true, true);
   };
+
+  // deal with the assign button.
+  var assignbutton = document.getElementById(name + '.assignbutton');
+  assignbutton.onclick = function() {
+    log('assignbutton for ' + name + ' clicked');
+    var whoami = document.getElementById('whoami');
+    var uid = whoami.options[whoami.selectedIndex].value;
+    if (uid == "") {
+      log('no valid name');
+      alert("Please tell me who you are first! (upper-left of page)");
+    } else {
+      log('assigning uid ' + uid);
+      UpdateStatus(gUsers[uid], gActivities[name],
+		 (new Date()).valueOf(), true, true);
+    }
+  }
 
   var form = tmp.firstChild;
   form.onsubmit = on_submit_edit;
@@ -414,6 +459,11 @@ var on_value = function(key, field, value) {
   // Called whenever key.field changes value.  key is the id of an HTML
   // form on this page.  field is any key, although some keys have special
   // significance.
+
+  // Do we have information about a new user?  If so, update the "whoami" list.
+  if (key[0] == "u" && field == "name") {
+    add_user_to_whoami(document.getElementById("whoami"), key, value);
+  }
 
   // Care only about puzzles (key starts with p).
   if (key[0] != "p" && key[0] != "x") return;
@@ -538,5 +588,6 @@ var start_czar = function(stateserver_url) {
   bind_input(document.forms.create.label, "Click to enter new puzzle name");
   document.forms.create.label.czar_autosubmit = false;
   document.forms.create.onsubmit = on_submit_create;
+
 }
 
