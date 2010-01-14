@@ -283,7 +283,6 @@ var the_form_html =
   "<span class=tooltip><input type=text name=sheet size=30></span>" +
   "<input type=text name=status size=50>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
-  "<select style='display:none' id=@NAME@.assign><option disabled>Assign</option></select>" +
   "<input type=submit id=@NAME@.assignbutton value='Accept'>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
       "title='Nobody is working on this task.'>(0p)</span>" +
@@ -317,65 +316,11 @@ var add_user_to_whoami = function(whoami, user_key, user_name) {
 
 };
 
-var add_users_to_select = function(select) {
-  //var select = document.createElement('select');
-
-  // Get a sorted list of users.
-  var compare_by_name = function(id1, id2) {
-    if (id1 == id2) return 0;
-    // If item 2 doesn't have a name then item 1 wins by default.  And vice
-    // versa.
-    if (!gUsers[id2] || !gUsers[id2].name) return -1;
-    if (!gUsers[id1] || !gUsers[id1].name) return 1;
-
-    // TODO(corin): precompute this key.
-    var name1 = gUsers[id1].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
-    var name2 = gUsers[id2].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
-
-    if (name1 < name2) return -1;
-    if (name1 > name2) return 1;
-    return 0;
-  };
-
-  var sorted_users = new Array();
-  for (u in gUsers) {
-    // Show a user only if they have a name.
-    if (gUsers[u].name) {
-      sorted_users.push(u);
-    }
-  }
-  sorted_users.sort(compare_by_name);
-
-  select.innerHTML = '';
-  var option = document.createElement('option');
-  option.appendChild(document.createTextNode('Assign'));
-  option.disabled = true;
-  select.appendChild(option);
-
-  for (var i = 0; i < sorted_users.length; i++) {
-    var user = gUsers[sorted_users[i]];
-    var option = document.createElement('option');
-    option.appendChild(document.createTextNode(user.name));
-    option.value = user.id;
-    select.appendChild(option);
-  }
-};
-
 var make_form = function(name) {
   // Makes a new form to represent a single puzzle.
 
   var tmp = document.getElementById("tmp");
   tmp.innerHTML = the_form_html.replace(/@NAME@/g, name);
-
-  // deal with the assign drop-down box.
-  var assign = document.getElementById(name + '.assign');
-  assign.onfocus = function() { log('onfocus'); add_users_to_select(assign); };
-  assign.onchange = function() {
-    var uid = assign.options[assign.selectedIndex].value;
-    log('uid is ' + uid);
-    UpdateStatus(gUsers[uid], gActivities[name],
-		 (new Date()).valueOf(), true, true);
-  };
 
   // deal with the assign button.
   var assignbutton = document.getElementById(name + '.assignbutton');
@@ -389,7 +334,7 @@ var make_form = function(name) {
     } else {
       log('assigning uid ' + uid);
       UpdateStatus(gUsers[uid], gActivities[name],
-		 (new Date()).valueOf(), true, true);
+                   (new Date()).valueOf(), true, true);
     }
   }
 
@@ -588,6 +533,5 @@ var start_czar = function(stateserver_url) {
   bind_input(document.forms.create.label, "Click to enter new puzzle name");
   document.forms.create.label.czar_autosubmit = false;
   document.forms.create.onsubmit = on_submit_create;
-
 }
 

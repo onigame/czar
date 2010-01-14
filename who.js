@@ -56,7 +56,8 @@ Array.prototype.has = function(v) {
 var gStateServer = null;
 var gPeriodicTimer = null;
 var gLastServerUpdate = null;
-var gTableFontSize = 83;
+var gTableFontSize = 83;  // percentage of font-size for the table as
+                          // compared to the rest of the document.
 
 var Init = function(stateserver_url) {
   UpdateTagsSelector();
@@ -465,15 +466,8 @@ var ToggleAutoUpdate = function(input) {
   }
 };
 
-var TableFontSizeBigger = function() {
-  gTableFontSize = Math.floor(gTableFontSize * 1.25);
-  document.getElementById('the_big_table').style.fontSize = gTableFontSize + '%';
-  // Don't bother redrawing it because we're resizing it directly.
-  //  RedrawTable();
-};
-
-var TableFontSizeSmaller = function() {
-  gTableFontSize = Math.floor(gTableFontSize * 0.8);
+var AdjustTableFontSize = function(factor) {
+  gTableFontSize = Math.floor(gTableFontSize * factor);
   document.getElementById('the_big_table').style.fontSize = gTableFontSize + '%';
   // Don't bother redrawing it because we're resizing it directly.
   //  RedrawTable();
