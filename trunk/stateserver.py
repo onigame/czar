@@ -270,7 +270,7 @@ class ChannelManager(threading.Thread):
 
         if size > channel.__last_size*2 and size > channel.__last_size + 65536:
           channel.rewrite()
-          size = channel.__last_size
+          channel.__last_size = os.path.getsize(filename)
 
       time.sleep(300)
 
