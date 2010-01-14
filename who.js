@@ -243,7 +243,7 @@ var RedrawTable = function() {
   AddHeaderRow();
 
   var selected_tags = GetSelectedTags();
-  var shade_this_row = false;
+  var shade_this_row = true;
 
   // One row per activity.
   for (var a = 0; a < sorted_activities.length; a++) {
@@ -275,7 +275,7 @@ var RedrawTable = function() {
     td.innerHTML = activity.name;
     if (activity.IsNonPuzzleActivity()) {
       // Non-puzzle activity.
-      td.className = 'nonpuzzle';
+      td.className = shade_this_row ? 'nonpuzzlelt' : 'nonpuzzledk';
       td.onclick = BindRenameWidget(td, activity);
     }
     tr.appendChild(td);

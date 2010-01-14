@@ -107,7 +107,7 @@ var on_submit_create = function() {
 }
 
 var watch_deadline = function(form) {
-  // Dunno what this is all about.
+  // This procedure is something about deleting forms.
 
   if (form.czar_timeout) {
     window.clearTimeout(form.czar_timeout);
@@ -142,7 +142,11 @@ var watch_deadline = function(form) {
       form.czar_timeout = window.setTimeout(callme, 1000);
     }
     var secs = Math.round((form.czar_deadline - now) / 1000);
-    form.status.value = "DELETED in " + secs + " seconds (click to undo)";
+    if (secs == 0) {
+      form.status.value = "already DELETED, just waiting for server to realize it";
+    } else {
+      form.status.value = "DELETED in " + secs + " seconds (click to undo)";
+    }
     form.status.className = "countdown";
   } else if (form.className == "deleted") {
     send_value(form, "label", null);
@@ -154,6 +158,7 @@ var watch_deadline = function(form) {
   } else {
     var delay = 60000 + Math.random() * 60000;
     form.className = "deleted";
+    UpdateBackgroundColors();
     form.czar_timeout = window.setTimeout(callme, delay);
   }
 }
@@ -189,6 +194,7 @@ var sort_forms = function() {
     }
   }
   UpdateTagsSelector();
+  UpdateBackgroundColors();
 }
 
 var bind_input = function(input, prompt) {
@@ -286,7 +292,7 @@ var the_form_html =
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
       "title='Nobody is working on this task.'>(0p)</span>" +
   "<input type=submit id=@NAME@.assignbutton value='WhoRU?'" +
-      " style='background-color:#888;color:#555;width:5em'" +
+      " style='background-color:#888;color:#555;width:5em;font-size:80%;border:2px outset;width:5em'" +
       " title='Please tell me who you are (upper-left).'>" +
   "</form>";
 
@@ -407,15 +413,21 @@ var UpdateBackgroundColors = function() {
   // We don't really have a great way of iterating through all
   // the puzzles on the page without just looking at the HTML DOM.
   var itemList = document.getElementById('items');
+  var is_dark = false;
   for (var i=0; i < itemList.childNodes.length; ++i) {
     // do stuff with alternating background colors.
     var puzzle = itemList.childNodes[i];
-    var color = (i % 2 == 0) ? "#DDDDDD" : "#FFFFFF";
-    puzzle.style.backgroundColor = color;
-    for (var j=0; j < puzzle.childNodes.length; ++j) {
-      var child = puzzle.childNodes[j];
-      if (child.name == "label" || child.name == "status" || child.name == "tags") {
-        child.style.backgroundColor = color;
+    if (puzzle.style.display != "none" && puzzle.className != "deleted") {
+      // only toggle color if the user can see it.
+      is_dark = !(is_dark);
+      var color = (is_dark) ? "#DDDDDD" : "#FFFFFF";
+      puzzle.style.backgroundColor = color;
+      for (var j=0; j < puzzle.childNodes.length; ++j) {
+        var child = puzzle.childNodes[j];
+        if (child.name == "label" || child.name == "status" || child.name == "tags") {
+          child.style.backgroundColor = color;
+          child.style.borderColor = color;
+        }
       }
     }
   }
@@ -430,7 +442,8 @@ var UpdateAssignButtons = function() {
  
     var assignbuttonName = itemList.childNodes[i].name + ".assignbutton";
     var assignbutton = document.getElementById(assignbuttonName);
-    assignbutton.style.border = '1px solid';
+    assignbutton.style.fontSize = '80%';
+    assignbutton.style.border = '2px outset';
 
     var puzzle = assignbutton.id.split('.')[0];
 
@@ -562,6 +575,7 @@ var filter_tags = function() {
   // selects all puzzles.
   for (var node=document.getElementById("items").firstChild; 
        node != null; node=node.nextSibling) {
+    if (node.className == "deleted") continue;  // skip over deleted forms.
     if (TagsMatch(selected,
 		  document.getElementById(node.name + ".tags").value)) {
       node.style.display = IsSelectionInverted() ? "none" : "block";
@@ -569,6 +583,7 @@ var filter_tags = function() {
       node.style.display = IsSelectionInverted() ? "block" : "none";
     }
   }
+  UpdateBackgroundColors();
 };
 
 
