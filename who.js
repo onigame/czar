@@ -119,6 +119,61 @@ var DisplayTime = function(d) {
   return s;
 };
 
+var compare_by_name = function(id1, id2, storage) {
+  if (id1 == id2) return 0;
+  // If item 2 doesn't have a name then item 1 wins by default.  And vice
+  // versa.
+  if (!storage[id2] || !storage[id2].name) return -1;
+  if (!storage[id1] || !storage[id1].name) return 1;
+
+  // TODO(corin): precompute this key.
+  var name1 = storage[id1].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  var name2 = storage[id2].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+  if (name1 < name2) return -1;
+  if (name1 > name2) return 1;
+  return 0;
+};
+
+var GetSortedUsers = function() {
+
+  // Get a sorted list of users and activities.
+
+  var sorted_users = new Array();
+  for (u in gUsers) {
+    // Show a user only if they have a name.
+    if (gUsers[u].name) {
+      sorted_users.push(u);
+    }
+  }
+  sorted_users.sort(function(id1, id2) {
+      return compare_by_name(id1, id2, gUsers); });
+
+  return sorted_users;
+};
+
+var RadioUserSelected = function() {
+  // We just had a request to sort by users.  Populate the sortUserSelect select
+  // tag with the list of users and allow them to callback.
+  sorted_users = GetSortedUsers();
+  
+  var select = document.getElementById("sortUserSelect");
+
+  select.innerHTML = '';
+  for (var i = 0; i < sorted_users.length; i++) {
+    var user = gUsers[sorted_users[i]];
+    var option = document.createElement('option');
+    option.appendChild(document.createTextNode(user.name));
+    option.value = user.id;
+    select.appendChild(option);
+    option.selected = true;
+  }
+
+  select.disabled = false;
+  select.onchange = RedrawTable;
+  RedrawTable;
+};
+
 
 var RedrawTable = function() {
   // Recreate the HTML <table> showing who's been working on what activity.
@@ -143,33 +198,7 @@ var RedrawTable = function() {
 
   var tr;
 
-  // Get a sorted list of users and activities.
-  var compare_by_name = function(id1, id2, storage) {
-    if (id1 == id2) return 0;
-    // If item 2 doesn't have a name then item 1 wins by default.  And vice
-    // versa.
-    if (!storage[id2] || !storage[id2].name) return -1;
-    if (!storage[id1] || !storage[id1].name) return 1;
-
-    // TODO(corin): precompute this key.
-    var name1 = storage[id1].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
-    var name2 = storage[id2].name.toLowerCase().replace(/[^a-z0-9]+/g, "");
-
-    if (name1 < name2) return -1;
-    if (name1 > name2) return 1;
-    return 0;
-  };
-
-  var sorted_users = new Array();
-  for (u in gUsers) {
-    // Show a user only if they have a name.
-    if (gUsers[u].name) {
-      sorted_users.push(u);
-    }
-  }
-  sorted_users.sort(function(id1, id2) {
-      return compare_by_name(id1, id2, gUsers); });
-
+  var sorted_users = GetSortedUsers();
 
   // When was the most recent activity for each activity?
   var mostRecentActivity = {};
@@ -192,6 +221,9 @@ var RedrawTable = function() {
     sortOrder = 'recency';
   } else if (document.getElementById('radioRecencyReverse').checked) {
     sortOrder = 'recencyReverse';
+  } else if (document.getElementById('radioUser').checked) {
+    var select = document.getElementById("sortUserSelect");
+    sortOrder = select.options[select.selectedIndex].value;
   }
 
   var compare_activities = function(id1, id2) {
@@ -199,21 +231,35 @@ var RedrawTable = function() {
     var id2_is_nonpuzzle = (id2[0] == 'a');
 
     // Puzzles precede non-puzzle activities.
-    if (!id1_is_nonpuzzle && id2_is_nonpuzzle) return -1;
-    if (id1_is_nonpuzzle && !id2_is_nonpuzzle) return 1;
-    if (sortOrder == 'alpha') return compare_by_name(id1, id2, gActivities);
+    if (sortOrder == 'alpha') {
+      if (!id1_is_nonpuzzle && id2_is_nonpuzzle) return -1;
+      if (id1_is_nonpuzzle && !id2_is_nonpuzzle) return 1;
+      return compare_by_name(id1, id2, gActivities);
+    }
     var t1 = mostRecentActivity[id1];
     var t2 = mostRecentActivity[id2];
     if (sortOrder == 'recency') {
+      if (!id1_is_nonpuzzle && id2_is_nonpuzzle) return -1;
+      if (id1_is_nonpuzzle && !id2_is_nonpuzzle) return 1;
       if (t1 == t2) return 0;
       if (t2 == null) return -1;
       if (t1 == null) return 1;
       return t2 - t1;
     } else if (sortOrder == 'recencyReverse') {
+      if (!id1_is_nonpuzzle && id2_is_nonpuzzle) return -1;
+      if (id1_is_nonpuzzle && !id2_is_nonpuzzle) return 1;
       if (t1 == t2) return 0;
       if (t2 == null) return 1;
       if (t1 == null) return -1;
       return t1 - t2;
+    } else {
+      // sortOrder is a user_id
+      t1 = LastSeenTime(sortOrder, id1);
+      t2 = LastSeenTime(sortOrder, id2);
+      if (t1 == t2) return 0;
+      if (t2 == 0) return -1;
+      if (t1 == 0) return 1;
+      return t2 - t1;
     }
   };
 
