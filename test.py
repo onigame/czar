@@ -34,15 +34,16 @@ Add two more items, one redundant; only bumps the version by +1.
 
 
 Modify the first item and the last item; version is bumped by +2.
+Verify that non-ASCII characters survive.
 
->>> channel.set({1: "one+", 3: "three+"})
+>>> channel.set({1: "one+", 3: u"\u4e09"})
 
 >>> pprint.pprint([channel.get(n, 0) for n in range(6)])
-[(5, {1: 'one+', 2: 'two', 3: 'three+'}),
- (5, {1: 'one+', 2: 'two', 3: 'three+'}),
- (5, {1: 'one+', 3: 'three+'}),
- (5, {1: 'one+', 3: 'three+'}),
- (5, {3: 'three+'}),
+[(5, {1: 'one+', 2: 'two', 3: u'\u4e09'}),
+ (5, {1: 'one+', 2: 'two', 3: u'\u4e09'}),
+ (5, {1: 'one+', 3: u'\u4e09'}),
+ (5, {1: 'one+', 3: u'\u4e09'}),
+ (5, {3: u'\u4e09'}),
  (5, {})]
 
 
@@ -52,11 +53,11 @@ Empty values (like "" or 0) should not delete.
 >>> channel.set({0: "", 1: 0, 2: None, 4: None})
 
 >>> pprint.pprint([channel.get(n, 0) for n in range(9)])
-[(8, {0: '', 1: 0, 3: 'three+'}),
- (8, {0: '', 1: 0, 3: 'three+'}),
- (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
- (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
- (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
+[(8, {0: '', 1: 0, 3: u'\u4e09'}),
+ (8, {0: '', 1: 0, 3: u'\u4e09'}),
+ (8, {0: '', 1: 0, 2: None, 3: u'\u4e09'}),
+ (8, {0: '', 1: 0, 2: None, 3: u'\u4e09'}),
+ (8, {0: '', 1: 0, 2: None, 3: u'\u4e09'}),
  (8, {0: '', 1: 0, 2: None}),
  (8, {1: 0, 2: None}),
  (8, {2: None}),
@@ -69,11 +70,11 @@ Reload the channel from the data file, make sure it's intact.
 >>> channel = stateserver.Channel("test.state")
 >>> pprint.pprint([channel.get(n, 0) for n in range(9)])
 Read 4 keys: test.state
-[(8, {0: '', 1: 0, 3: 'three+'}),
- (8, {0: '', 1: 0, 3: 'three+'}),
- (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
- (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
- (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
+[(8, {0: '', 1: 0, 3: u'\u4e09'}),
+ (8, {0: '', 1: 0, 3: u'\u4e09'}),
+ (8, {0: '', 1: 0, 2: None, 3: u'\u4e09'}),
+ (8, {0: '', 1: 0, 2: None, 3: u'\u4e09'}),
+ (8, {0: '', 1: 0, 2: None, 3: u'\u4e09'}),
  (8, {0: '', 1: 0, 2: None}),
  (8, {1: 0, 2: None}),
  (8, {2: None}),
@@ -93,11 +94,11 @@ True
 >>> after_rewrite < os.path.getsize("test.state")
 True
 >>> pprint.pprint([channel.get(n, 0) for n in range(10)])
-[(9, {0: '', 1: 0, 3: 'three+', 4: 'four'}),
- (9, {0: '', 1: 0, 3: 'three+', 4: 'four'}),
- (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
- (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
- (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
+[(9, {0: '', 1: 0, 3: u'\u4e09', 4: 'four'}),
+ (9, {0: '', 1: 0, 3: u'\u4e09', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: u'\u4e09', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: u'\u4e09', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: u'\u4e09', 4: 'four'}),
  (9, {0: '', 1: 0, 2: None, 4: 'four'}),
  (9, {1: 0, 2: None, 4: 'four'}),
  (9, {2: None, 4: 'four'}),
@@ -111,15 +112,15 @@ Reload the rewritten state file to make sure it's all good.
 >>> channel = stateserver.Channel("test.state")
 >>> pprint.pprint([channel.get(n, 0) for n in range(10)])
 Read 5 keys: test.state
-[(9, {0: '', 1: 0, 3: 'three+', 4: 'four'}),
- (9, {0: '', 1: 0, 3: 'three+', 4: 'four'}),
- (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
- (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
- (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
- (9, {0: '', 1: 0, 2: None, 4: 'four'}),
- (9, {1: 0, 2: None, 4: 'four'}),
- (9, {2: None, 4: 'four'}),
- (9, {4: 'four'}),
+[(9, {0: '', 1: 0, 3: u'\u4e09', 4: u'four'}),
+ (9, {0: '', 1: 0, 3: u'\u4e09', 4: u'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: u'\u4e09', 4: u'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: u'\u4e09', 4: u'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: u'\u4e09', 4: u'four'}),
+ (9, {0: '', 1: 0, 2: None, 4: u'four'}),
+ (9, {1: 0, 2: None, 4: u'four'}),
+ (9, {2: None, 4: u'four'}),
+ (9, {4: u'four'}),
  (9, {})]
 
 """
