@@ -47,39 +47,44 @@ Modify the first item and the last item; version is bumped by +2.
 
 
 Delete something, make sure that works properly.
+Empty values (like "" or 0) should not delete.
 
->>> channel.set({2: None})
+>>> channel.set({0: "", 1: 0, 2: None, 4: None})
 
->>> pprint.pprint([channel.get(n, 0) for n in range(7)])
-[(6, {1: 'one+', 3: 'three+'}),
- (6, {1: 'one+', 3: 'three+'}),
- (6, {1: 'one+', 2: None, 3: 'three+'}),
- (6, {1: 'one+', 2: None, 3: 'three+'}),
- (6, {2: None, 3: 'three+'}),
- (6, {2: None}),
- (6, {})]
+>>> pprint.pprint([channel.get(n, 0) for n in range(9)])
+[(8, {0: '', 1: 0, 3: 'three+'}),
+ (8, {0: '', 1: 0, 3: 'three+'}),
+ (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
+ (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
+ (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
+ (8, {0: '', 1: 0, 2: None}),
+ (8, {1: 0, 2: None}),
+ (8, {2: None}),
+ (8, {})]
 
 
 Reload the channel from the data file, make sure it's intact.
 
 >>> channel = None
 >>> channel = stateserver.Channel("test.state")
->>> pprint.pprint([channel.get(n, 0) for n in range(7)])
-Read 3 keys: test.state
-[(6, {1: 'one+', 3: 'three+'}),
- (6, {1: 'one+', 3: 'three+'}),
- (6, {1: 'one+', 2: None, 3: 'three+'}),
- (6, {1: 'one+', 2: None, 3: 'three+'}),
- (6, {2: None, 3: 'three+'}),
- (6, {2: None}),
- (6, {})]
+>>> pprint.pprint([channel.get(n, 0) for n in range(9)])
+Read 4 keys: test.state
+[(8, {0: '', 1: 0, 3: 'three+'}),
+ (8, {0: '', 1: 0, 3: 'three+'}),
+ (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
+ (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
+ (8, {0: '', 1: 0, 2: None, 3: 'three+'}),
+ (8, {0: '', 1: 0, 2: None}),
+ (8, {1: 0, 2: None}),
+ (8, {2: None}),
+ (8, {})]
 
 
 Make sure rewrite() works properly, reducing the file size.
 
 >>> before_rewrite = os.path.getsize("test.state")
 >>> channel.rewrite()
-Rewrote 3 keys: test.state
+Rewrote 4 keys: test.state
 >>> after_rewrite = os.path.getsize("test.state")
 >>> after_rewrite < before_rewrite
 True
@@ -87,31 +92,35 @@ True
 >>> channel.set({4: "four"})
 >>> after_rewrite < os.path.getsize("test.state")
 True
->>> pprint.pprint([channel.get(n, 0) for n in range(8)])
-[(7, {1: 'one+', 3: 'three+', 4: 'four'}),
- (7, {1: 'one+', 3: 'three+', 4: 'four'}),
- (7, {1: 'one+', 2: None, 3: 'three+', 4: 'four'}),
- (7, {1: 'one+', 2: None, 3: 'three+', 4: 'four'}),
- (7, {2: None, 3: 'three+', 4: 'four'}),
- (7, {2: None, 4: 'four'}),
- (7, {4: 'four'}),
- (7, {})]
+>>> pprint.pprint([channel.get(n, 0) for n in range(10)])
+[(9, {0: '', 1: 0, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 4: 'four'}),
+ (9, {1: 0, 2: None, 4: 'four'}),
+ (9, {2: None, 4: 'four'}),
+ (9, {4: 'four'}),
+ (9, {})]
 
 
 Reload the rewritten state file to make sure it's all good.
 
 >>> channel = None
 >>> channel = stateserver.Channel("test.state")
->>> pprint.pprint([channel.get(n, 0) for n in range(8)])
-Read 4 keys: test.state
-[(7, {1: 'one+', 3: 'three+', 4: 'four'}),
- (7, {1: 'one+', 3: 'three+', 4: 'four'}),
- (7, {1: 'one+', 2: None, 3: 'three+', 4: 'four'}),
- (7, {1: 'one+', 2: None, 3: 'three+', 4: 'four'}),
- (7, {2: None, 3: 'three+', 4: 'four'}),
- (7, {2: None, 4: 'four'}),
- (7, {4: 'four'}),
- (7, {})]
+>>> pprint.pprint([channel.get(n, 0) for n in range(10)])
+Read 5 keys: test.state
+[(9, {0: '', 1: 0, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 3: 'three+', 4: 'four'}),
+ (9, {0: '', 1: 0, 2: None, 4: 'four'}),
+ (9, {1: 0, 2: None, 4: 'four'}),
+ (9, {2: None, 4: 'four'}),
+ (9, {4: 'four'}),
+ (9, {})]
 
 """
 

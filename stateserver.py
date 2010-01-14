@@ -116,7 +116,7 @@ class Channel:
       data = {}
       update = self.__latest_update
       while update and update.modify_version > version:
-        if update.value or update.create_version <= version:
+        if update.value is not None or update.create_version <= version:
           data[update.key] = update.value
         update = update.prev
 
@@ -314,6 +314,8 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
       output = "%s(%s%d,%s)\n" % (jsonp, jsona, new_version, json.write(data))
       self.send_response(200)
       self.send_header("Content-type", "text/javascript")
+      self.send_header("Pragma", "no-cache")
+      self.send_header("Cache-control", "no-cache")
       self.end_headers()
       self.wfile.write(output)
       self.wfile.close()
