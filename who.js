@@ -56,6 +56,7 @@ Array.prototype.has = function(v) {
 var gStateServer = null;
 var gPeriodicTimer = null;
 var gLastServerUpdate = null;
+var gTableFontSize = 83;
 
 var Init = function(stateserver_url) {
   UpdateTagsSelector();
@@ -128,7 +129,7 @@ var RedrawTable = function() {
   var table = document.createElement("table");
   table.frame = 'outline';
   table.rules = 'all';
-  table.style.fontSize = '83%';
+  table.style.fontSize = gTableFontSize + '%';
 
   // Record that we're redrawing now and when the last data update was.
   var caption = table.createCaption();
@@ -463,3 +464,12 @@ var ToggleAutoUpdate = function(input) {
   }
 };
 
+var TableFontSizeBigger = function() {
+  gTableFontSize = Math.Floor(gTableFontSize * 1.25);
+  RedrawTable();
+};
+
+var TableFontSizeSmaller = function() {
+  gTableFontSize = Math.Floor(gTableFontSize * 0.8);
+  RedrawTable();
+};
