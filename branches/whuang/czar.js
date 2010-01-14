@@ -284,7 +284,8 @@ var the_form_html =
   "<input type=text name=status size=50>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
   "<select id=@NAME@.assign><option disabled>Assign</option></select>" +
-  "<span id=@NAME@.actives>(0 actives)</span>" +
+  "<span style=\"cursor:pointer;cursor:hand\" id=@NAME@.actives " +
+      "title='Nobody is working on this task.'>(0p)</span>" +
   "</form>";
 
 var add_users_to_select = function(select) {
@@ -390,14 +391,25 @@ var UpdateAssignmentHack = function(uid, aid, when, active, exclusive) {
 
 var UpdateActives = function(name) {
   log('UpdateActives for ' + name);
-
-  var actives = 0;
+  var activecount = 0;
+  var displaystring = "";
   for (u in gUsers) {
-    if (IsActiveAssignment(gUsers[u].id, name)) actives++;
+    if (IsActiveAssignment(gUsers[u].id, name)) {
+      activecount++;
+      if (displaystring != "") displaystring += ", ";
+      displaystring += gUsers[u].name;
+    }
   }
   var span = document.getElementById(name + '.actives');
   if (span) {
-    span.innerHTML = '(' + actives + ' active' + (actives == 1 ? '' : 's') + ')';
+    span.innerHTML = '(' + activecount + 'p)';
+    if (activecount == 0) {
+      span.title = "Nobody is working on this task.";
+    } else if (activecount == 1) {
+      span.title = displaystring + " is the only person working on this task.";
+    } else {
+      span.title = "There are " + activecount + " people working on this task:" + displaystring;
+    }
   }
 };
 
