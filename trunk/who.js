@@ -64,7 +64,7 @@ var Init = function(stateserver_url) {
   gStateServer = stateserver.open(stateserver_url, function(key, value) {
       HandleUpdateFromStateserver(key, value);
       gLastServerUpdate = new Date();
-      RedrawTable();
+      RedrawTableSoon();
     });
 
   RedrawTable();
@@ -91,6 +91,16 @@ var PeriodicRedrawTable = function() {
 var SchedulePeriodicRedrawTable = function() {
   gPeriodicTimer = window.setTimeout(PeriodicRedrawTable, 60 * 1000);
 };
+
+var gOneRedrawTimer = null;
+var RedrawTableSoon = function() {
+  if (gOneRedrawTimer == null) {
+    gOneRedrawTimer = window.setTimeout(function() {
+	gOneRedrawTimer = null;
+	RedrawTable();
+      }, 250);
+  }
+}
 
 var DisplayTime = function(d) {
   if (!d)

@@ -2,9 +2,9 @@
 <html> <head>
 <title>who</title>
 <style>
-.active {background-color:#0f0; font-weight: normal;}
-.nonactive {background-color:#ccc; color:#666 }
-.nonexclusive {background-color:#c3f; color:#000; }
+.active { background-color:#0f0; font-weight: normal; }
+.nonactive { background-color:#ccc; color:#666 }
+.nonexclusive { background-color:#c3f; color:#000; }
 .never { background-color:#fff; }
 td.active {text-align:right}
 td.nonactive {text-align: right }
@@ -139,6 +139,7 @@ Add activity: <input onchange="AddActivity(this);"><br>
     <td>Juliet</td>
     <td>Mike</td>
     <td>Oscar</td>
+    <td>Romeo</td>
   </tr>
   <tr>
     <td>First puzzle</td>
@@ -146,6 +147,7 @@ Add activity: <input onchange="AddActivity(this);"><br>
     <td class=active>:05</td>
     <td></td>
     <td class=active>:23</td>
+    <td></td>
   </tr>
   <tr>
     <td>Second puzzle</td>
@@ -153,6 +155,7 @@ Add activity: <input onchange="AddActivity(this);"><br>
     <td class=nonactive>1:12</td>
     <td class=nonactive>1:07</td>
     <td></td>
+    <td class=active style="background-color:#f00">4:38</td>
   </tr>
   <tr>
     <td>Third puzzle</td>
@@ -160,12 +163,14 @@ Add activity: <input onchange="AddActivity(this);"><br>
     <td></td>
     <td></td>
     <td class=nonexclusive>:05</td>
+    <td></td>
   </tr>
   <tr>
     <td class=nonpuzzle>Sleeping</td>
     <td></td>
     <td></td>
     <td class=active>:15</td>
+    <td></td>
     <td></td>
   </tr>
 </table>
