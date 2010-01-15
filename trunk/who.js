@@ -301,8 +301,8 @@ var RedrawTable = function() {
     var activity = gActivities[sorted_activities[a]];
     var tags_match = TagsMatch(selected_tags, activity.tags);
     
-    var show_activity = ((tags_match && !IsSelectionInverted()) ||
-			 (!tags_match && IsSelectionInverted()));
+    var show_activity = ((tags_match && !selected_tags.invert) ||
+			 (!tags_match && selected_tags.invert));
 
     if (!show_activity) {
       log('Not showing activity ' + activity.name);

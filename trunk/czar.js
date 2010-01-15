@@ -552,9 +552,9 @@ var filter_tags = function() {
     if (node.className == "deleted") continue;  // skip over deleted forms.
     if (TagsMatch(selected,
 		  document.getElementById(node.name + ".tags").value)) {
-      node.style.display = IsSelectionInverted() ? "none" : "block";
+      node.style.display = selected.invert ? "none" : "block";
     } else {
-      node.style.display = IsSelectionInverted() ? "block" : "none";
+      node.style.display = selected.invert ? "block" : "none";
     }
   }
 };

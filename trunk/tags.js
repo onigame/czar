@@ -31,9 +31,6 @@ var SanitizeTagList = function(str) {
   return str;
 };
 
-// When true show only those items that do _not_ match the selected tags.
-//var gInvertTags = false;
-
 // Array of all known tags, in order as shown to users.
 var gTags = [];
 var gTagCounts = {};
@@ -46,6 +43,7 @@ var GetSelectedTags = function() {
   var selected = {};
   selected.tags = {};
   selected.num = 0;
+  selected.invert = document.getElementById('invert').checked;
 
   // What tags are selected?
   for (var i = 0; i < gTags.length; i++) {
@@ -53,6 +51,13 @@ var GetSelectedTags = function() {
       selected.tags[gTags[i]] = true;
       selected.num++;
     }
+  }
+
+  // The 'unsolved' tag is in the UI only, it's not data that's recorded in
+  // stateserver.
+  selected.unsolved = document.getElementById('unsolved').checked;
+  if (selected.unsolved) {
+    selected.num++;
   }
 
   return selected;
@@ -64,17 +69,21 @@ var TagsMatch = function(selected, taglist) {
 
   var tags = taglist.split(',');
   var num_tags_match = 0;
+  var unsolved = true;
   for (var i = 0; i < tags.length; i++) {
     if (selected.tags[tags[i]]) {
       num_tags_match++;
     }
+    if (tags[i] == 'solved') {
+      unsolved = false;
+    }
+  }
+
+  if (selected.unsolved && unsolved) {
+    num_tags_match++;
   }
 
   return num_tags_match == selected.num;
-};
-
-var IsSelectionInverted = function() {
-  return document.getElementById('invert').checked;
 };
 
 var ResetTags = function() {
@@ -137,42 +146,48 @@ var MakeTagSelector = function(parent, filter_tags) {
   td = document.createElement('td');
   td.style.verticalAlign = 'top';
 
+  var num_checkboxes_added = 0;
+  var AddTagCheckbox = function(parent, tag, id, value, count) {
+    var label = document.createElement('label');
+    label.appendChild(document.createTextNode(tag));
+    if (count != null) {
+      var s = document.createElement('span');
+      s.style.fontSize = '68%';
+      s.appendChild(document.createTextNode('(' + count + ')'));
+      label.appendChild(s);
+    }
+    var input = document.createElement('input');
+    input.type = 'checkbox';
+    input.onchange = filter_tags;
+    input.id = id;
+    if (value != null) {
+      input.value = value;
+    }
+    label.style.paddingRight = '0.5em';
+    label.appendChild(input);
+    parent.appendChild(label);
+
+    if (num_checkboxes_added % 8 == 7) {
+      parent.appendChild(document.createElement('br'));
+    }
+
+    num_checkboxes_added++;
+  };
+
   for (var i = 0; i < gTags.length; i++) {
     var tag = gTags[i];
     var count = gTagCounts[tag];
     var id = 'checkbox.Tag' + i;
 
-    var label = document.createElement('label');
-    label.htmlFor = id;
-    label.appendChild(document.createTextNode(tag));
-    var s = document.createElement('span');
-    s.style.fontSize = '68%';
-    s.appendChild(document.createTextNode('(' + count + ')'));
-    label.appendChild(s);
-    var input = document.createElement('input');
-    input.type = 'checkbox';
-    input.onchange = filter_tags;
-    input.id = id;
-    input.value = i;
-    label.style.paddingRight = '0.5em';
-    label.appendChild(input);
+    AddTagCheckbox(td, tag, id, i, count);
 
-    td.appendChild(label);
-
-    if (i % 8 == 7) {
-      td.appendChild(document.createElement('br'));
-    }
+    //if (i % 8 == 7) {
+    //  td.appendChild(document.createElement('br'));
+    //}
   }
 
-  var label = document.createElement('label');
-  label.htmlFor = 'invert';
-  label.appendChild(document.createTextNode('invert'));
-  var input = document.createElement('input');
-  input.type = 'checkbox';
-  input.onchange = filter_tags;
-  input.id = 'invert';
-  label.appendChild(input);
-  td.appendChild(label);
+  AddTagCheckbox(td, 'INVERT', 'invert', null, null);
+  AddTagCheckbox(td, 'UNSOLVED', 'unsolved', null, null);
 
   tr.appendChild(td);
   table.appendChild(tr);
