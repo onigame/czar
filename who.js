@@ -271,7 +271,7 @@ var RedrawTable = function() {
   
   // Header row showing each user name.
   var AddHeaderRow = function() {
-    tr = document.createElement("tr");
+    var tr = document.createElement("tr");
     tr.appendChild(document.createElement("td"));
     for (var u = 0; u < sorted_users.length; u++) {
       var user = gUsers[sorted_users[u]];
@@ -286,16 +286,25 @@ var RedrawTable = function() {
     table.appendChild(tr);
   };
 
-  AddHeaderRow();
+  var AddSmallGap = function() {
+    var tr = document.createElement('tr');
+    var td = document.createElement('td');
+    td.colSpan = sorted_users.length + 1;
+    td.style.backgroundColor = '#ccc';
+    tr.appendChild(td);
+    table.appendChild(tr);
+  }
 
   var selected_tags = GetSelectedTags();
   var shade_this_row = true;
 
   // One row per activity.
   for (var a = 0; a < sorted_activities.length; a++) {
-    if (a % 30 == 29) {
+    if (a % 30 == 0) {
       // Every 30 activities show the header row again.
       AddHeaderRow();
+    } else if (a % 5 == 0) {
+      AddSmallGap();
     }
 
     var activity = gActivities[sorted_activities[a]];
