@@ -235,6 +235,7 @@ class ChannelManager(threading.Thread):
   def __init__(self):
     self.__channels = {}
     self.__channels_lock = threading.Lock()
+    threading.Thread.__init__(self)
     self.daemon = True
 
   def get_channel(self, filename):
