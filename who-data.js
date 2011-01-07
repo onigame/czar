@@ -1,3 +1,6 @@
+// Methods and classes to store and modify the data used by the Who page.
+// This data is used by the Czar page, too.
+
 var Assignment = function(when, active, exclusive) {
   this.when = when == null ? 0 : when;
   this.active = active == null ? false : active;
@@ -58,6 +61,9 @@ var UpdateAssignment = function(user, activity, when, active, exclusive) {
     }
   }
 
+  // UpdateAssignmentHack is a hook for anyone who wants to be called when
+  // UpdateAssignment is called.  UpdateAssignmentHack is defined in the
+  // global scope, so, just set it to your own callable and we'll invoke it.
   if (UpdateAssignmentHack) {
     UpdateAssignmentHack(user, activity, when, active, exclusive);
   }
