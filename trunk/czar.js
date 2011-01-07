@@ -5,6 +5,8 @@
 // Data is stored in stateserver as form.field = value.
 
 var gStateServer = null;
+// A timer for sort_forms.  Really, though, it's a mutex to ensure we
+// enqueue only one "please call sort_forms sometime soon" at a time.
 var the_sort_timeout = null;
 
 var on_blur = function(event) {
@@ -160,7 +162,7 @@ var watch_deadline = function(form) {
     form.className = "deleted";
     form.czar_timeout = window.setTimeout(callme, delay);
   }
-}
+};
 
 var sort_forms = function() {
   if (the_sort_timeout) window.clearTimeout(the_sort_timeout);
@@ -193,6 +195,11 @@ var sort_forms = function() {
     }
   }
   UpdateTagsSelector();
+
+  // Overkill, but: needed because <div id=items> isn't populated until
+  // the first sort_form call, which may be after whoami is set (which is
+  // the only other time UpdateAssignButtons() gets called at startup).
+  UpdateAssignButtons();
 }
 
 var bind_input = function(input, prompt) {
@@ -309,6 +316,7 @@ var add_user_to_whoami = function(whoami, user_key, user_name) {
   option.id = canon_name;
   option.value = user_key;
 
+  // Insert new option at its appropriately-sorted position.
   var i = 0;
   while (i < whoami.childNodes.length && whoami.childNodes[i].id < canon_name) {
     i++;
@@ -320,6 +328,11 @@ var add_user_to_whoami = function(whoami, user_key, user_name) {
     whoami.insertBefore(option, whoami.childNodes[i]);
   }
 
+  // Check the document cookies -- is this user_key the current user?
+  if (user_key == cookies.get('whoami')) {
+    option.selected = true;
+    UpdateAssignButtons();
+  }
 };
 
 var make_form = function(name) {
@@ -407,7 +420,22 @@ var UpdateActives = function(name) {
   }
 };
 
+
+var WhoAmIChanged = function() {
+  // Store this user identity in a cookie.
+  var whoami = document.getElementById('whoami');
+  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+  cookies.set('whoami', uid);
+
+  // Update the "Do this" buttons on each puzzle.
+  UpdateAssignButtons();
+};
+
+
 var UpdateAssignButtons = function() {
+  var whoami = document.getElementById('whoami');
+  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+
   // We don't really have a great way of iterating through all
   // the puzzles on the page without just looking at the HTML DOM.
   var itemList = document.getElementById('items');
@@ -420,10 +448,6 @@ var UpdateAssignButtons = function() {
     assignbutton.style.border = '2px outset';
 
     var puzzle = assignbutton.id.split('.')[0];
-
-    var whoami = document.getElementById('whoami');
-    var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
-
     var now = (new Date()).valueOf();
 
     if (! uid) {
@@ -509,6 +533,8 @@ var on_value = function(key, field, value) {
       }
     }
   }
+
+  UpdateAssignButtons();
 }
 
 var send_value = function(form, field, value) {
@@ -589,6 +615,6 @@ var start_czar = function(stateserver_url) {
   bind_input(document.forms.create.label, "Click to enter new puzzle name");
   document.forms.create.label.czar_autosubmit = false;
   document.forms.create.onsubmit = on_submit_create;
-  document.getElementById('whoami').onchange = UpdateAssignButtons;
+  document.getElementById('whoami').onchange = WhoAmIChanged;
 }
 

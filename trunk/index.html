@@ -37,12 +37,14 @@ span.tooltip {
 <script language="JavaScript" src="json2.js"></script>
 <script language="JavaScript" src="stateserver.js"></script>
 <script language="JavaScript" src="log.js"></script>
+<script language="JavaScript" src="cookie.js"></script>
 <script language="JavaScript" src="tags.js"></script>
 <script language="JavaScript" src="who-data.js"></script>
 <script language="JavaScript" src="czar.js"></script>
 </head>
 
-<body onload="start_czar('http://czar*.emagino.ofb.net:5222/mh10')">
+<!-- body onload="start_czar('http://czar*.emagino.ofb.net:5222/mh10')" -->
+<body onload="start_czar('http://squirrel.the4cs.com:5222/mh2011')">
 <img src=czar.jpeg style="float: left; margin-right: 10; margin-bottom: 15;">
 <div style="margin-left: 10">
   <h2 style="margin-top: 0">Czar
@@ -50,7 +52,12 @@ span.tooltip {
   </h2>
   <!-- id is "aaaaa" to make it sort before most users.  --->
   <span id='whoami.selector'>
-    Who are you? <select id="whoami"><option id="whoami_sortkey_aaaaa" value="">Nobody</option></select>
+    <!-- The whoami select element gets auto-populated by XXX -->
+    Who are you? <select id="whoami">
+      <option id="whoami_sortkey_aaaaa" value="">Nobody</option>
+      <option id="whoami_sortkey_zzzzz" value="">Name not here?  Go to 'who'
+	and add yourself!</option>
+    </select>
   </span>
   <br>
   Linking a Google Spreadsheet:
@@ -59,7 +66,7 @@ span.tooltip {
     (2) Invite <em>czar@ofb.net</em> to edit.
   <br>
   See also:
-  <a target="teampage" href="http://teamleftout.org/wiki/">Team Homepage</a>,
+  <a target="teampage" href="https://sites.google.com/a/teamleftout.org/mh2011/2011Hunt">Team Homepage</a>,
   <a target="huntpage" href="http://www.mit.edu/~puzzle/currhunt.html">Puzzle Hunt site</a>,
   <a target="whopage" href="who.html">Who's doing what</a>.
 </div>
