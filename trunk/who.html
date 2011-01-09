@@ -13,8 +13,6 @@ td.nonpuzzlelt { background-color:#fc9; }
 td.nonpuzzledk { background-color:#da7; }
 td.focused { border: 1px solid #AAAAAA; }
 
-td.smaller { font-size:68%; }
-
 .popup {
   border: thin solid black;
   position:absolute;
@@ -41,7 +39,8 @@ td.smaller { font-size:68%; }
 </head>
 
 
-<body onLoad=Init('http://czar*.emagino.ofb.net:5222/mh10')>
+<!-- body onLoad=Init('http://czar*.emagino.ofb.net:5222/mh2011') -->
+<body onLoad=Init('http://squirrel.the4cs.com:5222/mh2011')>
 
 <div class=title>Who's Doing What
 <a style="font-size:50%" href=".">(Back to Czar)</a>
@@ -78,12 +77,13 @@ Rename: <input id=inputName>
 
 <!-- Div that's populated by the javascript. -->
 <center>
-<div style="font-size:68%" id="data"></div>
+<div style="font-size:100%" id="data"></div>
 <div id="tags"></div>
 
+<!-- Sort rows. -->
 <div style="padding:10px">
 <span style="border: thin solid blue; padding: 8px">
-Sort:
+Sort rows:
 	    <label for=radioAlpha>
 	    <input type=radio name="sortOrder" id=radioAlpha checked
 	    onchange=RedrawTable()>Alphabetically</label>
@@ -99,6 +99,28 @@ Sort:
             <select disabled id=sortUserSelect>
               <option value="">Select...</option>
             </select>
+</span>
+</div>
+
+<!-- Sort columns. -->
+<div style="padding:10px">
+<span style="border: thin solid blue; padding: 8px">
+Sort people:
+    <label>
+    <input type=radio name="columnsSortOrder" id=columnsAlpha checked
+    onchange=RedrawTable()>Alphabetically</label>
+    <label>
+    <input type=radio name="columnsSortOrder" id=columnsRecency
+    onchange=RedrawTable()>By&nbsp;recency</label>
+    <label>
+    <input type=radio name="columnsSortOrder" id=columnsRecencyReverse
+    onchange=RedrawTable()>By&nbsp;recency&nbsp;(reverse)</label>
+    <label>
+    <input type=radio name="columnsSortOrder" id=columnsActivity
+    onchange=SortByActivitySelected()>By&nbsp;activity:</label>
+    <select disabled id=columnsActivitySelect>
+      <option value="">Select...</option>
+    </select>
 </span>
 </div>
 
