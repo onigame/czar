@@ -379,14 +379,8 @@ var RedrawTable = function() {
   var shade_this_row = true;
 
   // One row per activity.
+  var num_rows = 0;
   for (var a = 0; a < sorted_activities.length; a++) {
-    if (a % 30 == 0) {
-      // Every 30 activities show the header row again.
-      AddHeaderRow();
-    } else if (a % 5 == 0) {
-      AddSmallGap();
-    }
-
     var activity = gActivities[sorted_activities[a]];
     var tags_match = TagsMatch(selected_tags, activity.tags);
     
@@ -398,6 +392,14 @@ var RedrawTable = function() {
       continue;
     }
 
+    if (num_rows % 30 == 0) {
+      // Every 30 activities show the header row again.
+      AddHeaderRow();
+    } else if (num_rows % 5 == 0) {
+      AddSmallGap();
+    }
+
+    num_rows++;
     tr = document.createElement('tr');
 
     // Every other row is lightly highlighted.
@@ -408,6 +410,13 @@ var RedrawTable = function() {
 
     var td = document.createElement('td');
     td.innerHTML = activity.name;
+    if (!activity.IsNonPuzzleActivity()) {
+      if (activity.tags == '') {
+	td.title = 'No tags.';
+      } else {
+	td.title = activity.tags;
+      }
+    }
     if (activity.IsNonPuzzleActivity()) {
       // Non-puzzle activity.
       td.className = shade_this_row ? 'nonpuzzlelt' : 'nonpuzzledk';
