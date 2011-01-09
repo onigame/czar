@@ -347,6 +347,7 @@ var RedrawTable = function() {
   
   // Header row showing each user name.
   var AddHeaderRow = function() {
+    var whoami = cookies.get('whoami');
     var tr = document.createElement("tr");
     tr.appendChild(document.createElement("td"));
     for (var u = 0; u < sorted_users.length; u++) {
@@ -357,6 +358,9 @@ var RedrawTable = function() {
       td.style.whiteSpace = 'nowrap';
       td.innerHTML = user.name;
       td.onclick = BindRenameWidget(td, user);
+      if (whoami == user.id) {
+	td.style.backgroundColor = '#ff6'
+      }
       tr.appendChild(td);
     }
     table.appendChild(tr);
