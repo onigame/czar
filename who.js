@@ -135,85 +135,23 @@ var compare_by_name = function(id1, id2, storage) {
   return 0;
 };
 
-var GetSortedUsers = function() {
-
-  // Get a sorted list of users and activities.
-
-  var sorted_users = new Array();
-  for (u in gUsers) {
-    // Show a user only if they have a name.
-    if (gUsers[u].name) {
-      sorted_users.push(u);
-    }
+var GetUserSortOrder = function() {
+  var sortOrder;
+  if (document.getElementById('columnsAlpha').checked) {
+    sortOrder = 'alpha';
+  } else if (document.getElementById('columnsRecency').checked) {
+    sortOrder = 'recency';
+  } else if (document.getElementById('columnsRecencyReverse').checked) {
+    sortOrder = 'recencyReverse';
+  } else if (document.getElementById('columnsActivity').checked) {
+    var select = document.getElementById('columnsActivitySelect');
+    sortOrder = select.options[select.selectedIndex].value;
   }
-  sorted_users.sort(function(id1, id2) {
-      return compare_by_name(id1, id2, gUsers); });
 
-  return sorted_users;
+  return sortOrder;
 };
 
-var RadioUserSelected = function() {
-  // We just had a request to sort by users.  Populate the sortUserSelect select
-  // tag with the list of users and allow them to callback.
-  sorted_users = GetSortedUsers();
-  
-  var select = document.getElementById("sortUserSelect");
-
-  select.innerHTML = '';
-  for (var i = 0; i < sorted_users.length; i++) {
-    var user = gUsers[sorted_users[i]];
-    var option = document.createElement('option');
-    option.appendChild(document.createTextNode(user.name));
-    option.value = user.id;
-    select.appendChild(option);
-    option.selected = true;
-  }
-
-  select.disabled = false;
-  select.onchange = RedrawTable;
-  RedrawTable;
-};
-
-
-var RedrawTable = function() {
-  // Recreate the HTML <table> showing who's been working on what activity.
-  // Assumes that there's a <div> on the page with id=data.  Replaces its
-  // contents with this newly-created table.
-
-  var d = document.getElementById("data");
-  var now = (new Date()).valueOf();
-
-  var table = document.createElement("table");
-  table.frame = 'outline';
-  table.rules = 'all';
-  table.id = 'the_big_table';
-  table.style.fontFamily = 'Arial';
-  table.style.fontSize = gTableFontSize + '%';
-
-  // Record that we're redrawing now and when the last data update was.
-  var caption = table.createCaption();
-  caption.align = 'bottom';
-  caption.innerHTML = ('Last data update: ' + DisplayTime(gLastServerUpdate) +
-		       ' Page created: ' + DisplayTime(new Date()));
-
-  var tr;
-
-  var sorted_users = GetSortedUsers();
-
-  // When was the most recent activity for each activity?
-  var mostRecentActivity = {};
-  for (u in gUsers) {
-    var user = gUsers[u];
-
-    for (a in gLastSeenTime[user.id]) {
-      var t = LastSeenTime(user.id, a);
-      if (mostRecentActivity[a] == null ||
-	  t > mostRecentActivity[a]) {
-	mostRecentActivity[a] = t;
-      }
-    }
-  }
-
+var GetActivitySortOrder = function() {
   var sortOrder;
   if (document.getElementById('radioAlpha').checked) {
     sortOrder = 'alpha';
@@ -226,6 +164,52 @@ var RedrawTable = function() {
     sortOrder = select.options[select.selectedIndex].value;
   }
 
+  return sortOrder;
+};
+
+var GetSortedUsers = function(sortOrder, mostRecentActivity) {
+  var compare_users = function(id1, id2) {
+    if (sortOrder == 'alpha') {
+      return compare_by_name(id1, id2, gUsers);
+    }
+    var t1 = mostRecentActivity[id1];
+    var t2 = mostRecentActivity[id2];
+    if (sortOrder == 'recency') {
+      if (t1 == t2) return 0;
+      if (t2 == null) return -1;
+      if (t1 == null) return 1;
+      return t2 - t1;
+    } else if (sortOrder == 'recencyReverse') {
+      if (t1 == t2) return 0;
+      if (t2 == null) return 1;
+      if (t1 == null) return -1;
+      return t1 - t2;
+    } else {
+      // sortOrder is an activity_id
+      t1 = LastSeenTime(id1, sortOrder);
+      t2 = LastSeenTime(id2, sortOrder);
+      if (t1 == t2) return 0;
+      if (t2 == 0) return -1;
+      if (t1 == 0) return 1;
+      return t2 - t1;
+    }
+  }
+
+
+  var sorted_users = new Array();
+  for (u in gUsers) {
+    // Show a user only if they have a name.
+    if (gUsers[u].name) {
+      sorted_users.push(u);
+    }
+  }
+
+  sorted_users.sort(compare_users);
+
+  return sorted_users;
+};
+
+var GetSortedActivities = function(sortOrder, mostRecentActivity) {
   var compare_activities = function(id1, id2) {
     var id1_is_nonpuzzle = (id1[0] == 'a');
     var id2_is_nonpuzzle = (id2[0] == 'a');
@@ -268,6 +252,98 @@ var RedrawTable = function() {
     sorted_activities.push(a);
   }
   sorted_activities.sort(compare_activities);
+
+  return sorted_activities;
+};
+
+var RadioUserSelected = function() {
+  // We just had a request to sort by users.  Populate the sortUserSelect select
+  // tag with the list of users and allow them to callback.
+  sorted_users = GetSortedUsers('alpha');
+  
+  var select = document.getElementById("sortUserSelect");
+
+  select.innerHTML = '';
+  for (var i = 0; i < sorted_users.length; i++) {
+    var user = gUsers[sorted_users[i]];
+    var option = document.createElement('option');
+    option.appendChild(document.createTextNode(user.name));
+    option.value = user.id;
+    select.appendChild(option);
+    option.selected = true;
+  }
+
+  select.disabled = false;
+  select.onchange = RedrawTable;
+  RedrawTable;
+};
+
+
+var SortByActivitySelected = function() {
+  // We just had a request to sort by activity.  Populate the select tag with
+  // the list of activities and allow them to callback.
+  var sorted_activities = GetSortedActivities('alpha');
+  var select = document.getElementById("columnsActivitySelect");
+
+  select.innerHTML = '';
+  for (var i = 0; i < sorted_activities.length; i++) {
+    var activity = gActivities[sorted_activities[i]];
+    var option = document.createElement('option');
+    option.appendChild(document.createTextNode(activity.name));
+    option.value = activity.id;
+    select.appendChild(option);
+    option.selected = true;
+  }
+
+  select.disabled = false;
+  select.onchange = RedrawTable;
+  RedrawTable;
+};
+
+
+var RedrawTable = function() {
+  // Recreate the HTML <table> showing who's been working on what activity.
+  // Assumes that there's a <div> on the page with id=data.  Replaces its
+  // contents with this newly-created table.
+
+  var d = document.getElementById("data");
+  var now = (new Date()).valueOf();
+
+  var table = document.createElement("table");
+  table.frame = 'outline';
+  table.rules = 'all';
+  table.id = 'the_big_table';
+  table.style.fontFamily = 'Arial';
+  table.style.fontSize = gTableFontSize + '%';
+
+  // Record that we're redrawing now and when the last data update was.
+  var caption = table.createCaption();
+  caption.align = 'bottom';
+  caption.innerHTML = ('Last data update: ' + DisplayTime(gLastServerUpdate) +
+		       ' Page created: ' + DisplayTime(new Date()));
+
+  var tr;
+
+  // When was the most recent activity for each activity and each user?
+  var mostRecentActivity = {};
+  for (u in gUsers) {
+    var user = gUsers[u];
+
+    for (a in gLastSeenTime[user.id]) {
+      var t = LastSeenTime(user.id, a);
+      if (mostRecentActivity[a] == null ||
+	  t > mostRecentActivity[a]) {
+	mostRecentActivity[a] = t;
+      }
+      if (mostRecentActivity[u] == null ||
+	  t > mostRecentActivity[u]) {
+	mostRecentActivity[u] = t;
+      }
+    }
+  }
+
+  var sorted_users = GetSortedUsers(GetUserSortOrder(), mostRecentActivity);
+  var sorted_activities = GetSortedActivities(GetActivitySortOrder(), mostRecentActivity);
   
   // Header row showing each user name.
   var AddHeaderRow = function() {
@@ -340,7 +416,9 @@ var RedrawTable = function() {
 
       td = document.createElement('td');
       if (LastSeenTime(user.id, activity.id) > 0) {
-	td.innerHTML = MakeAgoString(now, LastSeenTime(user.id, activity.id));
+	var ago =  MakeAgoString(now, LastSeenTime(user.id, activity.id));
+	td.innerHTML = ago;
+	td.title = user.name + ' was doing ' + activity.name + ' ' + ago + ' ago.';
 	if (IsActiveAssignment(user.id, activity.id) &&
 	    IsExclusiveAssignment(user.id, activity.id)) {
 	  td.className = 'active';
