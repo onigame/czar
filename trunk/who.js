@@ -159,6 +159,8 @@ var GetActivitySortOrder = function() {
     sortOrder = 'recency';
   } else if (document.getElementById('radioRecencyReverse').checked) {
     sortOrder = 'recencyReverse';
+  } else if (document.getElementById('radioNumActives').checked) {
+    sortOrder = 'numActives';
   } else if (document.getElementById('radioUser').checked) {
     var select = document.getElementById("sortUserSelect");
     sortOrder = select.options[select.selectedIndex].value;
@@ -209,7 +211,8 @@ var GetSortedUsers = function(sortOrder, mostRecentActivity) {
   return sorted_users;
 };
 
-var GetSortedActivities = function(sortOrder, mostRecentActivity) {
+var GetSortedActivities = function(sortOrder,mostRecentActivity,
+				   peoplePerActivity) {
   var compare_activities = function(id1, id2) {
     var id1_is_nonpuzzle = (id1[0] == 'a');
     var id2_is_nonpuzzle = (id2[0] == 'a');
@@ -236,6 +239,15 @@ var GetSortedActivities = function(sortOrder, mostRecentActivity) {
       if (t2 == null) return 1;
       if (t1 == null) return -1;
       return t1 - t2;
+    } else if (sortOrder == 'numActives') {
+      if (!id1_is_nonpuzzle && id2_is_nonpuzzle) return -1;
+      if (id1_is_nonpuzzle && !id2_is_nonpuzzle) return 1;
+      var p1 = peoplePerActivity[id1];
+      var p2 = peoplePerActivity[id2];
+      if (p1 == p2) return 0;
+      if (p1 == null) return 1;
+      if (p2 == null) return -1;
+      return p2 - p1;
     } else {
       // sortOrder is a user_id
       t1 = LastSeenTime(sortOrder, id1);
@@ -326,6 +338,7 @@ var RedrawTable = function() {
 
   // When was the most recent activity for each activity and each user?
   var mostRecentActivity = {};
+  var peoplePerActivity = {};  // Counts only active assignments.
   for (u in gUsers) {
     var user = gUsers[u];
 
@@ -339,11 +352,20 @@ var RedrawTable = function() {
 	  t > mostRecentActivity[u]) {
 	mostRecentActivity[u] = t;
       }
+      if (IsActiveAssignment(u, a)) {
+	if (peoplePerActivity[a] == null) {
+	  peoplePerActivity[a] = 1;
+	} else {
+	  peoplePerActivity[a]++;
+	}
+      }
     }
   }
 
   var sorted_users = GetSortedUsers(GetUserSortOrder(), mostRecentActivity);
-  var sorted_activities = GetSortedActivities(GetActivitySortOrder(), mostRecentActivity);
+  var sorted_activities = GetSortedActivities(GetActivitySortOrder(),
+					      mostRecentActivity,
+					      peoplePerActivity);
   
   // Header row showing each user name.
   var AddHeaderRow = function() {
