@@ -63,9 +63,11 @@ var Init = function(stateserver_url) {
   UpdateTagsSelector();
   gStateServer = stateserver.open(stateserver_url, function(key, value) {
       HandleUpdateFromStateserver(key, value);
+      Notifications.HandleUpdateFromStateserver(key, value);
       gLastServerUpdate = new Date();
       RedrawTableSoon();
     });
+  Notifications.Init(gStateServer);
 
   RedrawTable();
   SchedulePeriodicRedrawTable();
