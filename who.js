@@ -345,6 +345,11 @@ var RedrawTable = function() {
     var user = gUsers[u];
 
     for (a in gLastSeenTime[user.id]) {
+      if (!IsActiveAssignment(user.id, a)) {
+	// We care about only active assignments.  Not interesting
+	// to sort by "recently, stopped working on X."
+	continue;
+      }
       var t = LastSeenTime(user.id, a);
       if (mostRecentActivity[a] == null ||
 	  t > mostRecentActivity[a]) {
