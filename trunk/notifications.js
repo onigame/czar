@@ -46,6 +46,7 @@ var Notifications = {
 
   _stateserver: null,
   _windows: null,
+  _solved_sound: null,
   
   _MaybeDisplayNotification: function(posted, message) {
     // Notifications are shown for only one minute.  Don't show stale
@@ -107,6 +108,11 @@ var Notifications = {
     var body = document.getElementsByTagName('body')[0];
     body.appendChild(div);
     this._windows.push(div);
+    if (this._solved_sound == null) {
+      this._solved_sound = 'solved';
+      soundManager.createSound(this._solved_sound, 'applause.mp3');
+    }
+    soundManager.play(this._solved_sound);
   },
 
   _Dismiss: function(div) {
