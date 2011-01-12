@@ -29,6 +29,7 @@ td.focused { border: 1px solid #AAAAAA; }
 
 </style>
 
+<script language="JavaScript" src="soundmanager2-nodebug-jsmin.js"></script>
 <script language="JavaScript" src="json2.js"></script>
 <script language="JavaScript" src="log.js"></script>
 <script language="JavaScript" src="stateserver.js"></script>
@@ -37,6 +38,15 @@ td.focused { border: 1px solid #AAAAAA; }
 <script language="JavaScript" src="who-data.js"></script>
 <script language="JavaScript" src="notifications.js"></script>
 <script language="JavaScript" src="who.js"></script>
+
+<!-- configure soundmanager2 -->
+<script type="text/javascript">
+soundManager.url = 'swf';
+soundManager.useHTML5Audio = true;
+soundManager.useFlashBlock = true;
+soundManager.debugMode = false;
+soundManager.onload = function() { };
+</script>
 
 </head>
 
