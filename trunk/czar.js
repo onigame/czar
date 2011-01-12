@@ -89,6 +89,10 @@ var MaybeSendSolvedNotification = function(puzzle_id, new_tags) {
   var tags = new_tags.split(',');
   if (tags.indexOf('solved') == -1) {
     // Not solved yet.
+    if (gSolvedPuzzles.indexOf(puzzle_id) != -1) {
+      // Weird case: human removed the "solved" tag.
+      gSolvedPuzzles.splice(gSolvedPuzzles.indexOf(puzzle_id), 1);
+    }
     return;
   }
 
@@ -580,6 +584,9 @@ var on_server = function(key, value) {
 
   // From who-data.js.
   HandleUpdateFromStateserver(key, value);
+
+  // For notifications.
+  Notifications.HandleUpdateFromStateserver(key, value);
 };
 
 

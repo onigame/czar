@@ -7,7 +7,6 @@
  * Notifications are displayed only if they've been posted within the last
  *   minute. 
  TODO:
- * Add a "dismiss all" button.
  * Play Some notifications can play a sound.
  */
 
@@ -91,6 +90,19 @@ var Notifications = {
     btn.innerHTML = 'okay';
     btn.onclick = function() { Notifications._Dismiss(div); };
     div.appendChild(btn);
+
+    if (this._windows.length > 0) {
+      // Permit hiding all the windows.
+      var btn = document.createElement('button');
+      btn.innerHTML = 'dismiss all';
+      btn.onclick = function() {
+	while (Notifications._windows.length > 0) {
+	  // _Dismiss will remove the div from _windows.
+	  Notifications._Dismiss(Notifications._windows[0]);
+	}
+      };
+      div.appendChild(btn);
+    }
 
     var body = document.getElementsByTagName('body')[0];
     body.appendChild(div);
