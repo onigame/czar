@@ -71,6 +71,7 @@ var on_submit_edit = function() {
         send_value(this, input, input.value);
         if (input.name == "tags") {
           UpdateTagsSelector();
+	  MaybeSendSolvedNotification(this.name, input.value);
         }
         if (!input.className)
           input.className = "inflight";
@@ -78,7 +79,28 @@ var on_submit_edit = function() {
     }
   }
   return false;
-}
+};
+
+var gSolvedPuzzles = [];
+var MaybeSendSolvedNotification = function(puzzle_id, new_tags) {
+  log('MaybeSendSolvedNotification(' + puzzle_id + ', ' + new_tags + ')');
+
+  // Is "solved" one of the tags mentioned?
+  var tags = new_tags.split(',');
+  if (tags.indexOf('solved') == -1) {
+    // Not solved yet.
+    return;
+  }
+
+  // Is it newly solved?
+  if (gSolvedPuzzles.indexOf(puzzle_id) >= 0) {
+    // Already solved.
+    return;
+  }
+
+  gSolvedPuzzles.push(puzzle_id);
+  Notifications.Send('We just solved ' + gActivities[puzzle_id].name + '!');
+};
 
 var on_submit_create = function() {
   // Callback for creating a new puzzle by means of the link at the top
@@ -616,5 +638,6 @@ var start_czar = function(stateserver_url) {
   document.forms.create.label.czar_autosubmit = false;
   document.forms.create.onsubmit = on_submit_create;
   document.getElementById('whoami').onchange = WhoAmIChanged;
+  Notifications.Init(gStateServer);
 }
 
