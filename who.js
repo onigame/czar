@@ -315,6 +315,15 @@ var SortByActivitySelected = function() {
 };
 
 
+var IsSolved = function(activity) {
+  if (!activity || !activity.tags)
+    return false;
+
+  var tags = activity.tags.split(',');
+  return tags.indexOf('solved') != -1;
+};
+
+
 var RedrawTable = function() {
   // Recreate the HTML <table> showing who's been working on what activity.
   // Assumes that there's a <div> on the page with id=data.  Replaces its
@@ -439,7 +448,7 @@ var RedrawTable = function() {
     var td = document.createElement('td');
     td.style.whiteSpace = 'nowrap';
     td.innerHTML = activity.name;
-    if (activity.tags && activity.tags.indexOf('solved') != -1) {
+    if (IsSolved(activity)) {
       td.innerHTML += ' <font color=green>&#x2714;</font>'
     }
     if (!activity.IsNonPuzzleActivity()) {
@@ -464,7 +473,9 @@ var RedrawTable = function() {
 	var ago =  MakeAgoString(now, LastSeenTime(user.id, activity.id));
 	td.innerHTML = ago;
 	td.title = user.name + ' was doing ' + activity.name + ' ' + ago + ' ago.';
-	if (IsActiveAssignment(user.id, activity.id) &&
+	if (IsActiveAssignment(user.id, activity.id) && IsSolved(activity)) {
+	  td.className = 'activeOnSolved';
+	} else if (IsActiveAssignment(user.id, activity.id) &&
 	    IsExclusiveAssignment(user.id, activity.id)) {
 	  td.className = 'active';
 
