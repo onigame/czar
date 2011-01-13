@@ -383,7 +383,6 @@ var RedrawTable = function() {
       var user = gUsers[sorted_users[u]];
       var td = document.createElement("td");
       td.style.verticalAlign = 'top';
-      td.style.fontSize = '68%';
       td.style.whiteSpace = 'nowrap';
       td.innerHTML = user.name;
       td.onclick = BindRenameWidget(td, user);
