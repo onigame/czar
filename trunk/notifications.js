@@ -53,14 +53,15 @@ var Notifications = {
     // notifications.
     var now = (new Date()).valueOf();
     if (posted + 60*1000 < now) {
+      log('Stale notification.');
       return;
     }
 
     var div = document.createElement('div');
     div.style.position = 'absolute';
-    div.style.height = 150;
-    div.style.width = 400;
-    div.style.left = document.body.clientWidth / 2 - 200;
+    div.style.height = 300;
+    div.style.width = 600;
+    div.style.left = document.body.clientWidth / 2 - 300;
     div.style.top = 200;
     var zIndex = 1;
     for (var i = 0; i < this._windows.length; i++) {
@@ -109,8 +110,10 @@ var Notifications = {
     body.appendChild(div);
     this._windows.push(div);
     if (this._solved_sound == null) {
-      this._solved_sound = 'solved';
-      soundManager.createSound(this._solved_sound, 'applause.mp3');
+      var sound_id = 'solved';
+      if (soundManager.createSound(sound_id, '/czar/applause.mp3')) {
+	this._solved_sound = sound_id;
+      }
     }
     soundManager.play(this._solved_sound);
   },
