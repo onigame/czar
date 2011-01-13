@@ -438,7 +438,11 @@ var RedrawTable = function() {
     shade_this_row = !shade_this_row;
 
     var td = document.createElement('td');
+    td.style.whiteSpace = 'nowrap';
     td.innerHTML = activity.name;
+    if (activity.tags && activity.tags.indexOf('solved') != -1) {
+      td.innerHTML += ' <font color=green>&#x2714;</font>'
+    }
     if (!activity.IsNonPuzzleActivity()) {
       if (activity.tags == '') {
 	td.title = 'No tags.';
