@@ -59,7 +59,7 @@ var Notifications = {
 
     var div = document.createElement('div');
     div.style.position = 'absolute';
-    div.style.height = 300;
+    div.style.height = 200;
     div.style.width = 600;
     div.style.left = document.body.clientWidth / 2 - 300;
     div.style.top = 200;
@@ -111,7 +111,7 @@ var Notifications = {
     this._windows.push(div);
     if (this._solved_sound == null) {
       var sound_id = 'solved';
-      if (soundManager.createSound(sound_id, '/czar/applause.mp3')) {
+      if (soundManager.createSound(sound_id, 'applause.mp3')) {
 	this._solved_sound = sound_id;
       }
     }
