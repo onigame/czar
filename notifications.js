@@ -57,6 +57,27 @@ var Notifications = {
       return;
     }
 
+    // Store a list of notifications in a cookie.  This cookie will prevent
+    // us from showing the same notification twice (say, czar, then click to
+    // the who page).
+    var notifications = cookies.get('notifications');
+    log('notifications is ' + notifications);
+    if (notifications) {
+      notifications = notifications.split(',');
+      log('notifications is now ' + notifications + ' and posted is ' + posted);
+      if (notifications.indexOf(String(posted)) != -1) {
+	// We've already seen this notification; pass.
+	log('Seen this notification before.');
+	return;
+      } else {
+	// Append this notification to those seen.
+	notifications[notifications.length] = posted;
+	cookies.set('notifications', notifications.join(','));
+      }
+    } else {
+      cookies.set('notifications', posted);
+    }
+
     var div = document.createElement('div');
     div.style.position = 'absolute';
     div.style.height = 200;
