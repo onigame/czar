@@ -7,6 +7,7 @@
 .nonexclusive { background-color:#c3f; color:#000; }
 .never { background-color:#fff; }
 td.active {text-align:right}
+td.activeOnSolved {text-align:right; background-color:#f60}
 td.nonactive {text-align: right }
 td.nonexclusive {text-align: right }
 td.nonpuzzlelt { background-color:#fc9; }
@@ -181,13 +182,13 @@ Add activity: <input onchange="AddActivity(this);"><br>
     <td></td>
     <td>Charlie</td>
     <td>Juliet</td>
-    <td>Mike</td>
+    <td style="background-color:#ff6">Mike</td>
     <td>Oscar</td>
     <td>Romeo</td>
   </tr>
   <tr>
     <td>First puzzle</td>
-    <td class=active>1:30</td>
+    <td></td>
     <td class=active>:05</td>
     <td></td>
     <td class=active>:23</td>
@@ -210,6 +211,14 @@ Add activity: <input onchange="AddActivity(this);"><br>
     <td></td>
   </tr>
   <tr>
+    <td>Fourth puzzle <font color=green>&#x2714;</font></td>
+    <td class=activeOnSolved>1:30</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
     <td class=nonpuzzlelt>Sleeping</td>
     <td></td>
     <td></td>
@@ -222,7 +231,8 @@ Add activity: <input onchange="AddActivity(this);"><br>
 
 <ul>
   <li>Each row is an activity, each column a person.  Non-puzzle
-      activities are orange.
+      activities are orange.  Your name is yellow, if you've selected your
+      name on <a href="">czar</a>.
   <li>Each cell shows when this person was last performing this
       activity.  It's hours and minutes.
   <li>Marking one assignment as "current" (green) marks all other assignments
@@ -234,6 +244,8 @@ Add activity: <input onchange="AddActivity(this);"><br>
   <li>At the two-hour mark, green starts "decaying" to red, turning
       into full red at 6 hours.  When someone starts losing their
       color, it means we haven't heard from them in a while.
+  <li>Solved puzzles have a checkmark next to their names.  Anyone active
+      assignments on solved puzzles are shown in orange.
 </ul>
 
 	</td>
