@@ -210,7 +210,7 @@ var sort_forms = function() {
 
   var parent = document.getElementById("items");
   var next = parent.firstChild;
-  var odd = 1;
+  var odd = 0;
   for (var i = 0; i < forms.length; ++i) {
     var form = forms[i];
     if (form && form.name != "create" && form.czar_sortkey) {
