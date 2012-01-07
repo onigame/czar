@@ -219,6 +219,14 @@ var sort_forms = function() {
       else
         parent.insertBefore(form, next);
     }
+    if (!form.classList.contains("deleted")) {
+      if (odd) {
+        form.classList.add("shaded");
+      } else {
+        form.classList.remove("shaded");
+      }
+      odd = !odd;
+    }
   }
   UpdateTagsSelector();
 
@@ -599,6 +607,7 @@ var filter_tags = function() {
 
   var selected = GetSelectedTags();
 
+  var odd = 1;
   // Examine each puzzle being displayed.  Take action only if all the
   // selected tags appear in the puzzle as well.  Note that "no tags selected"
   // selects all puzzles.
@@ -606,10 +615,18 @@ var filter_tags = function() {
        node != null; node=node.nextSibling) {
     if (node.className == "deleted") continue;  // skip over deleted forms.
     if (TagsMatch(selected,
-		  document.getElementById(node.name + ".tags").value)) {
+                  document.getElementById(node.name + ".tags").value)) {
       node.style.display = selected.invert ? "none" : "block";
     } else {
       node.style.display = selected.invert ? "block" : "none";
+    }
+    if (node.style.display == "block") {
+      if (odd) {
+        node.classList.add("shaded");
+      } else {
+        node.classList.remove("shaded");
+      }
+      odd = !odd;
     }
   }
 };
