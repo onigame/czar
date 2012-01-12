@@ -7,14 +7,28 @@ import re
 import sys
 import urllib
 
-TITLE_RE = re.compile("""I've shared a document with you called "(.*)":""")
-URL_RE = re.compile("""(https?://spreadsheets.google.com/ccc[\\S]*)""")
-NEW_RE = re.compile("""I've shared a document with you: *(.*) *(https?://spreadsheets.google.com/ccc[\\S]*)""")
-JUNK_RE = re.compile("""\\W+""")
+USAGE = """Command-line usage (for debugging):
+   czarmail.py http://stateserver:port/path < message
+
+Practical Usage:
+   Set an alias that forwards email to this script.
+   For example, set a postfix alias:
+     czar: "|/path/to/czarmail.py http://stateserver:port/path"
+"""
+
+TITLE_RE = re.compile(
+    r"I've shared (?:a document|an item) with you called "
+    r'"(.*)":')
+
+URL_RE = re.compile(
+    r'https?://(spreadsheets.google.com|docs.google.com/spreadsheet)/ccc[\S]*')
+
+BOTH_RE = re.compile(
+    r"I've shared an item with you: *(.*) (" + URL_RE.pattern + r")")
 
 
 def crunch(s):
-  return JUNK_RE.sub("", s).lower()
+  return re.sub(r"\W+", "", s).lower()
 
 
 def document(server, title, url):
@@ -47,13 +61,7 @@ def document(server, title, url):
 
 if __name__ == "__main__":
   if len(sys.argv) != 2:
-    sys.stderr.write("Command-line Usage (for debugging):\n")
-    sys.stderr.write("   czarmail.py http://stateserver:port/path < message\n")
-    sys.stderr.write("Practical Usage:\n")
-    sys.stderr.write("   Set an alias that forwards email to this script.\n")
-    sys.stderr.write("   For example, set a postfix alias:\n")
-    sys.stderr.write("     czar: \"|/path/to/czarmail.py http://stateserver:port/path\"\n")
-
+    sys.stderr.write(USAGE)
     sys.exit(2)
 
   server = sys.argv[1]
@@ -64,10 +72,10 @@ if __name__ == "__main__":
       title = TITLE_RE.search(body)
       url = URL_RE.search(body)
       if title and url:
-        document(server, title.group(1), url.group(1))
+        document(server, title.group(1), url.group(0))
         sys.exit(0)
 
-      both = NEW_RE.search(body)
+      both = BOTH_RE.search(body)
       if both:
         document(server, both.group(1), both.group(2))
         sys.exit(0)
