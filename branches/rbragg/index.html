@@ -1,0 +1,194 @@
+<html>
+<head>
+<title>Czar</title>
+<style>
+
+body { background: #FFFFFF; color: #000000; font: 100% sans-serif; }
+div.internal { display: none; }
+
+form a { font-size: 80%; margin-right: 10px; }
+form a.missing { color: #888888; text-decoration: none; }
+form.marked a.missing { text-decoration: line-through; }
+form { margin: 0; }
+form.deleted { display: none; }
+form.marked * { text-decoration: line-through; }
+form.marked input { color: #000000; }
+form.marked input.countdown { color: #AA0000; text-decoration: none; }
+
+div#items > form.shaded { background: #DDD; }
+div#items > form.shaded * { background: #DDD; }
+div#items > form.shaded input { background: #DDD; border-color: #DDD }
+
+input { font: 100% sans-serif; border: 1px solid #FFF; margin-right: 10px; }
+input.dirty { border: 1px solid #77F !important }
+input.empty { color: #888; }
+input.focused { border: 1px solid #AAA !important }
+input.inflight { border: 1px solid #BCF !important }
+
+span.tooltip input { margin-right: 0; font-size: 80% }
+span.tooltip { 
+  position: absolute;
+  visibility: hidden;
+  padding: 3 3 3 3;
+  background: #FFF; border: 1px solid #888;
+}
+
+</style>
+<script language="JavaScript" src="soundmanager2-nodebug-jsmin.js"></script>
+<script language="JavaScript" src="json2.js"></script>
+<script language="JavaScript" src="stateserver.js"></script>
+<script language="JavaScript" src="log.js"></script>
+<script language="JavaScript" src="cookie.js"></script>
+<script language="JavaScript" src="tags.js"></script>
+<script language="JavaScript" src="who-data.js"></script>
+<script language="JavaScript" src="notifications.js"></script>
+<script language="JavaScript" src="czar.js"></script>
+
+<!-- configure soundmanager2 -->
+<script type="text/javascript">
+soundManager.url = 'swf';
+soundManager.useHTML5Audio = true;
+soundManager.useFlashBlock = true;
+soundManager.debugMode = false;
+soundManager.onload = function() { };
+</script>
+
+</head>
+
+<!-- body onload="start_czar('http://czar*.emagino.ofb.net:5222/mh10')" -->
+<body onload="start_czar('http://squirrel.the4cs.com:5222/mh2011')">
+<img src=czar.jpeg style="float: left; margin-right: 10; margin-bottom: 15;">
+<div style="margin-left: 10">
+  <h2 style="margin-top: 0">Czar
+  <a style="font-size:50%" href="who.html">(Back to Who)</a>
+  </h2>
+  <!-- id is "aaaaa" to make it sort before most users.  --->
+  <span id='whoami.selector'>
+    <!-- The whoami select element gets auto-populated by XXX -->
+    Who are you? <select id="whoami">
+      <option id="whoami_sortkey_aaaaa" value="">Nobody</option>
+      <option id="whoami_sortkey_zzzzz" value="">Name not here?  Go to 'who'
+	and add yourself!</option>
+    </select>
+  </span>
+  <br>
+  Linking a Google Spreadsheet:
+  (1) Make a <a target="docs" href="http://docs.google.com/">spreadsheet</a> with <em>exactly</em>
+    the same title as the puzzle.  
+    (2) Invite <em>czar@ofb.net</em> to edit.
+  <br>
+  See also:
+  <a target="teampage" href="https://sites.google.com/a/teamleftout.org/mh2011/2011Hunt">Team Homepage</a>,
+  <a target="huntpage" href="http://www.mit.edu/~puzzle/currhunt.html">Puzzle Hunt site</a>,
+  <a target="whopage" href="who.html">Who's doing what</a>.
+</div>
+<br clear=left>
+
+<form id=create name=create style="margin-bottom: 10">
+<input type=text name=label size=30 style='font-weight: bold'>
+</form>
+
+<div id=tags></div>
+<hr>
+
+<!-- The "items" div holds the sorted list of puzzles.  It's the list -->
+<!-- that's actually visible. -->
+<div id=items></div>
+
+<!-- The "unsorted" div holds a list of puzzles.  Each puzzle is -->
+<!-- represented by a <form> tag -->
+<div id=unsorted class=internal></div>
+
+<div id=tmp class=internal></div>
+<hr>
+
+<!-- documentation goes here. --->
+
+<span id="showfaq" 
+      style="cursor: pointer; color: blue; text-decoration: underline; display: inline;" 
+      onclick="document.getElementById('faq').style.display='inline';
+               document.getElementById('showfaq').style.display='none';
+               document.getElementById('hidefaq').style.display='inline'">How Do I ...</span>
+<span id="hidefaq" 
+      style="cursor: pointer; color: blue; text-decoration: underline; display: none;" 
+      onclick="document.getElementById('faq').style.display='none';
+               document.getElementById('showfaq').style.display='inline';
+               document.getElementById('hidefaq').style.display='none'">How Do I ...</span>
+<span id="faq" style="display: none;">
+
+<DL>
+<DT><B>... get the grey butons to stop saying "WhoRU?"</B></DT>
+<DD>
+  In the upper-left corner, under "Czar", there's a box where you can tell Czar who you are.
+  Every time you reload the page, you'll have to answer this question again.  Sorry about that.
+  You shouldn't need to reload the page most of the time; the data automatically refreshes.
+  (Also, when new puzzles arrive, the button will say "WhoRU?" until you change the contents
+  of that drop-down box.  This is a bug, but we left it in, either because we didn't have time
+  to fix it or because we didn't want y'all to jump on the new puzzles.)
+</DD>
+<DT><B>... get a list of unsolved puzzles?</B></DT>
+<DD>
+  In the "Filter by tags" section, make sure "solved" and "invert" are checked, and no
+  other boxes are.
+</DD>
+<DT><B>... see who is working on a puzzle?</B></DT>
+<DD>
+  "(3p)" next to the button means that 3 people are working on it ("3" is just an 
+  example, this could be any number).  Hover your mouse over it to see who those people
+  are.
+</DD>
+<DT><B>... work on a new puzzle? ("new" as in it wasn't the last puzzle I was doing.)</B></DT>
+<DD>
+  First you need to deal with the last puzzle that you were working on (one of the three
+  cases below).  Then, click on the light-grey button that says "Do This" on the right 
+  side of a puzzle.  You'll be telling Czar that you're working on this puzzle, and leaving whatever
+  puzzle you were looking at.  Make sure you are communicating with the people who
+  are already working on the puzzle.
+</DD>
+<DT><B>... indicate that I've solved a puzzle?</B></DT>
+<DD>
+  Put the solution (if there is one) in the comment field, add your name(s) to it (so we can
+  come by and ask you how it worked if we need info for a meta), and add the "solved" tag to the
+  tags field.  Then you can move on to a new puzzle!
+</DD>
+<DT><B>... leave a puzzle that I've made no progress on to work on a new puzzle?</B></DT>
+<DD>
+  Don't forget that "could not solve" is not the same as "no progress" -- if you've tried
+  things and didn't work, that's progress, and you should note it (see below).  But if you
+  really didn't do anything, just go to a new puzzle.
+</DD>
+<DT><B>... leave a puzzle that I *have* made progress on to work on a new puzzle?</B></DT>
+<DD>
+  Czar keeps track of when people clicked on "Do This", but has no idea who has made
+  progress.  If you've made progress on a puzzle but haven't solved it, make sure you put your
+  name in the puzzle status area (between "sheet" and the tags) so other people
+  picking it up can ask what you've done.  Something like "David can explain this."
+  Then click on "Do This" next to the new puzzle.  Don't just jump to a new puzzle
+  without leaving a clean trail for us to follow, that's scummy.
+</DD>
+<DT><B>... "update my status" when I'm still on the same puzzle?</B></DT>
+<DD>
+  Click on the green button next to your current puzzle (which displays how long since
+  you last clicked on it).  This helps us know that you haven't fallen asleep or disappeared
+  without telling anybody.
+</DD>
+<DT><B>... see who has worked on a puzzle in the past?</B></DT>
+<DD>
+  You can see this on the "who's doing what" page.  Note that we don't distinguish
+  between people who spent a long time on a puzzle and people who briefly looked at
+  it and moved on.  So please update the status box if you have real progress, or
+  at least looked at it for a while and confirmed certain things didn't work.
+</DD>
+<DT><B>... deal with the issue that I have a bunch of progress on a puzzle but I can't
+  write it down for whatever reason but I really need to stop working on it for a while
+  and I promise I'll come back to it and I know this is working on more than one puzzle
+  at a time but it's for a good cause please please please?</B></DT>
+<DD>
+  Sigh.  You can't do this in czar, but it is possible to denote this on the 
+  "Who's doing what" page.  It's an advanced option, you'll have to figure out how to
+  do it yourself or ask the Meta Czar.  
+</DD>
+</span>
+
+</body>
+</html>

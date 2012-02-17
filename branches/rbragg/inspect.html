@@ -1,0 +1,179 @@
+<html>
+<head>
+<title>stateserver inspector</title>
+<style>
+
+textarea {
+  border: 1px solid #888;
+  background-color: #CCC;
+  color: #000;
+}
+
+table {
+  border-collapse: collapse;
+  background-color: #FF8;
+}
+
+td {
+  border: 1px solid gray;
+}
+
+td:first-child {
+  background-color: #8F8;
+}
+
+td.modified {
+  font-weight: bold;
+}
+
+</style>
+<script language="JavaScript" src="json2.js"></script>
+<script language="JavaScript" src="stateserver.js"></script>
+<script language="JavaScript">
+
+var the_server = null;
+var the_log_buffer = null;
+var the_rows_by_key = null;
+var the_sort_timeout = null;
+
+var log = function(line) {
+  if (the_log_buffer != null) {
+    the_log_buffer = the_log_buffer + line + "\n";
+  } else {
+    the_log_buffer = line + "\n";
+    window.setTimeout(function() {
+      var textarea = document.getElementById("log");
+      textarea.value += the_log_buffer;
+      textarea.scrollTop = textarea.scrollHeight;
+      the_log_buffer = null;
+    }, 0);
+  }
+}
+
+var sort_data = function() {
+  the_sort_timeout = null;
+
+  var keys = [];
+  for (var k in the_rows_by_key) keys[keys.length] = k;
+  keys.sort();
+
+  var tbody = document.getElementById("data").tBodies[0];
+  var actual_next = tbody.firstChild;
+  for (var i in keys) {
+    var desired_next = the_rows_by_key[keys[i]];
+    if (actual_next == desired_next)
+      actual_next = actual_next.nextSibling;
+    else
+      tbody.insertBefore(desired_next, actual_next);
+  }
+}
+
+var on_server = function(key, value) {
+  log("received: " + key + " = " + JSON.stringify(value));
+
+  if (the_sort_timeout == null) {
+    the_sort_timeout = window.setTimeout(sort_data, 10);
+    for (var k in the_rows_by_key) {
+      the_rows_by_key[k].cells[1].className = "";
+    }
+  }
+
+  var tr = the_rows_by_key[key];
+  if (value == null) {
+    var tbody = document.getElementById("data").tBodies[0];
+    tbody.removeChild(the_rows_by_key[key]);
+    delete the_rows_by_key[key];
+  } else if (tr != null) {
+    var td = tr.cells[1];
+    while (td.hasChildNodes()) td.removeChild(td.firstChild);
+    td.appendChild(document.createTextNode(value));
+    td.className = "modified";
+  } else {
+    tr = document.createElement("tr");
+    the_rows_by_key[key] = tr;
+
+    var td = document.createElement("td");
+    td.appendChild(document.createTextNode(key));
+    tr.appendChild(td);
+
+    td = document.createElement("td");
+    td.className = "modified";
+    td.appendChild(document.createTextNode(value));
+    tr.appendChild(td);
+
+    td = document.createElement("td");
+    var b = document.createElement("button");
+    b.onclick = function() { the_server.set(key, null); };
+    b.appendChild(document.createTextNode("delete"));
+    td.appendChild(b);
+
+    tr.appendChild(td);
+  }
+}
+
+var on_submit_connect = function(form) {
+  var url = form.url.value;
+  if (form.url.value == "") return false;
+
+  if (the_server) {
+    the_server.close();
+  } else {
+    document.getElementById("log").value = "";
+    document.getElementById("unroll").style.visibility = "visible";
+  }
+
+  the_rows_by_key = new Object();
+  var tbody = document.getElementById("data").tBodies[0];
+  while (tbody.hasChildNodes()) tbody.removeChild(tbody.firstChild);
+
+  log("connecting to: " + url);
+  the_server = stateserver.open(url, on_server);
+  return false;
+}
+
+var on_submit_update = function(form) {
+  var key = form.key.value, value = form.value.value;
+  if (key == "" || the_server == null) return false;
+
+  log("sent: " + key + " = " + JSON.stringify(value));
+  the_server.set(key, value);
+  return false;
+}
+
+var on_submit_delete = function(form) {
+  var key = form.key.value;
+  if (key == "" || the_server == null) return false;
+
+  log("transmit: " + key + " = null");
+  the_server.set(key, null);
+  return false;
+}
+
+</script>
+</head>
+<body>
+<form onsubmit="return on_submit_connect(this);">
+URL: <input type=text name=url size=40>
+<input type=submit value=Connect><br>
+</form>
+
+<div id=unroll style="visibility: hidden">
+<form onsubmit="return on_submit_update(this);">
+Key: <input type=text name=key size=30>
+Value: <input type=text name=value size=50>
+<input type=submit value=Update><br>
+</form>
+
+<form onsubmit="return on_submit_delete(this);">
+Key: <input type=text name=key size=30>
+<input type=submit value=Delete><br>
+</form>
+
+<form>
+<textarea id=log cols=80 rows=6 wrap=off readonly></textarea>
+</form>
+
+<table id=data><tbody></tbody></table>
+</div>
+</body>
+</html>

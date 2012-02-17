@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>who</title>
+<style>
+.active { background-color:#0f0; font-weight: normal; }
+.nonactive { background-color:#ccc; color:#666 }
+.nonexclusive { background-color:#c3f; color:#000; }
+.never { background-color:#fff; }
+td.active {text-align:right}
+td.activeOnSolved {text-align:right; background-color:#f60}
+td.nonactive {text-align: right }
+td.nonexclusive {text-align: right }
+td.nonpuzzlelt { background-color:#fc9; }
+td.nonpuzzledk { background-color:#da7; }
+td.focused { border: 1px solid #AAAAAA; }
+
+.popup {
+  border: thin solid black;
+  position:absolute;
+  background-color: white;
+  visibility: hidden;
+}
+
+.title {
+  text-align: center;
+  font-size: 200%;
+  padding-bottom: 1ex;
+}
+
+
+</style>
+
+<script language="JavaScript" src="soundmanager2-nodebug-jsmin.js"></script>
+<script language="JavaScript" src="json2.js"></script>
+<script language="JavaScript" src="log.js"></script>
+<script language="JavaScript" src="stateserver.js"></script>
+<script language="JavaScript" src="cookie.js"></script>
+<script language="JavaScript" src="tags.js"></script>
+<script language="JavaScript" src="who-data.js"></script>
+<script language="JavaScript" src="notifications.js"></script>
+<script language="JavaScript" src="who.js"></script>
+
+<!-- configure soundmanager2 -->
+<script type="text/javascript">
+soundManager.url = 'swf';
+soundManager.useHTML5Audio = true;
+soundManager.useFlashBlock = true;
+soundManager.debugMode = false;
+soundManager.onload = function() { };
+</script>
+
+</head>
+
+
+<!-- body onLoad=Init('http://czar*.emagino.ofb.net:5222/mh2011') -->
+<body onLoad=Init('http://squirrel.the4cs.com:5222/mh2011')>
+
+<div class=title>Who's Doing What
+<a style="font-size:50%" href=".">(Back to Czar)</a>
+</div>
+
+<!-- The dialog that appears when you click on any person/puzzle cell. -->
+<div id=divUpdateWidget class=popup>
+Working on this activity...
+<table>
+  <tr><td><button class=active id=btnCurrently>Currently</button></td>
+      <td><button class=active id=btnRecently>Recently</button></td></tr>
+  <tr><td><button class=nonactive id=btnNoLonger>No longer</button></td>
+      <td><button class=never id=btnNever>Never</button></td></tr>
+</table>
+  <label>
+    See advanced options <input type=checkbox id=checkboxToggleAdvanced
+    onchange="var d = document.getElementById('divAdvanced');  if (d.style.display == 'block') d.style.display = 'none'; else d.style.display = 'block';">
+  </label>
+  <div id=divAdvanced style="display:none">
+    <button style="display:none" class=active
+     id=btnMakeExclusive>Make exclusive of other assignments</button>
+    <button style="display:none" class=nonexclusive
+     id=btnMakeNonExclusive>Make non-exclusive of other assignments</button>
+  </div>
+<br>
+  <center><button id=btnCancel><small>Cancel</small></button></center>
+</div>
+
+<!-- The dialog that appears when you click on any person/puzzle header. -->
+<div id=divRenameWidget class=popup>
+Rename: <input id=inputName>
+  <button id=btnCancelRename><small>cancel</small></button>
+</div>
+
+<!-- Div that's populated by the javascript. -->
+<center>
+<div style="font-size:68%" id="data"></div>
+<div id="tags"></div>
+
+<!-- Sort rows. -->
+<div style="padding:10px">
+<span style="border: thin solid blue; padding: 8px">
+Sort rows:
+	    <label for=radioAlpha>
+	    <input type=radio name="sortOrder" id=radioAlpha checked
+	    onchange=RedrawTable()>Alphabetically</label>
+	    <label for=radioRecency>
+	    <input type=radio name="sortOrder" id=radioRecency
+	    onchange=RedrawTable()>By&nbsp;recency</label>
+            <label for=radioRecencyReverse>
+	    <input type=radio name="sortOrder" id=radioRecencyReverse
+	    onchange=RedrawTable()>By&nbsp;recency&nbsp;(reverse)</label>
+            <label>
+	    <input type=radio name="sortOrder" id=radioNumActives
+	    onchange=RedrawTable()>By&nbsp;#actives</label>
+            <label>
+	    <input type=radio name="sortOrder" id=radioUser
+	    onchange=RadioUserSelected()>By&nbsp;person:</label>
+            <select disabled id=sortUserSelect>
+              <option value="">Select...</option>
+            </select>
+</span>
+</div>
+
+<!-- Sort columns. -->
+<div style="padding:10px">
+<span style="border: thin solid blue; padding: 8px">
+Sort people:
+    <label>
+    <input type=radio name="columnsSortOrder" id=columnsAlpha checked
+    onchange=RedrawTable()>Alphabetically</label>
+    <label>
+    <input type=radio name="columnsSortOrder" id=columnsRecency
+    onchange=RedrawTable()>By&nbsp;recency</label>
+    <label>
+    <input type=radio name="columnsSortOrder" id=columnsRecencyReverse
+    onchange=RedrawTable()>By&nbsp;recency&nbsp;(reverse)</label>
+    <label>
+    <input type=radio name="columnsSortOrder" id=columnsActivity
+    onchange=SortByActivitySelected()>By&nbsp;activity:</label>
+    <select disabled id=columnsActivitySelect>
+      <option value="">Select...</option>
+    </select>
+</span>
+</div>
+
+<div style="padding:10px">
+<span style="border: thin solid blue; padding: 8px">
+<label for=checkboxToggleAutoUpdate>Update every minute:
+<input type=checkbox checked id=checkboxToggleAutoUpdate
+ onchange="ToggleAutoUpdate(this);"></label>
+</span>
+<span style="border: thin solid blue; padding: 8px">
+Table font size:
+<input type=submit value='+' onClick='AdjustTableFontSize(1.25);'>
+<input type=submit value='-' onClick='AdjustTableFontSize(0.8);'>
+</span>
+</div>
+
+
+<br><br><br>
+
+<table width=80%>
+  <tr><th width=50%>Edit</th><th>Legend</th></tr>
+  <tr>
+    <td valign=top>
+Add person: <input onchange="AddPerson(this);"><br>
+Add activity: <input onchange="AddActivity(this);"><br>
+
+    <ul>
+      <li>You can rename any person or activity by clicking their name
+	  in the table.
+      <li>You cannot delete any person or activity.  Contact Corey if
+	  you added something you didn't mean to.
+      <li>New activities, new people, and changes in work assignments
+	  appear automatically.  The Update every minute checkbox is
+	  useful only to update the minutes-ago time in the table.
+    </ul>
+    </td>
+
+    <td valign=top>
+
+<center>
+<table rules=all frame=outline>
+  <tr>
+    <td></td>
+    <td>Charlie</td>
+    <td>Juliet</td>
+    <td style="background-color:#ff6">Mike</td>
+    <td>Oscar</td>
+    <td>Romeo</td>
+  </tr>
+  <tr>
+    <td>First puzzle</td>
+    <td></td>
+    <td class=active>:05</td>
+    <td></td>
+    <td class=active>:23</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Second puzzle</td>
+    <td></td>
+    <td class=nonactive>1:12</td>
+    <td class=nonactive>1:07</td>
+    <td></td>
+    <td class=active style="background-color:#f00">4:38</td>
+  </tr>
+  <tr>
+    <td>Third puzzle</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td class=nonexclusive>:05</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Fourth puzzle <font color=green>&#x2714;</font></td>
+    <td class=activeOnSolved>1:30</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class=nonpuzzlelt>Sleeping</td>
+    <td></td>
+    <td></td>
+    <td class=active>:15</td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+</center>
+
+<ul>
+  <li>Each row is an activity, each column a person.  Non-puzzle
+      activities are orange.  Your name is yellow, if you've selected your
+      name on <a href="">czar</a>.
+  <li>Each cell shows when this person was last performing this
+      activity.  It's hours and minutes.
+  <li>Marking one assignment as "current" (green) marks all other assignments
+      as "no longer" (grey).  The exception are non-exclusive
+      assignments, shown in purple.  Choose "See advanced options" to
+      enable this feature.  Non-exclusive assignments for puzzles will
+      be rare -- it would suggest you're actively working on more than
+      one puzzle simultaneously.
+  <li>At the two-hour mark, green starts "decaying" to red, turning
+      into full red at 6 hours.  When someone starts losing their
+      color, it means we haven't heard from them in a while.
+  <li>Solved puzzles have a checkmark next to their names.  Anyone active
+      assignments on solved puzzles are shown in orange.
+</ul>
+
+	</td>
+      </tr>
+</table>
+
+
+
+</center>
+
+
+
+
+</body> </html>
