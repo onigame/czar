@@ -71,7 +71,7 @@ var on_submit_edit = function() {
         send_value(this, input, input.value);
         if (input.name == "tags") {
           UpdateTagsSelector();
-	  MaybeSendSolvedNotification(this.name, input.value);
+          MaybeSendSolvedNotification(this.name, input.value);
         }
         if (!input.className)
           input.className = "inflight";
@@ -103,7 +103,11 @@ var MaybeSendSolvedNotification = function(puzzle_id, new_tags) {
   }
 
   gSolvedPuzzles.push(puzzle_id);
-  Notifications.Send('We just solved ' + gActivities[puzzle_id].name + '!');
+  if (tags.indexOf('meta') == -1) {
+	Notifications.Send('We just solved ' + gActivities[puzzle_id].name + '!');
+  } else {
+	Notifications.Send('We just solved a meta!<br>' + gActivities[puzzle_id].name);
+  }
 };
 
 var on_submit_create = function() {

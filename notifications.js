@@ -1,13 +1,11 @@
 // Methods for displaying and managing notifications.
 
 /*
- * Each notification is a new <div>  We create them dynamically ,here.
- * Put each notification in a z-index higher than all othe rnotifications.
+ * Each notification is a new <div>  We create them dynamically here.
+ * Put each notification in a z-index higher than all other notifications.
  * Clicking "okay" in a notification dismisses it.
  * Notifications are displayed only if they've been posted within the last
- *   minute. 
- TODO:
- * Play Some notifications can play a sound.
+ * minute. 
  */
 
 var Notifications = {
@@ -46,7 +44,8 @@ var Notifications = {
 
   _stateserver: null,
   _windows: null,
-  _solved_sound: null,
+  _solved_puzzle_sound: null,
+  _solved_meta_sound: null,
   
   _MaybeDisplayNotification: function(posted, message) {
     // Notifications are shown for only one minute.  Don't show stale
@@ -66,13 +65,13 @@ var Notifications = {
       notifications = notifications.split(',');
       log('notifications is now ' + notifications + ' and posted is ' + posted);
       if (notifications.indexOf(String(posted)) != -1) {
-	// We've already seen this notification; pass.
-	log('Seen this notification before.');
-	return;
+        // We've already seen this notification; pass.
+	    log('Seen this notification before.');
+	    return;
       } else {
-	// Append this notification to those seen.
-	notifications[notifications.length] = posted;
-	cookies.set('notifications', notifications.join(','));
+	    // Append this notification to those seen.
+	    notifications[notifications.length] = posted;
+	    cookies.set('notifications', notifications.join(','));
       }
     } else {
       cookies.set('notifications', posted);
@@ -130,13 +129,24 @@ var Notifications = {
     var body = document.getElementsByTagName('body')[0];
     body.appendChild(div);
     this._windows.push(div);
-    if (this._solved_sound == null) {
-      var sound_id = 'solved';
+    
+    if (this._solved_puzzle_sound == null) {
+      var sound_id = 'solved_puzzle';
       if (soundManager.createSound(sound_id, 'applause.mp3')) {
-	this._solved_sound = sound_id;
+    	  this._solved_puzzle_sound = sound_id;
       }
     }
-    soundManager.play(this._solved_sound);
+    soundManager.play(this._solved_puzzle_sound);
+
+    if (message.indexOf('We just solved a meta!') == 0) {
+      if (this._solved_meta_sound == null) {
+	    var sound_id = 'solved_meta';
+	    if (soundManager.createSound(sound_id, 'hooray.mp3')) {
+	      this._solved_meta_sound = sound_id;
+	    }
+	  }
+	  soundManager.play(this._solved_meta_sound);
+    }
   },
 
   _Dismiss: function(div) {
