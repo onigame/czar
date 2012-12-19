@@ -8,6 +8,7 @@ div.internal { display: none; }
 
 form a { font-size: 80%; margin-right: 10px; }
 form a.missing { color: #888888; text-decoration: none; }
+form a.invalid { color: #FF0000; text-decoration: line-through; }
 form.marked a.missing { text-decoration: line-through; }
 form { margin: 0; }
 form.deleted { display: none; }
@@ -55,8 +56,8 @@ soundManager.onload = function() { };
 
 </head>
 
-<!-- body onload="start_czar('http://czar*.emagino.ofb.net:5222/mh10')" -->
-<body onload="start_czar('http://squirrel.the4cs.com:5222/mh2011')">
+<body onload="start_czar('http://czar.emagino.net:433/mh2013')">
+<!-- body onload="start_czar('http://squirrel.the4cs.com:5222/mh2011')" -->
 <img src=czar.jpeg style="float: left; margin-right: 10; margin-bottom: 15;">
 <div style="margin-left: 10">
   <h2 style="margin-top: 0">Czar
@@ -73,14 +74,18 @@ soundManager.onload = function() { };
   </span>
   <br>
   Linking a Google Spreadsheet:
-  (1) Make a <a target="docs" href="http://docs.google.com/">spreadsheet</a> with <em>exactly</em>
-    the same title as the puzzle.  
-    (2) Invite <em>czar@ofb.net</em> to edit.
+  (1) <a target="docs" href="http://spreadsheets.google.com/ccc?new">Make a new spreadsheet</a>.  (2) Title it with the <i>same</i> name as
+   the puzzle; cut-and-paste if you need to.  (3) Invite <i>czar@ofb.net</i> to share (edit) the sheet.
+<!--
+    (2) Click on "Share" in the upper-right.  (3) Click on "Change..." and set to "Anyone with the link"; also check "Allow anyone to edit".
+    (4) Click on "Save".  (5) Copy the link in the box.  (6) Come back to this page, click on "sheet" next to the puzzle, then paste the link,
+     then hit enter.
+-->
   <br>
   See also:
-  <a target="teampage" href="https://sites.google.com/a/teamleftout.org/mh2011/2011Hunt">Team Homepage</a>,
-  <a target="huntpage" href="http://www.mit.edu/~puzzle/currhunt.html">Puzzle Hunt site</a>,
-  <a target="whopage" href="who.html">Who's doing what</a>.
+  <a target="huntpage" href="http://web.mit.edu/puzzle/www/">Puzzle Hunt site</a> (user:teamleftout pass:leftierthanthou),
+  <a target="whopage" href="who.html">Who's doing what</a>,
+  <a target="needsahapage" href="https://docs.google.com/document/d/1s2w1td65BfU7XI9DBhGycwzZ1ajuyU-8wh-TdKT9cXg/edit">Needs Aha</a>.
 </div>
 <br clear=left>
 
@@ -150,6 +155,13 @@ soundManager.onload = function() { };
   Put the solution (if there is one) in the comment field, add your name(s) to it (so we can
   come by and ask you how it worked if we need info for a meta), and add the "solved" tag to the
   tags field.  Then you can move on to a new puzzle!
+</DD>
+<DT><B>... indicate that we're not using the spreadsheet to solve the puzzle?</B></DT>
+<DD>
+  Add the tag "nosheet" to the puzzle.  The spreadsheet link will become a red strikethrough
+  word.  Note that this change is purely cosmetic; the link will still link to any spreadsheet
+  that it linked to before, and can still be changed.  It's just a way to notify the other
+  humans on the team that you don't plan to use the spreadsheet.
 </DD>
 <DT><B>... leave a puzzle that I've made no progress on to work on a new puzzle?</B></DT>
 <DD>
