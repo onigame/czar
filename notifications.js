@@ -72,7 +72,7 @@ var Notifications = {
       log('notifications is now ' + notifications + ' and posted is ' + posted);
       if (notifications.indexOf(String(posted)) != -1) {
         // We've already seen this notification; pass.
-	    log('Seen this notification before.');
+        log('Seen this notification before.');
 	    return;
       } else {
 	    // Append this notification to those seen.
