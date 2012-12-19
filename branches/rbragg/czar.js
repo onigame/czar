@@ -81,6 +81,18 @@ var on_submit_edit = function() {
   return false;
 };
 
+var MaybeRecolorSheet = function(puzzle_id, new_tags) {
+  log('MaybeRecolorSheet(' + puzzle_id + ', ' + new_tags + ')');
+  var tags = new_tags.split(',');
+  if (tags.indexOf('nosheet') != -1) {
+    document.getElementById(puzzle_id + ".sheet").style.color = "#FF0000";
+    document.getElementById(puzzle_id + ".sheet").style.textDecoration = "line-through";
+  } else {
+    document.getElementById(puzzle_id + ".sheet").style.color = "";
+    document.getElementById(puzzle_id + ".sheet").style.textDecoration = "";
+  }
+}
+
 var gSolvedPuzzles = [];
 var MaybeSendSolvedNotification = function(puzzle_id, new_tags) {
   log('MaybeSendSolvedNotification(' + puzzle_id + ', ' + new_tags + ')');
@@ -655,6 +667,7 @@ var UpdateTagsSelector = function() {
     log('node.name is [' + node.name + ']');
 
     UpdateTagCounts(document.getElementById(node.name + ".tags").value);
+    MaybeRecolorSheet(node.name, document.getElementById(node.name + ".tags").value);
   }
 
   MakeTagSelector(document.getElementById("tags"), filter_tags);
