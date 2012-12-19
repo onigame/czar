@@ -1,0 +1,25 @@
+application: czar
+version: 1
+runtime: python27
+threadsafe: true
+api_version: 1
+
+handlers:
+# Static assets
+- url: /
+  static_files: index.html
+  upload: index\.html
+- url: /swf
+  static_dir: swf
+- url: /(.*\.jpeg)
+  static_files: \1
+  upload: (.*\.jpeg)
+- url: /(.*\.js)
+  static_files: \1
+  upload: (.*\.js)
+- url: /(.*\.mp3)
+  static_files: \1
+  upload: (.*\.mp3)
+- url: /(.*\.html)
+  static_files: \1
+  upload: (.*\.html)

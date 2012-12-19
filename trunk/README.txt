@@ -74,9 +74,14 @@ Running it yourself
    For example: start_czar('http://czar*.ofb.net:8888/my_test_name_here')
 
 4. Load your copy of index.html in a browser, directly off disk or
-   with some sort of web server.  You should get an initially empty czar
-   instance to which you can make entries and edits.  Make sure the data is
-   being sent to the server -- try simultaneous viewing in two browser windows.
+   with some sort of web server.  (Note that if you serve index.html directly
+   off disk, none of the audio will work due to Flash security restrictions.
+   To avoid this limitation, running a web server is necessary.  You can use
+   Google App Engine's dev_appserver.py to run such a web server, and an
+   app.yaml config file is included for this purpose.)  You should get an
+   initially empty czar instance to which you can make entries and edits.  Make
+   sure the data is being sent to the server -- try simultaneous viewing in two
+   browser windows.
 
 5. Load up inspect.html in your browser.  Enter the URL of your stateserver
    (the same one you put in your edited index.html).  Look at the key/value
