@@ -104,10 +104,10 @@ var MaybeSendSolvedNotification = function(puzzle_id, new_tags) {
 
   gSolvedPuzzles.push(puzzle_id);
   if (tags.indexOf('meta') == -1) {
-	Notifications.Send('We just solved ' + gActivities[puzzle_id].name + '!',
+    Notifications.Send('We just solved ' + gActivities[puzzle_id].name + '!',
 			'puzzle');
   } else {
-	Notifications.Send('We just solved a meta:<br>' + gActivities[puzzle_id].name,
+    Notifications.Send('We just solved a meta:<br>' + gActivities[puzzle_id].name,
 			'meta');
   }
 };
