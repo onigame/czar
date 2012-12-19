@@ -5,17 +5,15 @@
  * Put each notification in a z-index higher than all othe rnotifications.
  * Clicking "okay" in a notification dismisses it.
  * Notifications are displayed only if they've been posted within the last
- *   minute. 
- TODO:
- * Play Some notifications can play a sound.
+ * minute. 
  */
 
 var Notifications = {
-  Send: function(message) {
+  Send: function(message, type) {
     // Sends "message" as a notification.
 
     var now = (new Date()).valueOf();
-    this._stateserver.set('n' + now, now + '#' + message);
+    this._stateserver.set('n' + now + '.' + type, now + '#' + message);
   },
 
   HandleUpdateFromStateserver: function(key, value) {
@@ -24,6 +22,13 @@ var Notifications = {
       return;
     }
 
+    // Assume puzzle type unless otherwise specified for backward compatibility.
+    var type = 'puzzle';
+    var dot = key.indexOf(".");
+    if (dot != -1) {
+      type = key.substring(dot+1)
+    }
+    	
     // Value is posted#message.  Message may contain any symbols.
     // Posted is moment when notification was created, as a string
     // representing milliseconds since epoch.
@@ -35,7 +40,7 @@ var Notifications = {
     var message = value.substring(hash+1);
 
     log('Notification [' + message + '] @ ' + posted);
-    this._MaybeDisplayNotification(posted, message);
+    this._MaybeDisplayNotification(posted, message, type);
   },
 
 
@@ -46,9 +51,9 @@ var Notifications = {
 
   _stateserver: null,
   _windows: null,
-  _solved_sound: null,
+  _sounds_loaded: new Object(),
   
-  _MaybeDisplayNotification: function(posted, message) {
+  _MaybeDisplayNotification: function(posted, message, type) {
     // Notifications are shown for only one minute.  Don't show stale
     // notifications.
     var now = (new Date()).valueOf();
@@ -66,13 +71,13 @@ var Notifications = {
       notifications = notifications.split(',');
       log('notifications is now ' + notifications + ' and posted is ' + posted);
       if (notifications.indexOf(String(posted)) != -1) {
-	// We've already seen this notification; pass.
-	log('Seen this notification before.');
-	return;
+        // We've already seen this notification; pass.
+        log('Seen this notification before.');
+	      return;
       } else {
-	// Append this notification to those seen.
-	notifications[notifications.length] = posted;
-	cookies.set('notifications', notifications.join(','));
+        // Append this notification to those seen.
+        notifications[notifications.length] = posted;
+        cookies.set('notifications', notifications.join(','));
       }
     } else {
       cookies.set('notifications', posted);
@@ -88,7 +93,7 @@ var Notifications = {
     for (var i = 0; i < this._windows.length; i++) {
       var d = this._windows[i];
       if (d.style.zIndex > zIndex) {
-	zIndex = d.style.zIndex + 1;
+        zIndex = d.style.zIndex + 1;
       }
     }
     div.style.zIndex = zIndex;
@@ -119,10 +124,10 @@ var Notifications = {
       var btn = document.createElement('button');
       btn.innerHTML = 'dismiss all';
       btn.onclick = function() {
-	while (Notifications._windows.length > 0) {
-	  // _Dismiss will remove the div from _windows.
-	  Notifications._Dismiss(Notifications._windows[0]);
-	}
+	    while (Notifications._windows.length > 0) {
+	      // _Dismiss will remove the div from _windows.
+	      Notifications._Dismiss(Notifications._windows[0]);
+	    }
       };
       div.appendChild(btn);
     }
@@ -130,15 +135,24 @@ var Notifications = {
     var body = document.getElementsByTagName('body')[0];
     body.appendChild(div);
     this._windows.push(div);
-    if (this._solved_sound == null) {
-      var sound_id = 'solved';
-      if (soundManager.createSound(sound_id, 'applause.mp3')) {
-	this._solved_sound = sound_id;
-      }
+    
+    // Always play the applause sound.
+    this._PlaySound('applause.mp3');
+    if (type == 'meta') {
+      // Play an extra, simultaneous sound for an added thrill for meta solves.
+      this._PlaySound('hooray.mp3');
     }
-    soundManager.play(this._solved_sound);
   },
 
+  _PlaySound: function(file_name) {
+    if (!(file_name in this._sounds_loaded)) {
+      if (soundManager.createSound(file_name, file_name)) {
+        this._sounds_loaded[file_name] = 1;
+      }
+    }
+    soundManager.play(file_name);
+  },
+  
   _Dismiss: function(div) {
     var body = document.getElementsByTagName('body')[0];
     body.removeChild(div);
