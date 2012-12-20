@@ -1,4 +1,5 @@
 var scopes = 'https://www.googleapis.com/auth/drive';
+var logged_in = false;
 var debug = true;
 
 function loadGoogleApis() {
@@ -18,21 +19,55 @@ function handleAuthClick() {
 
 function handleAuthResult(authResult) {
   if (authResult && !authResult.error) {
-    document.forms.create.style.display = "inline";
-    bind_input(document.forms.create.label, "Click to enter new puzzle name");
-    document.forms.create.label.czar_autosubmit = false;
-    document.forms.create.onsubmit = on_submit_create;
-    document.getElementById("auth_button").style.display = "none";
+    if (debug) console.log('Authentication successful.');
+    checkFolderAccess();
   } else {
     if (authResult && authResult.error) {
       alert("Authentication failed: " + authResult.error);
     }
-    document.forms.create.style.display = "none";
-    document.getElementById("auth_button").style.display = "inline";
+    handleNotLoggedIn();
   }
 }
 
+function checkFolderAccess() {
+  gapi.client.load('drive', 'v2', function() {
+    var request = gapi.client.request({
+      'path': '/drive/v2/files/' + config.doc_folder_id,
+      'method': 'GET',
+      });
+    request.execute(function(resp) {
+      if (!resp.error) {
+        if (debug) console.log('Verified access to shared folder.');
+        handleLoggedIn();
+      } else {
+        alert('Access to shared folder denied!\nAsk someone else on the team with access to add you.\n\n' +
+            '\nDetails: ' + resp.error.code + ': ' + resp.error.message);
+        handleNotLoggedIn();
+      }  
+    });
+  });
+} 
+
+function handleLoggedIn() {
+  logged_in = true;
+  document.forms.create.style.display = "inline";
+  bind_input(document.forms.create.label, "Click to enter new puzzle name");
+  document.forms.create.label.czar_autosubmit = false;
+  document.forms.create.onsubmit = on_submit_create;
+  document.getElementById("auth_button").style.display = "none";
+}
+
+function handleNotLoggedIn() {
+  logged_in = false;
+  document.forms.create.style.display = "none";
+  document.getElementById("auth_button").style.display = "inline";
+}
+
 function createSpreadsheet(title, callback) {
+  if (!logged_in) {
+    alert('To add new puzzles, authenticate with Google using the button above.');
+    return false;
+  }
   gapi.client.load('drive', 'v2', function() {
     var request = gapi.client.request({
       'path': '/drive/v2/files',
@@ -52,9 +87,14 @@ function createSpreadsheet(title, callback) {
       }
     });
   });
+  return true;
 }
 
 function renameSpreadsheet(id, title) {
+  if (!logged_in) {
+    alert('To edit puzzle names, authenticate with Google using the button above.');
+    return false;
+  }
   gapi.client.load('drive', 'v2', function() {
     var request = gapi.client.request({
       'path': '/drive/v2/files/' + id,
@@ -71,4 +111,5 @@ function renameSpreadsheet(id, title) {
       }
     });
   });
+  return true;
 }
