@@ -1,4 +1,5 @@
-var scopes = 'https://www.googleapis.com/auth/drive.file';
+var scopes = 'https://www.googleapis.com/auth/drive';
+var debug = true;
 
 function loadGoogleApis() {
   window.setTimeout(checkAuth, 1);
@@ -24,15 +25,14 @@ function handleAuthResult(authResult) {
     document.getElementById("auth_button").style.display = "none";
   } else {
     if (authResult && authResult.error) {
-      alert("Error: " + authResult.error);
+      alert("Authentication failed: " + authResult.error);
     }
     document.forms.create.style.display = "none";
     document.getElementById("auth_button").style.display = "inline";
   }
 }
 
-function createNewSpreadsheet(czar_id, title) {
-  var url = "";
+function createSpreadsheet(title, callback) {
   gapi.client.load('drive', 'v2', function() {
     var request = gapi.client.request({
       'path': '/drive/v2/files',
@@ -43,8 +43,32 @@ function createNewSpreadsheet(czar_id, title) {
         'parents': [{"id": config.doc_folder_id}],
       }
     });
-    request.execute(function(response) {
-      send_value(czar_id, "sheet", response.alternateLink);
+    request.execute(function(resp) {
+      if (!resp.error) {
+        if (debug) console.log('Created spreadsheet: ' + title);
+        callback(resp.id, resp.alternateLink);
+      } else {
+        alert('Spreadsheet not created!\nError ' + resp.error.code + ': ' + resp.error.message);
+      }
+    });
+  });
+}
+
+function renameSpreadsheet(id, title) {
+  gapi.client.load('drive', 'v2', function() {
+    var request = gapi.client.request({
+      'path': '/drive/v2/files/' + id,
+      'method': 'PUT',
+      'body': {
+        'title': title,
+      }
+    });
+    request.execute(function(resp) {
+      if (!resp.error) {
+        if (debug) console.log('Renamed spreadsheet: ' + title);
+      } else {
+        alert('Spreadsheet not renamed!\nError ' + resp.error.code + ': ' + resp.error.message);
+      }
     });
   });
 }
