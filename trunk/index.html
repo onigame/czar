@@ -35,6 +35,7 @@ span.tooltip {
 }
 
 </style>
+<script language="JavaScript" src="config.js"></script>
 <script language="JavaScript" src="soundmanager2-nodebug-jsmin.js"></script>
 <script language="JavaScript" src="json2.js"></script>
 <script language="JavaScript" src="stateserver.js"></script>
@@ -44,6 +45,7 @@ span.tooltip {
 <script language="JavaScript" src="who-data.js"></script>
 <script language="JavaScript" src="notifications.js"></script>
 <script language="JavaScript" src="czar.js"></script>
+<script language="JavaScript" src="googledocs.js"></script>
 
 <!-- configure soundmanager2 -->
 <script type="text/javascript">
@@ -54,11 +56,14 @@ soundManager.debugMode = false;
 soundManager.onload = function() { };
 </script>
 
+<!-- load Google APIs -->
+<script src="https://apis.google.com/js/client.js?onload=loadGoogleApis">
+</script>
+
 </head>
 
-<!-- body onload="start_czar('http://czar.emagino.net:433/mh2013')" -->
-<!-- body onload="start_czar('http://squirrel.the4cs.com:5222/mh2011')" -->
-<body onload="start_czar('http://localhost:8888/localtest')">
+<body onload="start_czar()">
+
 <img src=czar.jpeg style="float: left; margin-right: 10; margin-bottom: 15;">
 <div style="margin-left: 10">
   <h2 style="margin-top: 0">Czar
@@ -74,15 +79,6 @@ soundManager.onload = function() { };
     </select>
   </span>
   <br>
-  Linking a Google Spreadsheet:
-  (1) <a target="docs" href="http://spreadsheets.google.com/ccc?new">Make a new spreadsheet</a>.  (2) Title it with the <i>same</i> name as
-   the puzzle; cut-and-paste if you need to.  (3) Invite <i>czar@ofb.net</i> to share (edit) the sheet.
-<!--
-    (2) Click on "Share" in the upper-right.  (3) Click on "Change..." and set to "Anyone with the link"; also check "Allow anyone to edit".
-    (4) Click on "Save".  (5) Copy the link in the box.  (6) Come back to this page, click on "sheet" next to the puzzle, then paste the link,
-     then hit enter.
--->
-  <br>
   See also:
   <a target="huntpage" href="http://web.mit.edu/puzzle/www/">Puzzle Hunt site</a> (user:teamleftout pass:leftierthanthou),
   <a target="whopage" href="who.html">Who's doing what</a>,
@@ -90,7 +86,8 @@ soundManager.onload = function() { };
 </div>
 <br clear=left>
 
-<form id=create name=create style="margin-bottom: 10">
+<button id=auth_button name=auth_button style="display: inline" onclick="handleAuthClick();">Authenticate with Google to enter a new puzzle</button>
+<form id=create name=create style="margin-bottom: 10; display: none">
 <input type=text name=label size=30 style='font-weight: bold'>
 </form>
 
