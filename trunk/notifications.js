@@ -1,8 +1,8 @@
 // Methods for displaying and managing notifications.
 
 /*
- * Each notification is a new <div>  We create them dynamically ,here.
- * Put each notification in a z-index higher than all othe rnotifications.
+ * Each notification is a new <div>  We create them dynamically here.
+ * Put each notification in a z-index higher than all other notifications.
  * Clicking "okay" in a notification dismisses it.
  * Notifications are displayed only if they've been posted within the last
  * minute. 

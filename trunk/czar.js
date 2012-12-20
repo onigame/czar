@@ -81,7 +81,7 @@ var on_submit_edit = function() {
         send_value(this, input, input.value);
         if (input.name == "tags") {
           UpdateTagsSelector();
-	  MaybeSendSolvedNotification(this.name, input.value);
+          MaybeSendSolvedNotification(this.name, input.value);
         }
       }
       if (!input.className)
