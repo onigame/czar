@@ -59,7 +59,8 @@ var gLastServerUpdate = null;
 var gTableFontSize = 100;  // percentage of font-size for the table as
                           // compared to the rest of the document.
 
-var Init = function(stateserver_url) {
+var Init = function() {
+  stateserver_url = config.server_url + config.hunt_id
   UpdateTagsSelector();
   gStateServer = stateserver.open(stateserver_url, function(key, value) {
       HandleUpdateFromStateserver(key, value);

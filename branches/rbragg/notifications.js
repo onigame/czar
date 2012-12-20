@@ -93,7 +93,7 @@ var Notifications = {
     for (var i = 0; i < this._windows.length; i++) {
       var d = this._windows[i];
       if (d.style.zIndex > zIndex) {
-	zIndex = d.style.zIndex + 1;
+        zIndex = d.style.zIndex + 1;
       }
     }
     div.style.zIndex = zIndex;

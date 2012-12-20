@@ -140,7 +140,9 @@ var on_submit_create = function() {
       do name = "p" + Math.floor(Math.random() * 10000);
       while (document.forms[name]);
 
+      url = createNewSpreadsheet(name, label);      
       send_value(name, "label", label);
+      
       var form = document.forms[name];
       if (this.label.className != "dirty")
         form.label.className = "inflight";
@@ -676,11 +678,9 @@ var UpdateTagsSelector = function() {
 
 /////////// end Tag Manipulation
 
-var start_czar = function(stateserver_url) {
+var start_czar = function() {
+  stateserver_url = config.server_url + config.hunt_id
   gStateServer = stateserver.open(stateserver_url, on_server);
-  bind_input(document.forms.create.label, "Click to enter new puzzle name");
-  document.forms.create.label.czar_autosubmit = false;
-  document.forms.create.onsubmit = on_submit_create;
   document.getElementById('whoami').onchange = WhoAmIChanged;
   Notifications.Init(gStateServer);
 }
