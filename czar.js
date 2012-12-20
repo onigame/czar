@@ -61,9 +61,19 @@ var on_submit_edit = function() {
     var input = this.elements[i];
     if (input.className == "dirty") {
       input.className = "";
-      if (!input.value && input.czar_oldvalue && input.name == "label") {
-        input.value = input.czar_oldvalue;
-        send_value(this, "deadline", new Date().getTime() + 20000);
+      if (input.name == "label") {
+        if (!input.value && input.czar_oldvalue) {
+          // start countdown to delete puzzle
+          input.value = input.czar_oldvalue;
+          send_value(this, "deadline", new Date().getTime() + 20000);
+        } else if (input.value) {
+          docid = this["docid"].value;
+          if (!docid || renameSpreadsheet(docid, input.value)) {
+            send_value(this, input, input.value);
+          } else {
+            input.value = input.czar_oldvalue;
+          }
+        }
       } else {
         if (input.name == "tags") {
           input.value = SanitizeTagList(input.value);
@@ -73,9 +83,9 @@ var on_submit_edit = function() {
           UpdateTagsSelector();
 	  MaybeSendSolvedNotification(this.name, input.value);
         }
-        if (!input.className)
-          input.className = "inflight";
       }
+      if (!input.className)
+        input.className = "inflight";
     }
   }
   return false;
@@ -140,13 +150,18 @@ var on_submit_create = function() {
       do name = "p" + Math.floor(Math.random() * 10000);
       while (document.forms[name]);
 
-      send_value(name, "label", label);
-      var form = document.forms[name];
-      if (this.label.className != "dirty")
-        form.label.className = "inflight";
-
-      sort_forms();
-      form.status.focus();
+      if (createSpreadsheet(label, function(id, url) {
+        send_value(name, "docid", id);
+        send_value(name, "sheet", url);
+      })) {
+        send_value(name, "label", label);
+        var form = document.forms[name];
+        if (this.label.className != "dirty")
+          form.label.className = "inflight";
+  
+        sort_forms();
+        form.status.focus();
+      }
     }
   }
   return false;
@@ -340,6 +355,7 @@ var bind_link = function(form, name, prompt) {
 
 var the_form_html =
   "<form name=@NAME@>" +
+  "<input type=hidden id=@NAME@.docid name=docid>" +
   "<input type=text name=label size=35 style='font-weight: bold'>" +
   "<a class=missing target=@NAME@.puzzle id=@NAME@.puzzle>puzzle</a>" +
   "<span class=tooltip><input type=text name=puzzle size=30></span>" +
@@ -676,11 +692,9 @@ var UpdateTagsSelector = function() {
 
 /////////// end Tag Manipulation
 
-var start_czar = function(stateserver_url) {
+var start_czar = function() {
+  stateserver_url = config.server_url + config.hunt_id
   gStateServer = stateserver.open(stateserver_url, on_server);
-  bind_input(document.forms.create.label, "Click to enter new puzzle name");
-  document.forms.create.label.czar_autosubmit = false;
-  document.forms.create.onsubmit = on_submit_create;
   document.getElementById('whoami').onchange = WhoAmIChanged;
   Notifications.Init(gStateServer);
 }
