@@ -68,10 +68,11 @@ var on_submit_edit = function() {
           send_value(this, "deadline", new Date().getTime() + 20000);
         } else if (input.value) {
           docid = this["docid"].value;
-          if (docid) {
-            renameSpreadsheet(docid, input.value);
+          if (!docid || renameSpreadsheet(docid, input.value)) {
+            send_value(this, input, input.value);
+          } else {
+            input.value = input.czar_oldvalue;
           }
-          send_value(this, input, input.value);
         }
       } else {
         if (input.name == "tags") {
@@ -149,18 +150,18 @@ var on_submit_create = function() {
       do name = "p" + Math.floor(Math.random() * 10000);
       while (document.forms[name]);
 
-      createSpreadsheet(label, function(id, url) {
+      if (createSpreadsheet(label, function(id, url) {
         send_value(name, "docid", id);
         send_value(name, "sheet", url);
-      });
-      send_value(name, "label", label);
-      
-      var form = document.forms[name];
-      if (this.label.className != "dirty")
-        form.label.className = "inflight";
-
-      sort_forms();
-      form.status.focus();
+      })) {
+        send_value(name, "label", label);
+        var form = document.forms[name];
+        if (this.label.className != "dirty")
+          form.label.className = "inflight";
+  
+        sort_forms();
+        form.status.focus();
+      }
     }
   }
   return false;
