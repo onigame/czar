@@ -1,5 +1,4 @@
-// Configuration for localhost testing, assuming the static files are served
-// by a 
+// Configuration for localhost testing.
 var localhost_config = {
   server_url: "http://localhost:8888/",
   hunt_id: "localtest",
