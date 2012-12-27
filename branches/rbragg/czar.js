@@ -463,10 +463,44 @@ var on_label_change = function(form, value) {
   the_sort_timeout = window.setTimeout(sort_forms, 0);
 };
 
-var UpdateAssignmentHack = function(uid, aid, when, active, exclusive) {
+var UpdateActivityHack = function(aid) {
   UpdateActives(aid);
   UpdateAssignButtons();
+  UpdateMyStatus();
 };
+
+var UpdateMyStatus = function() {
+  var mystatus = document.getElementById("mystatus");
+  mystatus.style.fontWeight="bold";
+  var whoami = document.getElementById('whoami');
+  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+  if (!uid) {
+    mystatus.style.backgroundColor = "#eee";
+    mystatus.style.color = "#333";
+    mystatus.innerHTML = "Unknown user: please select above.";
+  } else {
+    mystatus.style.color = "#000";
+    var is_assigned = false;
+    for (activity in gActivities) {
+      if (IsActiveAssignment(uid, activity) &&
+          IsExclusiveAssignment(uid,activity)) {
+        mystatus.style.backgroundColor = "#FFF";
+        mystatus.style.color = "#000";
+        mystatus.innerHTML = gActivities[activity].name;
+        is_assigned = true;
+        break;
+      }
+    }
+    if (!is_assigned) {
+      mystatus.innerHTML = 'You are not assigned to anything!  Please select ' +
+        'a puzzle below or select a non-puzzle activity ' +
+        '(on <a href="who.html">who</a>).<br>' +
+        'Consult with your local Puzzle Czar if you are unsure what you should be doing.';
+      mystatus.style.backgroundColor = "#FFF";
+      mystatus.style.color = "#F00";
+    }
+  }
+}
 
 var UpdateActives = function(name) {
   log('UpdateActives for ' + name);
@@ -489,7 +523,6 @@ var UpdateActives = function(name) {
   }
 };
 
-
 var WhoAmIChanged = function() {
   // Store this user identity in a cookie.
   var whoami = document.getElementById('whoami');
@@ -498,6 +531,7 @@ var WhoAmIChanged = function() {
 
   // Update the "Do this" buttons on each puzzle.
   UpdateAssignButtons();
+  UpdateMyStatus();
 };
 
 
