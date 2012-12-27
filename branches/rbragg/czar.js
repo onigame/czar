@@ -483,7 +483,8 @@ var UpdateMyStatus = function() {
     var is_assigned = false;
     for (activity in gActivities) {
       if (IsActiveAssignment(uid, activity) &&
-          IsExclusiveAssignment(uid,activity)) {
+          IsExclusiveAssignment(uid,activity) &&
+          gActivities[activity].name) {
         mystatus.style.backgroundColor = "#FFF";
         mystatus.style.color = "#000";
         mystatus.innerHTML = gActivities[activity].name;
