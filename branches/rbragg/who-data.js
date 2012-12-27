@@ -219,7 +219,7 @@ var InternalUpdateActivity = function(id, name, tags) {
     activity.tags = 'activity';
   }
   if (UpdateActivityHack) {
-    UpdateActivityHack(activity);
+    UpdateActivityHack(activity.id);
   }
 };
 
