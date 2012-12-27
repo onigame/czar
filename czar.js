@@ -81,7 +81,7 @@ var on_submit_edit = function() {
         send_value(this, input, input.value);
         if (input.name == "tags") {
           UpdateTagsSelector();
-          MaybeSendSolvedNotification(this.name, input.value);
+          MaybeHandleSolvedPuzzle(this.name, input.value);
         }
       }
       if (!input.className)
@@ -104,8 +104,8 @@ var MaybeRecolorSheet = function(puzzle_id, new_tags) {
 }
 
 var gSolvedPuzzles = [];
-var MaybeSendSolvedNotification = function(puzzle_id, new_tags) {
-  log('MaybeSendSolvedNotification(' + puzzle_id + ', ' + new_tags + ')');
+var MaybeHandleSolvedPuzzle = function(puzzle_id, new_tags) {
+  log('MaybeHandleSolvedPuzzle(' + puzzle_id + ', ' + new_tags + ')');
 
   // Is "solved" one of the tags mentioned?
   var tags = new_tags.split(',');
@@ -132,7 +132,14 @@ var MaybeSendSolvedNotification = function(puzzle_id, new_tags) {
     Notifications.Send('We just solved a meta:<br>' + gActivities[puzzle_id].name,
 			'meta');
   }
-};
+  
+  // Unassign all users assigned to this puzzle.
+  for (u in gUsers) {
+    if (IsActiveAssignment(gUsers[u].id, puzzle_id)) {
+      UpdateStatus(gUsers[u], gActivities[puzzle_id], null, false, true);
+    }
+  }  
+}
 
 var on_submit_create = function() {
   // Callback for creating a new puzzle by means of the link at the top
@@ -463,10 +470,45 @@ var on_label_change = function(form, value) {
   the_sort_timeout = window.setTimeout(sort_forms, 0);
 };
 
-var UpdateAssignmentHack = function(uid, aid, when, active, exclusive) {
+var UpdateActivityHack = function(aid) {
   UpdateActives(aid);
   UpdateAssignButtons();
+  UpdateMyStatus();
 };
+
+var UpdateMyStatus = function() {
+  var mystatus = document.getElementById("mystatus");
+  mystatus.style.fontWeight="bold";
+  var whoami = document.getElementById('whoami');
+  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+  if (!uid) {
+    mystatus.style.backgroundColor = "#eee";
+    mystatus.style.color = "#333";
+    mystatus.innerHTML = "Unknown user: please select above.";
+  } else {
+    mystatus.style.color = "#000";
+    var is_assigned = false;
+    for (activity in gActivities) {
+      if (IsActiveAssignment(uid, activity) &&
+          IsExclusiveAssignment(uid,activity) &&
+          gActivities[activity].name) {
+        mystatus.style.backgroundColor = "#FFF";
+        mystatus.style.color = "#000";
+        mystatus.innerHTML = gActivities[activity].name;
+        is_assigned = true;
+        break;
+      }
+    }
+    if (!is_assigned) {
+      mystatus.innerHTML = 'You are not assigned to anything!  Please select ' +
+        'a puzzle below or select a non-puzzle activity ' +
+        'on <a href="who.html">Who</a>.<br>' +
+        'Consult with your local Puzzle Czar if you are unsure what you should be doing.';
+      mystatus.style.backgroundColor = "#FFF";
+      mystatus.style.color = "#F00";
+    }
+  }
+}
 
 var UpdateActives = function(name) {
   log('UpdateActives for ' + name);
@@ -489,7 +531,6 @@ var UpdateActives = function(name) {
   }
 };
 
-
 var WhoAmIChanged = function() {
   // Store this user identity in a cookie.
   var whoami = document.getElementById('whoami');
@@ -498,6 +539,7 @@ var WhoAmIChanged = function() {
 
   // Update the "Do this" buttons on each puzzle.
   UpdateAssignButtons();
+  UpdateMyStatus();
 };
 
 
@@ -696,6 +738,8 @@ var start_czar = function() {
   stateserver_url = config.server_url + config.hunt_id
   gStateServer = stateserver.open(stateserver_url, on_server);
   document.getElementById('whoami').onchange = WhoAmIChanged;
+  document.getElementById('hunt_url').href = config.hunt_url;
+  document.getElementById('hunt_info').innerHTML = config.hunt_info;
+  document.getElementById('team_url').href = config.team_url;
   Notifications.Init(gStateServer);
 }
-

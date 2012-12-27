@@ -33,7 +33,10 @@ var IsActiveAssignment = function(user, activity) {
   }
 };
 
-var UpdateAssignmentHack = null;
+// UpdateActivityHack is a hook for anyone who wants to be called when
+// an activity or an assignment has changed  UpdateActivityHack is defined in
+// the global scope, so, just set it to your own callable and we'll invoke it.
+var UpdateActivityHack = null;
 
 var UpdateAssignment = function(user, activity, when, active, exclusive) {
   if (when == null && active == null && exclusive == null) {
@@ -61,11 +64,8 @@ var UpdateAssignment = function(user, activity, when, active, exclusive) {
     }
   }
 
-  // UpdateAssignmentHack is a hook for anyone who wants to be called when
-  // UpdateAssignment is called.  UpdateAssignmentHack is defined in the
-  // global scope, so, just set it to your own callable and we'll invoke it.
-  if (UpdateAssignmentHack) {
-    UpdateAssignmentHack(user, activity, when, active, exclusive);
+  if (UpdateActivityHack) {
+    UpdateActivityHack(activity);
   }
 };
 
@@ -121,31 +121,37 @@ var HandleUpdateFromStateserver = function(key, value) {
     // Puzzle.
     if (dot >= 0 && field == 'label') {
       if (value) {
-	InternalUpdateActivity(id, value);
+        InternalUpdateActivity(id, value);
       } else {
-	ForgetActivity(id);
+        ForgetActivity(id);
       }
     } else if (dot >= 0 && field == 'tags') {
       UpdateTags(id, value);
+    }
+    if (UpdateActivityHack) {
+      UpdateActivityHack(id);
     }
   } else if (key[0] == 'a') {
     // Activity.
     var dot = key.indexOf(".");
     if (dot >= 0 && key.substring(dot+1) == 'name') {
       if (value) {
-	InternalUpdateActivity(key.substring(0, dot), value);
+        InternalUpdateActivity(key.substring(0, dot), value);
       } else {
-	ForgetActivity(key.substring(0, dot));
+        ForgetActivity(key.substring(0, dot));
       }
+    }
+    if (UpdateActivityHack) {
+      UpdateActivityHack(id);
     }
   } else if (key[0] == 'u') {
     // Person.
     var dot = key.indexOf(".");
     if (dot >= 0 && key.substring(dot+1) == 'name') {
       if (value) {
-	InternalAddPerson(key.substring(0, dot), value);
+        InternalAddPerson(key.substring(0, dot), value);
       } else {
-	ForgetPerson(key.substring(0, dot));
+        ForgetPerson(key.substring(0, dot));
       }
     }
   } else if (key[0] == 't') {
@@ -164,11 +170,11 @@ var HandleUpdateFromStateserver = function(key, value) {
       var exclusive;
 
       if (field == null || field == 'when') {
-	when = value;
+        when = value;
       } else if (field == 'active') {
-	active = gStateServer.parse_boolean(value);
+        active = gStateServer.parse_boolean(value);
       } else if (field == 'exclusive') {
-	exclusive = gStateServer.parse_boolean(value);
+        exclusive = gStateServer.parse_boolean(value);
       }
       UpdateAssignment(uid, aid, when, active, exclusive);
     }
@@ -182,7 +188,7 @@ var InternalAdd = function(id, name, Type, storage) {
   if (storage[id]) {
     o = storage[id];
     // Update name.
-    if (name && !o.name) {
+    if (name) {
       o.name = name;
     }
   } else {
@@ -255,9 +261,9 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
     for (a in gLastSeenTime[user.id]) {
       var otherActivity = gActivities[a];
       if (otherActivity != activity &&
-	  IsActiveAssignment(user.id, otherActivity.id) &&
-	  IsExclusiveAssignment(user.id, otherActivity.id)) {
-	UpdateStatus(user, otherActivity, null, false, true);
+          IsActiveAssignment(user.id, otherActivity.id) &&
+          IsExclusiveAssignment(user.id, otherActivity.id)) {
+        UpdateStatus(user, otherActivity, null, false, true);
       }
     }
   }
