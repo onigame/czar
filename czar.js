@@ -730,6 +730,8 @@ var start_czar = function() {
   stateserver_url = config.server_url + config.hunt_id
   gStateServer = stateserver.open(stateserver_url, on_server);
   document.getElementById('whoami').onchange = WhoAmIChanged;
+  document.getElementById('hunt_url').href = config.hunt_url;
+  document.getElementById('hunt_info').innerHTML = config.hunt_info;
+  document.getElementById('team_url').href = config.team_url;
   Notifications.Init(gStateServer);
 }
-
