@@ -128,6 +128,9 @@ var HandleUpdateFromStateserver = function(key, value) {
     } else if (dot >= 0 && field == 'tags') {
       UpdateTags(id, value);
     }
+    if (UpdateActivityHack) {
+      UpdateActivityHack(id);
+    }
   } else if (key[0] == 'a') {
     // Activity.
     var dot = key.indexOf(".");
@@ -137,6 +140,9 @@ var HandleUpdateFromStateserver = function(key, value) {
       } else {
         ForgetActivity(key.substring(0, dot));
       }
+    }
+    if (UpdateActivityHack) {
+      UpdateActivityHack(id);
     }
   } else if (key[0] == 'u') {
     // Person.
@@ -217,9 +223,6 @@ var InternalUpdateActivity = function(id, name, tags) {
     activity.tags = tags;
   } else if (tags == null && activity.IsNonPuzzleActivity()) {
     activity.tags = 'activity';
-  }
-  if (UpdateActivityHack) {
-    UpdateActivityHack(activity.id);
   }
 };
 
