@@ -356,25 +356,25 @@ var RedrawTable = function() {
 
     for (a in gLastSeenTime[user.id]) {
       if (!IsActiveAssignment(user.id, a)) {
-	// We care about only active assignments.  Not interesting
-	// to sort by "recently, stopped working on X."
-	continue;
+      	// We care about only active assignments.  Not interesting
+      	// to sort by "recently, stopped working on X."
+      	continue;
       }
       var t = LastSeenTime(user.id, a);
       if (mostRecentActivity[a] == null ||
-	  t > mostRecentActivity[a]) {
-	mostRecentActivity[a] = t;
+          t > mostRecentActivity[a]) {
+        mostRecentActivity[a] = t;
       }
       if (mostRecentActivity[u] == null ||
-	  t > mostRecentActivity[u]) {
-	mostRecentActivity[u] = t;
+          t > mostRecentActivity[u]) {
+        mostRecentActivity[u] = t;
       }
       if (IsActiveAssignment(u, a)) {
-	if (peoplePerActivity[a] == null) {
-	  peoplePerActivity[a] = 1;
-	} else {
-	  peoplePerActivity[a]++;
-	}
+        if (peoplePerActivity[a] == null) {
+          peoplePerActivity[a] = 1;
+        } else {
+          peoplePerActivity[a]++;
+        }
       }
     }
   }
@@ -397,7 +397,7 @@ var RedrawTable = function() {
       td.innerHTML = user.name;
       td.onclick = BindRenameWidget(td, user);
       if (whoami == user.id) {
-	td.style.backgroundColor = '#ff6'
+        td.style.backgroundColor = '#ff6'
       }
       tr.appendChild(td);
     }
@@ -429,7 +429,7 @@ var RedrawTable = function() {
       log('Not showing activity ' + activity.name);
       continue;
     }
-
+    
     if (num_rows % 30 == 0) {
       // Every 30 activities show the header row again.
       AddHeaderRow();
@@ -454,9 +454,9 @@ var RedrawTable = function() {
     }
     if (!activity.IsNonPuzzleActivity()) {
       if (activity.tags == '') {
-	td.title = 'No tags.';
+        td.title = 'No tags.';
       } else {
-	td.title = activity.tags;
+        td.title = activity.tags;
       }
     }
     if (activity.IsNonPuzzleActivity()) {
@@ -471,14 +471,14 @@ var RedrawTable = function() {
 
       td = document.createElement('td');
       if (LastSeenTime(user.id, activity.id) > 0) {
-	var ago =  MakeAgoString(now, LastSeenTime(user.id, activity.id));
-	td.innerHTML = ago;
-	td.title = user.name + ' was doing ' + activity.name + ' ' + ago + ' ago.';
-	if (IsActiveAssignment(user.id, activity.id) && IsSolved(activity)) {
-	  td.className = 'activeOnSolved';
-	} else if (IsActiveAssignment(user.id, activity.id) &&
-	    IsExclusiveAssignment(user.id, activity.id)) {
-	  td.className = 'active';
+      	var ago =  MakeAgoString(now, LastSeenTime(user.id, activity.id));
+      	td.innerHTML = ago;
+      	td.title = user.name + ' was doing ' + activity.name + ' ' + ago + ' ago.';
+      	if (IsActiveAssignment(user.id, activity.id) && IsSolved(activity)) {
+      	  td.className = 'activeOnSolved';
+      	} else if (IsActiveAssignment(user.id, activity.id) &&
+      	    IsExclusiveAssignment(user.id, activity.id)) {
+      	  td.className = 'active';
 
           // Color hack -- if we haven't seen someone in a while,
           // start turning their color to red.  They start losing
@@ -491,11 +491,11 @@ var RedrawTable = function() {
           ago = parseInt(255 * ago);  // range 0-255 (int)
           td.style.backgroundColor = "rgb(" + (ago) + "," + (256-ago) + ",0)";
 
-	} else if (IsActiveAssignment(user.id, activity.id)) {
-	  td.className = 'nonexclusive';
-	} else {
-	  td.className = 'nonactive';
-	}
+      	} else if (IsActiveAssignment(user.id, activity.id)) {
+      	  td.className = 'nonexclusive';
+      	} else {
+      	  td.className = 'nonactive';
+      	}
       }
 
       td.onclick = BindShowUpdateWidget(td, user, activity);
@@ -532,17 +532,12 @@ var ShowUpdateWidget = function(td, user, activity) {
   var div = document.getElementById('divUpdateWidget');
   var now = (new Date()).valueOf();
 
-  document.getElementById('btnCurrently').onclick = function() {
+  document.getElementById('btnExclusively').onclick = function() {
     UpdateStatusAndRedraw(user, activity, now, true, null);
   };
-  document.getElementById('btnRecently').onclick = function() {
-    // 15 minutes ago.
-    UpdateStatusAndRedraw(user, activity, now - 15 * 60 * 1000, true, null);
+  document.getElementById('btnNonExclusively').onclick = function() {
+    UpdateStatusAndRedraw(user, activity, now, true, false);
   };
-  if (!IsExclusiveAssignment(user.id, activity.id)) {
-    document.getElementById('btnCurrently').className = 'nonexclusive';
-    document.getElementById('btnRecently').className = 'nonexclusive';
-  }
   document.getElementById('btnNoLonger').onclick = function() {
     var then = LastSeenTime(user, activity);
     if (then == 0) {
@@ -556,24 +551,6 @@ var ShowUpdateWidget = function(td, user, activity) {
   document.getElementById('btnCancel').onclick = function() {
     div.style.visibility = 'hidden';
   };
-  document.getElementById('btnMakeExclusive').onclick = function() {
-    UpdateStatusAndRedraw(user, activity, now, true, true);
-  };
-  document.getElementById('btnMakeNonExclusive').onclick = function() {
-    UpdateStatusAndRedraw(user, activity, now, true, false);
-  };
-
-  if (IsExclusiveAssignment(user.id, activity.id)) {
-    document.getElementById('btnMakeExclusive').style.display = 'none';
-    document.getElementById('btnMakeNonExclusive').style.display = 'block';
-    document.getElementById('checkboxToggleAdvanced').checked = false;
-    document.getElementById('divAdvanced').style.display = 'none';
-  } else {
-    document.getElementById('btnMakeExclusive').style.display = 'block';
-    document.getElementById('btnMakeNonExclusive').style.display = 'none';
-    document.getElementById('checkboxToggleAdvanced').checked = true;
-    document.getElementById('divAdvanced').style.display = 'block';
-  }
 
   // Place the widget near the cell we're editing and show it.
   div.style.visibility = 'visible';
