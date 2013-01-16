@@ -269,7 +269,7 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
       IsExclusiveAssignment(user.id, activity.id)) {
     for (a in gLastSeenTime[user.id]) {
       var otherActivity = gActivities[a];
-      if (otherActivity != activity &&
+      if (otherActivity && otherActivity != activity &&
           IsActiveAssignment(user.id, otherActivity.id) &&
           IsExclusiveAssignment(user.id, otherActivity.id)) {
         UpdateStatus(user, otherActivity, null, false, true);

@@ -3,7 +3,7 @@
 <title>who</title>
 <style>
 .active { background-color:#0f0; font-weight: normal; }
-.nonactive { background-color:#ccc; color:#666 }
+.nonactive { background-color:#ccc; color:#666; }
 .nonexclusive { background-color:#c3f; color:#000; }
 .never { background-color:#fff; }
 td.active {text-align:right}
@@ -62,23 +62,12 @@ soundManager.onload = function() { };
 <div id=divUpdateWidget class=popup>
 Working on this activity...
 <table>
-  <tr><td><button class=active id=btnCurrently>Currently</button></td>
-      <td><button class=active id=btnRecently>Recently</button></td></tr>
-  <tr><td><button class=nonactive id=btnNoLonger>No longer</button></td>
-      <td><button class=never id=btnNever>Never</button></td></tr>
+  <tr><td><button class=active id=btnExclusively style="width:120px">Exclusively</button></td>
+      <td><button class=nonexclusive id=btnNonExclusively style="width:120px">Non-Exclusively</button></td></tr>
+  <tr><td><button class=nonactive id=btnNoLonger style="width:120px">No longer</button></td>
+      <td><button class=never id=btnNever style="width:120px">Never</button></td></tr>
 </table>
-  <label>
-    See advanced options <input type=checkbox id=checkboxToggleAdvanced
-    onchange="var d = document.getElementById('divAdvanced');  if (d.style.display == 'block') d.style.display = 'none'; else d.style.display = 'block';">
-  </label>
-  <div id=divAdvanced style="display:none">
-    <button style="display:none" class=active
-     id=btnMakeExclusive>Make exclusive of other assignments</button>
-    <button style="display:none" class=nonexclusive
-     id=btnMakeNonExclusive>Make non-exclusive of other assignments</button>
-  </div>
-<br>
-  <center><button id=btnCancel><small>Cancel</small></button></center>
+<center><button id=btnCancel><small>Cancel</small></button></center>
 </div>
 
 <!-- The dialog that appears when you click on any person/puzzle header. -->
