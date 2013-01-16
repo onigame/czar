@@ -33,6 +33,15 @@ var IsActiveAssignment = function(user, activity) {
   }
 };
 
+var IsJobToDisplay = function(activity) {
+  for (j in config.jobs_to_display) {
+    if (config.jobs_to_display[j] == gActivities[activity].name) {
+      return true;
+    }
+  }
+  return false;
+};
+
 // UpdateActivityHack is a hook for anyone who wants to be called when
 // an activity or an assignment has changed  UpdateActivityHack is defined in
 // the global scope, so, just set it to your own callable and we'll invoke it.
@@ -260,7 +269,7 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
       IsExclusiveAssignment(user.id, activity.id)) {
     for (a in gLastSeenTime[user.id]) {
       var otherActivity = gActivities[a];
-      if (otherActivity != activity &&
+      if (otherActivity && otherActivity != activity &&
           IsActiveAssignment(user.id, otherActivity.id) &&
           IsExclusiveAssignment(user.id, otherActivity.id)) {
         UpdateStatus(user, otherActivity, null, false, true);
