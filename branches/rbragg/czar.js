@@ -487,6 +487,7 @@ var UpdateMyStatus = function() {
     mystatus.innerHTML = "Unknown user: please select above.";
   } else {
     mystatus.style.color = "#000";
+    mystatus.style.backgroundColor = "#FFF";
     var activity = null;
     var job = null;
     for (aid in gActivities) {
@@ -503,22 +504,18 @@ var UpdateMyStatus = function() {
         }
       }
     }
-    if (activity != null) {
-      mystatus.innerHTML = "Current activity: <b>" + activity + "</b>";
-      mystatus.style.backgroundColor = "#FFF";
-      mystatus.style.color = "#000";
+    mystatus.innerHTML = ""
+    if (activity) {
+      mystatus.innerHTML += "Current activity: <b>" + activity + "</b><br>";
     } else {
-      mystatus.innerHTML = '<b>You are not assigned to anything!  Please ' +
-        'select a puzzle below or select a non-puzzle activity on ' +
-        '<a href="who.html">Who</a>.<br>Consult with your local Puzzle Czar' +
-        'if you are unsure what you should be doing.';
-      mystatus.style.backgroundColor = "#FFF";
-      mystatus.style.color = "#F00";
+      mystatus.innerHTML += '<b><font color="red">You are not assigned to ' +
+        'an activity!  Please select a puzzle below or select an exclusive ' +
+        'non-puzzle activity on <a href="who.html">Who</a>.<br>Consult with ' +
+        'your local Puzzle Czar if you are unsure what you should be doing.' +
+        '</font></b><br>';
     }
-    if (job != null) {
-      myjob.innerHTML = "Current job: <b>" + job + "</b><br>";
-    } else {
-      myjob.innerHTML = "";
+    if (job) {
+      mystatus.innerHTML += "Current job: <b>" + job + "</b><br>";
     }
   }
 };
@@ -540,7 +537,7 @@ var UpdateJobsToDisplay = function() {
           if (jobs_assigned[job_name]) {
             jobs_assigned[job_name] += "," + gUsers[u].name;
           } else {
-            jobs_assigned[gActivities[a].name] = gUsers[u].name;
+            jobs_assigned[job_name] = gUsers[u].name;
           }
         }
       }
