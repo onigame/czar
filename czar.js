@@ -474,41 +474,88 @@ var UpdateActivityHack = function(aid) {
   UpdateActives(aid);
   UpdateAssignButtons();
   UpdateMyStatus();
+  UpdateJobsToDisplay();
 };
 
 var UpdateMyStatus = function() {
   var mystatus = document.getElementById("mystatus");
-  mystatus.style.fontWeight="bold";
   var whoami = document.getElementById('whoami');
-  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+  var uid = whoami.options[whoami.selectedIndex].value;
   if (!uid) {
     mystatus.style.backgroundColor = "#eee";
     mystatus.style.color = "#333";
     mystatus.innerHTML = "Unknown user: please select above.";
   } else {
     mystatus.style.color = "#000";
-    var is_assigned = false;
-    for (activity in gActivities) {
-      if (IsActiveAssignment(uid, activity) &&
-          IsExclusiveAssignment(uid,activity) &&
-          gActivities[activity].name) {
-        mystatus.style.backgroundColor = "#FFF";
-        mystatus.style.color = "#000";
-        mystatus.innerHTML = gActivities[activity].name;
-        is_assigned = true;
-        break;
+    var activity = null;
+    var job = null;
+    for (aid in gActivities) {
+      if (IsActiveAssignment(uid, aid) && gActivities[aid].name) {
+        if (IsExclusiveAssignment(uid,aid)) {
+          activity = gActivities[aid].name;
+        }
+        if (IsJobToDisplay(aid)) {
+          if (job == null) {
+            job = gActivities[aid].name;
+          } else {
+            job += "," + gActivities[aid].name;
+          }
+        }
       }
     }
-    if (!is_assigned) {
-      mystatus.innerHTML = 'You are not assigned to anything!  Please select ' +
-        'a puzzle below or select a non-puzzle activity ' +
-        'on <a href="who.html">Who</a>.<br>' +
-        'Consult with your local Puzzle Czar if you are unsure what you should be doing.';
+    if (activity != null) {
+      mystatus.innerHTML = "Current activity: <b>" + activity + "</b>";
+      mystatus.style.backgroundColor = "#FFF";
+      mystatus.style.color = "#000";
+    } else {
+      mystatus.innerHTML = '<b>You are not assigned to anything!  Please ' +
+        'select a puzzle below or select a non-puzzle activity on ' +
+        '<a href="who.html">Who</a>.<br>Consult with your local Puzzle Czar' +
+        'if you are unsure what you should be doing.';
       mystatus.style.backgroundColor = "#FFF";
       mystatus.style.color = "#F00";
     }
+    if (job != null) {
+      myjob.innerHTML = "Current job: <b>" + job + "</b><br>";
+    } else {
+      myjob.innerHTML = "";
+    }
   }
-}
+};
+
+var UpdateJobsToDisplay = function() {
+  if (config.jobs_to_display == null ||
+      config.jobs_to_display.length == 0) {
+    return;
+  }
+  var jobs = document.getElementById("jobs");
+  var whoami = document.getElementById('whoami');
+  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+  var jobs_assigned = {}
+  for (a in gActivities) {
+    if (IsJobToDisplay(a)) {
+      for (u in gUsers) {
+        if (IsActiveAssignment(gUsers[u].id, gActivities[a].id)) {
+          var job_name = gActivities[a].name;
+          if (jobs_assigned[job_name]) {
+            jobs_assigned[job_name] += "," + gUsers[u].name;
+          } else {
+            jobs_assigned[gActivities[a].name] = gUsers[u].name;
+          }
+        }
+      }
+    }
+  }
+  jobs.innerHTML = "<b><u>Current Jobs</u></b> (edit in <a href='who.html'>Who</a>)<br>";
+  for (j in config.jobs_to_display) {
+    var job_name = config.jobs_to_display[j];
+    if (jobs_assigned[job_name]) {
+      jobs.innerHTML += job_name + ": " + jobs_assigned[job_name] + "<br>";
+    } else {
+      jobs.innerHTML += job_name + ": <b><font color=\"red\">NONE</font></b><br>";
+    }
+  }
+};
 
 var UpdateActives = function(name) {
   log('UpdateActives for ' + name);
@@ -540,6 +587,7 @@ var WhoAmIChanged = function() {
   // Update the "Do this" buttons on each puzzle.
   UpdateAssignButtons();
   UpdateMyStatus();
+  UpdateJobsToDisplay();
 };
 
 
