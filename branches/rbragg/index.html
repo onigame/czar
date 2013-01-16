@@ -65,6 +65,7 @@ soundManager.onload = function() { };
 <body onload="start_czar()">
 
 <img src=czar.jpeg style="float: left; margin-right: 10; margin-bottom: 15;">
+<span id="jobs" style="float: right; margin-left: 10;"></span><br>
 <div style="margin-left: 10">
   <h2 style="margin-top: 0">Czar
   <a style="font-size:50%" href="who.html">(Back to Who)</a>
@@ -79,8 +80,9 @@ soundManager.onload = function() { };
     </select>
   </span>
   <br>
-  Current activity: <span id="mystatus">Loading...</span>
-  <br><br>
+  <span id="mystatus">Loading...</span><br>
+  <span id="myjob"></span>
+  <br>
   See also:
   <a id="hunt_url" href="">Hunt site</a> (<span id="hunt_info"></span>),
   <a id="team_url" href="">Team site</a>
@@ -121,7 +123,7 @@ soundManager.onload = function() { };
 <span id="faq" style="display: none;">
 
 <DL>
-<DT><B>... get the grey butons to stop saying "WhoRU?"</B></DT>
+<DT><B>... get the grey buttons to stop saying "WhoRU?"</B></DT>
 <DD>
   In the upper-left corner, under "Czar", there's a box where you can tell Czar who you are.
   Every time you reload the page, you'll have to answer this question again.  Sorry about that.
