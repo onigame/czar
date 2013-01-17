@@ -56,8 +56,10 @@ Array.prototype.has = function(v) {
 var gStateServer = null;
 var gPeriodicTimer = null;
 var gLastServerUpdate = null;
-var gTableFontSize = 100;  // percentage of font-size for the table as
+var gTableFontSize = 80;  // percentage of font-size for the table as
                           // compared to the rest of the document.
+var gNumCellsBetweenBreaks = 5;
+var gNumCellsBetweenHeaders = 25;
 
 var Init = function() {
   stateserver_url = config.server_url + config.hunt_id
@@ -69,7 +71,6 @@ var Init = function() {
       RedrawTableSoon();
     });
   Notifications.Init(gStateServer);
-
   RedrawTable();
   SchedulePeriodicRedrawTable();
 };
@@ -264,7 +265,10 @@ var GetSortedActivities = function(sortOrder,mostRecentActivity,
 
   var sorted_activities = new Array();
   for (a in gActivities) {
-    sorted_activities.push(a);
+    // Show an activity only if it has a name.
+    if (gActivities[a].name) {
+      sorted_activities.push(a);
+    }
   }
   sorted_activities.sort(compare_activities);
 
@@ -337,8 +341,7 @@ var RedrawTable = function() {
   table.frame = 'outline';
   table.rules = 'all';
   table.id = 'the_big_table';
-  table.style.fontFamily = 'Arial';
-  table.style.fontSize = gTableFontSize + '%';
+  table.style.fontSize = '75%';
 
   // Record that we're redrawing now and when the last data update was.
   var caption = table.createCaption();
@@ -388,12 +391,16 @@ var RedrawTable = function() {
   var AddHeaderRow = function() {
     var whoami = cookies.get('whoami');
     var tr = document.createElement("tr");
-    tr.appendChild(document.createElement("td"));
     for (var u = 0; u < sorted_users.length; u++) {
+      if (u % gNumCellsBetweenBreaks == 0) {
+        tr.appendChild(document.createElement("td"));
+      }
       var user = gUsers[sorted_users[u]];
       var td = document.createElement("td");
       td.style.verticalAlign = 'top';
       td.style.whiteSpace = 'nowrap';
+      td.style.fontWeight = 'bold';
+      td.style.textAlign = 'center';
       td.innerHTML = user.name;
       td.onclick = BindRenameWidget(td, user);
       if (whoami == user.id) {
@@ -404,15 +411,16 @@ var RedrawTable = function() {
     table.appendChild(tr);
   };
 
-  var AddSmallGap = function() {
+  var AddHorizontalGap = function() {
     var tr = document.createElement('tr');
     var td = document.createElement('td');
-    td.colSpan = sorted_users.length + 1;
+    td.colSpan = sorted_users.length + 
+      sorted_users.length/gNumCellsBetweenBreaks + 1;
     td.style.backgroundColor = '#ccc';
     tr.appendChild(td);
     table.appendChild(tr);
   }
-
+  
   var selected_tags = GetSelectedTags();
   var shade_this_row = true;
 
@@ -430,11 +438,11 @@ var RedrawTable = function() {
       continue;
     }
     
-    if (num_rows % 30 == 0) {
+    if (num_rows % gNumCellsBetweenHeaders == 0) {
       // Every 30 activities show the header row again.
       AddHeaderRow();
-    } else if (num_rows % 5 == 0) {
-      AddSmallGap();
+    } else if (num_rows % gNumCellsBetweenBreaks == 0) {
+      AddHorizontalGap();
     }
 
     num_rows++;
@@ -446,30 +454,47 @@ var RedrawTable = function() {
     }
     shade_this_row = !shade_this_row;
 
-    var td = document.createElement('td');
-    td.style.whiteSpace = 'nowrap';
-    td.innerHTML = activity.name;
-    if (IsSolved(activity)) {
-      td.innerHTML += ' <font color=green>&#x2714;</font>'
-    }
-    if (!activity.IsNonPuzzleActivity()) {
-      if (activity.tags == '') {
-        td.title = 'No tags.';
-      } else {
-        td.title = activity.tags;
+    var AddActivityCell = function() {
+      var td = document.createElement('td');
+      td.style.whiteSpace = 'nowrap';
+      td.style.fontWeight = 'bold';
+      td.innerHTML = activity.name;
+      if (IsSolved(activity)) {
+        td.innerHTML += ' <font color=green>&#x2714;</font>'
       }
+      if (!activity.IsNonPuzzleActivity()) {
+        if (activity.tags == '') {
+          td.title = 'No tags.';
+        } else {
+          td.title = activity.tags;
+        }
+      }
+      if (activity.IsNonPuzzleActivity()) {
+        // Non-puzzle activity.
+        td.className = shade_this_row ? 'nonpuzzlelt' : 'nonpuzzledk';
+        if (!activity.IsJobToDisplay()) {
+          td.onclick = BindRenameWidget(td, activity);
+        }
+      }
+      tr.appendChild(td);
     }
-    if (activity.IsNonPuzzleActivity()) {
-      // Non-puzzle activity.
-      td.className = shade_this_row ? 'nonpuzzlelt' : 'nonpuzzledk';
-      td.onclick = BindRenameWidget(td, activity);
-    }
-    tr.appendChild(td);
 
+    var AddVerticalGap = function() {
+      var td = document.createElement('td');
+      td.style.backgroundColor = '#ccc';
+      tr.appendChild(td);
+    }
+    
     for (var u = 0; u < sorted_users.length; u++) {
       var user = gUsers[sorted_users[u]];
 
-      td = document.createElement('td');
+      if (u % gNumCellsBetweenHeaders == 0) {
+        AddActivityCell();
+      } else if (u % gNumCellsBetweenBreaks == 0) {
+        AddVerticalGap();
+      }
+      
+      var td = document.createElement('td');
       if (LastSeenTime(user.id, activity.id) > 0) {
       	var ago =  MakeAgoString(now, LastSeenTime(user.id, activity.id));
       	td.innerHTML = ago;
@@ -499,7 +524,6 @@ var RedrawTable = function() {
       }
 
       td.onclick = BindShowUpdateWidget(td, user, activity);
-
       tr.appendChild(td);
     }
 
@@ -533,7 +557,7 @@ var ShowUpdateWidget = function(td, user, activity) {
   var now = (new Date()).valueOf();
 
   document.getElementById('btnExclusively').onclick = function() {
-    UpdateStatusAndRedraw(user, activity, now, true, null);
+    UpdateStatusAndRedraw(user, activity, now, true, true);
   };
   document.getElementById('btnNonExclusively').onclick = function() {
     UpdateStatusAndRedraw(user, activity, now, true, false);
@@ -609,11 +633,13 @@ var UpdateName = function(item) {
   var div = document.getElementById('divRenameWidget');
   div.style.visibility = 'hidden';
 
-  item.name = document.getElementById('inputName').value;
-  RedrawTable();
-
-  // Update stateserver with this information.
-  gStateServer.set(item.id + '.name', item.name);
+  var value = document.getElementById('inputName').value;
+  if (value || confirm("Delete \"" + item.name + "\" forever?")) {
+    item.name = document.getElementById('inputName').value;
+    RedrawTable();
+    // Update stateserver with this information.
+    gStateServer.set(item.id + '.name', item.name);
+  }
 };
 
 var AddPerson = function(input) {
@@ -644,13 +670,6 @@ var ToggleAutoUpdate = function(input) {
       gPeriodicTimer = null;
     }
   }
-};
-
-var AdjustTableFontSize = function(factor) {
-  gTableFontSize = Math.floor(gTableFontSize * factor);
-  document.getElementById('the_big_table').style.fontSize = gTableFontSize + '%';
-  // Don't bother redrawing it because we're resizing it directly.
-  //  RedrawTable();
 };
 
 var CreateTestData = function() {
