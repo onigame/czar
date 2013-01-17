@@ -33,13 +33,13 @@ var IsActiveAssignment = function(user, activity) {
   }
 };
 
-var IsJobToDisplay = function(activity) {
-  for (j in config.jobs_to_display) {
-    if (config.jobs_to_display[j] == gActivities[activity].name) {
-      return true;
+var GetActivityByName = function(activity_name) {
+  for (a in gActivities) {
+    if (gActivities[a] && activity_name == gActivities[a].name) {
+      return gActivities[a];
     }
   }
-  return false;
+  return null;
 };
 
 // UpdateActivityHack is a hook for anyone who wants to be called when
@@ -103,6 +103,15 @@ var Activity = function(id, name) {
 Activity.prototype.IsNonPuzzleActivity = function() {
   return this.id[0] == 'a';
 };
+
+Activity.prototype.IsJobToDisplay = function() {
+  for (j in config.jobs_to_display) {
+    if (config.jobs_to_display[j] == this.name) {
+      return true;
+    }
+  }
+  return false;  
+}
 
 var gUsers = {};
 var gActivities = {};
@@ -218,6 +227,7 @@ var InternalAddPerson = function(id, name) {
   if (! gLastSeenTime[user.id]) {
     gLastSeenTime[user.id] = {};
   }
+  return user;
 };
 
 var InternalUpdateActivity = function(id, name, tags) {
@@ -233,6 +243,7 @@ var InternalUpdateActivity = function(id, name, tags) {
   } else if (tags == null && activity.IsNonPuzzleActivity()) {
     activity.tags = 'activity';
   }
+  return activity;
 };
 
 var ForgetPerson = function(id) {
