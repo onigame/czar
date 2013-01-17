@@ -2,6 +2,7 @@
 <html> <head>
 <title>who</title>
 <style>
+body { background: #FFFFFF; color: #000000; font: 100% sans-serif; }
 .active { background-color:#0f0; font-weight: normal; }
 .nonactive { background-color:#ccc; color:#666; }
 .nonexclusive { background-color:#c3f; color:#000; }
@@ -78,7 +79,7 @@ Rename: <input id=inputName>
 
 <!-- Div that's populated by the javascript. -->
 <center>
-<div style="font-size:68%" id="data"></div>
+<div id="data"></div>
 <div id="tags"></div>
 
 <!-- Sort rows. -->
@@ -134,11 +135,6 @@ Sort people:
 <input type=checkbox checked id=checkboxToggleAutoUpdate
  onchange="ToggleAutoUpdate(this);"></label>
 </span>
-<span style="border: thin solid blue; padding: 8px">
-Table font size:
-<input type=submit value='+' onClick='AdjustTableFontSize(1.25);'>
-<input type=submit value='-' onClick='AdjustTableFontSize(0.8);'>
-</span>
 </div>
 
 
@@ -154,9 +150,6 @@ Add activity: <input onchange="AddActivity(this);"><br>
     <ul>
       <li>You can rename any person or activity by clicking their name
 	  in the table.
-      <li>You cannot delete any person or activity.  Contact Dan (Boston)
-          or Wei-Hwa (Los Altos) if
-	  you added something you didn't mean to.
       <li>New activities, new people, and changes in work assignments
 	  appear automatically.  The Update every minute checkbox is
 	  useful only to update the minutes-ago time in the table.

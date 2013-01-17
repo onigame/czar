@@ -33,9 +33,9 @@ var IsActiveAssignment = function(user, activity) {
   }
 };
 
-var IsJobToDisplay = function(activity) {
-  for (j in config.jobs_to_display) {
-    if (config.jobs_to_display[j] == gActivities[activity].name) {
+var ActivityNameExists = function(activity_name) {
+  for (a in gActivities) {
+    if (gActivities[a] && activity_name == gActivities[a].name) {
       return true;
     }
   }
@@ -103,6 +103,15 @@ var Activity = function(id, name) {
 Activity.prototype.IsNonPuzzleActivity = function() {
   return this.id[0] == 'a';
 };
+
+Activity.prototype.IsJobToDisplay = function() {
+  for (j in config.jobs_to_display) {
+    if (config.jobs_to_display[j] == this.name) {
+      return true;
+    }
+  }
+  return false;  
+}
 
 var gUsers = {};
 var gActivities = {};

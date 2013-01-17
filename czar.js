@@ -495,7 +495,7 @@ var UpdateMyStatus = function() {
         if (IsExclusiveAssignment(uid,aid)) {
           activity = gActivities[aid].name;
         }
-        if (IsJobToDisplay(aid)) {
+        if (gActivities[aid].IsJobToDisplay()) {
           if (job == null) {
             job = gActivities[aid].name;
           } else {
@@ -530,14 +530,17 @@ var UpdateJobsToDisplay = function() {
   var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
   var jobs_assigned = {}
   for (a in gActivities) {
-    if (IsJobToDisplay(a)) {
+    if (gActivities[a].IsJobToDisplay()) {
       for (u in gUsers) {
-        if (IsActiveAssignment(gUsers[u].id, gActivities[a].id)) {
-          var job_name = gActivities[a].name;
-          if (jobs_assigned[job_name]) {
-            jobs_assigned[job_name] += "," + gUsers[u].name;
-          } else {
-            jobs_assigned[job_name] = gUsers[u].name;
+        var user_name = gUsers[u].name;
+        if (user_name) {
+          if (IsActiveAssignment(gUsers[u].id, gActivities[a].id)) {
+            var job_name = gActivities[a].name;
+            if (jobs_assigned[job_name]) {
+              jobs_assigned[job_name] += "," + gUsers[u].name;
+            } else {
+              jobs_assigned[job_name] = gUsers[u].name;
+            }
           }
         }
       }
@@ -558,7 +561,7 @@ var UpdateActives = function(name) {
   log('UpdateActives for ' + name);
   var actives = [];
   for (u in gUsers) {
-    if (IsActiveAssignment(gUsers[u].id, name)) {
+    if (gUsers[u].name && IsActiveAssignment(gUsers[u].id, name)) {
       actives.push(gUsers[u].name);
     }
   }
@@ -641,7 +644,7 @@ var on_value = function(key, field, value) {
   // significance.
 
   // Do we have information about a new user?  If so, update the "whoami" list.
-  if (key[0] == "u" && field == "name") {
+  if (key[0] == "u" && field == "name" && value) {
     add_user_to_whoami(document.getElementById("whoami"), key, value);
   }
 
