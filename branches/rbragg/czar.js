@@ -578,7 +578,7 @@ var MakeJobForm = function(job_id, job_name) {
     jobbutton.style.color = "#555";
     jobbutton.value = "WhoRU?";
     jobbutton.title = "Please tell me who you are (upper-left)."
-  } else if (IsActiveAssignment(uid, activity.id)) {
+  } else if (activity && IsActiveAssignment(uid, activity.id)) {
     if (IsExclusiveAssignment(uid, activity.id)) {
       // Exclusive and Active == "green" on who
       jobbutton.style.backgroundColor = "#0F0";
