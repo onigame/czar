@@ -33,13 +33,13 @@ var IsActiveAssignment = function(user, activity) {
   }
 };
 
-var ActivityNameExists = function(activity_name) {
+var GetActivityByName = function(activity_name) {
   for (a in gActivities) {
     if (gActivities[a] && activity_name == gActivities[a].name) {
-      return true;
+      return gActivities[a];
     }
   }
-  return false;
+  return null;
 };
 
 // UpdateActivityHack is a hook for anyone who wants to be called when
@@ -227,6 +227,7 @@ var InternalAddPerson = function(id, name) {
   if (! gLastSeenTime[user.id]) {
     gLastSeenTime[user.id] = {};
   }
+  return user;
 };
 
 var InternalUpdateActivity = function(id, name, tags) {
@@ -242,6 +243,7 @@ var InternalUpdateActivity = function(id, name, tags) {
   } else if (tags == null && activity.IsNonPuzzleActivity()) {
     activity.tags = 'activity';
   }
+  return activity;
 };
 
 var ForgetPerson = function(id) {
