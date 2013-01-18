@@ -124,7 +124,6 @@ var stateserver = {
       if (token != current_token) return;
 
       sent_data = null;
-      var send_delay = 0;
       if (version > current_version) {
         current_version = version;
         send_request();
