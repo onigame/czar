@@ -124,20 +124,12 @@ var stateserver = {
       if (token != current_token) return;
 
       sent_data = null;
-      var send_delay = 0;
-      if (current_version == 0) {
-        // This is the first time we've received any data.  Let's delay the
-        // next request for a litle while to make sure the page is fully
-        // loaded.  This is really a HACK to fix an interaction bug with the
-        // Google authentication code.
-        send_delay = 5000;
-      }
       if (version > current_version) {
         current_version = version;
-        window.setTimeout(send_request, send_delay);
+        send_request();
         for (var key in obj) callback(key, obj[key]);
       } else {
-        window.setTimeout(send_request, send_delay);
+        send_request();
       }
     };
 
