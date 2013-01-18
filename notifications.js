@@ -73,11 +73,11 @@ var Notifications = {
       if (notifications.indexOf(String(posted)) != -1) {
         // We've already seen this notification; pass.
         log('Seen this notification before.');
-	    return;
+	      return;
       } else {
-	    // Append this notification to those seen.
-	    notifications[notifications.length] = posted;
-	    cookies.set('notifications', notifications.join(','));
+        // Append this notification to those seen.
+        notifications[notifications.length] = posted;
+        cookies.set('notifications', notifications.join(','));
       }
     } else {
       cookies.set('notifications', posted);
