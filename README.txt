@@ -92,3 +92,43 @@ Running it yourself
 
 Note that this will not handle spreadsheet link creation via e-mail --
 TODO(egnor): add directions for how to set that up.
+
+Transcript of Conversation between Wei-Hwa and Rich Regarding Setting up APIs
+-----------------------------------------------------------------------------
+
+Wei-Hwa:  I've created a new virtual server at wczar.emagino.net
+Wei-Hwa:  I pretty much copy everything from czar onto the new place
+  I create a new config item in config.js
+  I change server_url and doc_folder_id appropriately, but I keep the same gapi_client_id
+Rich:  let me look into that gapi_client_id, I suspect that's the issue
+Wei-Hwa:  "368612528023-n65vkgeithp9k7ch3nr2e9rubnjqj5ib.apps.googleusercontent.com"
+  it's the same one used on czar.emagino.net but there it doesn't complain
+  so the origin domain must be part of the authentication
+Rich:  right, I may have to generate a new client ID for wczar
+Wei-Hwa:  that's what I'm thinking
+Rich:  now to figure out how/where that happens
+Wei-Hwa:  or write down instructions on how to do it :)
+Rich:  boy, I wish I'd left a better howto trail
+  yes  :-)
+Wei-Hwa:  This might be relevant: https://developers.google.com/api-client-library/javascript/features/authentication
+  but it seems to be application-specific
+Rich:  yeah, this is starting to come back to me, stand by
+Wei-Hwa:  Oh, this might be it: https://console.developers.google.com/project/368612528023
+  https://console.developers.google.com/project/368612528023/apiui/credential
+  yeah, that looks good
+  lemme create one for wczar
+Rich:  yes, that's it!
+Wei-Hwa:  d'oh!
+  "Only project owners are allowed to created clients for web applications and service accounts"
+Rich:  what?
+  ok, I'll see if I can add you as an owner
+  if not, I'll just do it
+Wei-Hwa:  yep
+Rich:  ok, try now
+Wei-Hwa:  new key generated...
+Rich:  totally going to work
+Wei-Hwa:  okay, success
+Rich:  great!
+  have fun!
+Wei-Hwa:  kinda, didn't work after a page refresh, but worked after clicking Authenticate and giving permission
+  thanks!
