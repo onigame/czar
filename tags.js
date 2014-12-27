@@ -7,7 +7,7 @@
 // x Selector should look okay when there's lots of tags.
 
 var SanitizeTagList = function(str) {
-  // Sanitize the list of tags the user gave us.
+  // Sanitize and sort the list of tags the user gave us.
 
   // Lowercase.
   str = str.toLowerCase()
@@ -26,7 +26,7 @@ var SanitizeTagList = function(str) {
     }
   }
   
-  str = uniq_tags.join(',');
+  str = uniq_tags.sort().join(',');
 
   return str;
 };
