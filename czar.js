@@ -646,9 +646,12 @@ var UpdateJobsToDisplay = function() {
 var UpdateActives = function(name) {
   log('UpdateActives for ' + name);
   var actives = [];
+  var inactives = [];
   for (u in gUsers) {
     if (gUsers[u].name && IsActiveAssignment(gUsers[u].id, name)) {
       actives.push(gUsers[u].name);
+    } else if (gUsers[u].name && LastSeenTime(gUsers[u].id, name)) {
+      inactives.push(gUsers[u].name);
     }
   }
   var span = document.getElementById(name + '.actives');
@@ -659,7 +662,12 @@ var UpdateActives = function(name) {
     } else if (actives.length == 1) {
       span.title = actives[0] + " is the only person working on this task.";
     } else {
-      span.title = "There are " + actives.length + " people working on this task: " + actives.join(', ');
+      span.title = "There are " + actives.length + " people working on this task: " + actives.join(', ') + ".";
+    }
+    if (inactives.length == 1) {
+      span.title += " " + inactives[0] + " worked on this task.";
+    } else if (inactives.length > 1) {
+      span.title = " There were " + inactives.length + " people who worked on this task: " + inactives.join(', ');
     }
   }
 };
