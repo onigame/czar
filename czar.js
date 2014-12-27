@@ -125,11 +125,27 @@ var MaybeHandleSolvedPuzzle = function(puzzle_id, new_tags) {
   }
 
   gSolvedPuzzles.push(puzzle_id);
+
+  // get a list of all users who are working and were working on this puzzle.
+  var actives = [];
+  var inactives = [];
+  for (u in gUsers) {
+    if (gUsers[u].name && IsActiveAssignment(gUsers[u].id, puzzle_id)) {
+      actives.push(gUsers[u].name);
+    } else if (gUsers[u].name && LastSeenTime(gUsers[u].id, puzzle_id)) {
+      inactives.push(gUsers[u].name);
+    }
+  }
+  var info_message = '<div style="font-size:60%">';
+  if (actives.length > 0) info_message += '<br>Active Solvers: ' + actives.join(', ');
+  if (inactives.length > 0) info_message += '<br>Previous Solvers: ' + inactives.join(', ');
+  info_message += '<br>Final Status: ' + new_tags + '</div>';
+
   if (tags.indexOf('meta') == -1) {
-    Notifications.Send('We just solved ' + gActivities[puzzle_id].name + '!',
+    Notifications.Send('We just solved ' + gActivities[puzzle_id].name + '!' + info_message,
 			'puzzle');
   } else {
-    Notifications.Send('We just solved a meta:<br>' + gActivities[puzzle_id].name,
+    Notifications.Send('We just solved a meta:<br>' + gActivities[puzzle_id].name + info_message,
 			'meta');
   }
   
