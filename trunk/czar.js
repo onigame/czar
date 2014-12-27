@@ -388,7 +388,7 @@ var the_form_html =
   "<span class=tooltip><input type=text name=puzzle size=30></span>" +
   "<a class=missing target=@NAME@.sheet id=@NAME@.sheet>sheet</a>" +
   "<span class=tooltip><input type=text name=sheet size=30></span>" +
-  "<input type=text name=status size=50>" +
+  "<input type=text name=status size=50 style='width:32em'>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
       "title='Nobody is working on this task.'>(0p)</span>" +
@@ -763,6 +763,17 @@ var on_value = function(key, field, value) {
       }
 
       if (field == "label") on_label_change(form, value);
+
+      if (field == "status") {
+        if (value && (value.toUpperCase() == value)) {
+          // Make the status monospaced if it doesn't have lower-case letters
+          // (and it isn't empty), since it's (by convention) a puzzle answer.
+          node.setAttribute('style','width:32em;font-family:"Lucida Console", Monaco, Courier, monospace');
+        } else {
+          // Make the status non-monospaced if it does have lower-case letters or is empty.
+          node.setAttribute('style','width:32em');
+        }
+      }
     }
   }
 
