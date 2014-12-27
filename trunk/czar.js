@@ -151,6 +151,23 @@ var on_submit_create = function() {
     this.label.value = this.label.czar_prompt;
     this.label.blur();
 
+    // Does the label contain a URL as its last term?
+    var i = label.lastIndexOf(" ");
+    var puzurl = "";
+    if (i != -1) {
+      var lastterm = label.substring(i+1);
+      var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+      if (pattern.test(lastterm)) {
+        puzurl = lastterm;
+        label = label.substring(0,i);
+      }
+    }
+
     if (label) {
       var name = null;
       // p is for puzzle.
@@ -162,6 +179,9 @@ var on_submit_create = function() {
         send_value(name, "sheet", url);
       })) {
         send_value(name, "label", label);
+        if (puzurl) {
+          send_value(name, "puzzle", puzurl);
+        }
         var form = document.forms[name];
         if (this.label.className != "dirty")
           form.label.className = "inflight";
