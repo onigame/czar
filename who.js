@@ -396,6 +396,9 @@ var RedrawTable = function() {
         tr.appendChild(document.createElement("td"));
       }
       var user = gUsers[sorted_users[u]];
+
+      var activity = GetCurrentActivity(user.id);
+
       var td = document.createElement("td");
       td.style.verticalAlign = 'top';
       td.style.whiteSpace = 'nowrap';
@@ -403,8 +406,14 @@ var RedrawTable = function() {
       td.style.textAlign = 'center';
       td.innerHTML = user.name;
       td.onclick = BindRenameWidget(td, user);
-      if (whoami == user.id) {
-        td.style.backgroundColor = '#ff6'
+      if (!activity) {
+        td.style.backgroundColor = '#ff0000';
+        td.title = "(NO TASK ASSIGNED)";
+      } else {
+        if (whoami == user.id) {
+          td.style.backgroundColor = '#ff6';
+        }
+        td.title = "Working on: " + gActivities[activity].name;
       }
       tr.appendChild(td);
     }
