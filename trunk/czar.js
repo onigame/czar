@@ -528,9 +528,6 @@ var UpdateMyStatus = function() {
     var job = null;
     for (aid in gActivities) {
       if (IsActiveAssignment(uid, aid) && gActivities[aid].name) {
-        if (IsExclusiveAssignment(uid,aid)) {
-          activity = gActivities[aid].name;
-        }
         if (gActivities[aid].IsJobToDisplay()) {
           if (job == null) {
             job = gActivities[aid].name;
@@ -540,7 +537,10 @@ var UpdateMyStatus = function() {
         }
       }
     }
-    mystatus.innerHTML = ""
+    activity = GetCurrentActivity(uid);
+    if (activity) { activity = gActivities[activity].name; }
+
+    mystatus.innerHTML = "";
     if (activity) {
       mystatus.innerHTML += "Current activity: <b>" + activity + "</b><br>";
     } else {

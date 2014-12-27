@@ -42,6 +42,18 @@ var GetActivityByName = function(activity_name) {
   return null;
 };
 
+var GetCurrentActivity = function(userid) {
+  var aid;
+  for (aid in gActivities) {
+    if (IsActiveAssignment(userid, aid) && gActivities[aid].name) {
+      if (IsExclusiveAssignment(userid,aid)) {
+        return aid;
+      }
+    }
+  }
+  return null;
+};
+
 // UpdateActivityHack is a hook for anyone who wants to be called when
 // an activity or an assignment has changed  UpdateActivityHack is defined in
 // the global scope, so, just set it to your own callable and we'll invoke it.
