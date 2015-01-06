@@ -7,11 +7,29 @@ var Assignment = function(when, active, exclusive) {
   this.exclusive = exclusive == null ? true : exclusive;
 };
 
+var Duration = function(length) {
+  this.length = length == null ? 0 : length;
+};
+
 var LastSeenTime = function(user, activity) {
   if (gLastSeenTime[user] && gLastSeenTime[user][activity]) {
     return gLastSeenTime[user][activity].when;
   } else {
     return 0;
+  }
+};
+
+var DurationString = function(user, activity) {
+  if (gDuration[user] && gDuration[user][activity]) {
+    var length = gDuration[user][activity].length;
+    if (length < 60000) {
+      return Math.floor(length/1000) + 's';
+    } else if (length < 3600000) {
+      return Math.floor(length/60000) + 'm';
+    } else {
+      var hrs = Math.floor(length/3600000);
+      return hrs + 'h' + Math.floor((length - hrs*3600000)/60000) + 'm';
+    }
   }
 };
 
@@ -90,6 +108,35 @@ var UpdateAssignment = function(user, activity, when, active, exclusive) {
   }
 };
 
+var UpdateDuration = function(user, activity, length, isAddition) {
+  if (length == null) {
+    // Delete this duration node.
+    delete gDuration[user][activity];
+    return;
+  }
+
+  if (! gDuration[user]) {
+    gDuration[user] = {};
+  }
+  if (!gDuration[user][activity]) {
+    // Create new object.
+    gDuration[user][activity] = new Duration(length);
+  } else {
+    // Update existing object.
+    if (length != null) {
+      if (isAddition) {
+        gDuration[user][activity].length += length;
+      } else {
+        gDuration[user][activity].length = length;
+      }
+    }
+  }
+
+  if (UpdateActivityHack) {
+    UpdateActivityHack(activity);
+  }
+};
+
 var User = function(id, name) {
   if (id < 0) {
     // Generate a new ID.
@@ -130,6 +177,10 @@ var gActivities = {};
 // Map from person to {map of activity to Assignment} wherein this person most
 // recently worked on this activity at this time.
 var gLastSeenTime = {};
+// Map from person to {map of activity to Assignment} that tries to store how
+// long this person worked on this activity in the past.  Not accurate for the
+// person's current activity.
+var gDuration = {};
 
 
 var HandleUpdateFromStateserver = function(key, value) {
@@ -141,6 +192,8 @@ var HandleUpdateFromStateserver = function(key, value) {
   // a####.field................ Activity (excl. puzzle).  #### is ID, field
   //                             is name.
   // t.u####.?####.field........ Assignment.  field is when, exclusive, active.
+  //                             ####s are IDs.
+  // d.u####.?####.field........ Duration.  field is length, exclusive, active.
   //                             ####s are IDs.
 
   var dot = key.indexOf(".");
@@ -184,6 +237,9 @@ var HandleUpdateFromStateserver = function(key, value) {
         ForgetPerson(key.substring(0, dot));
       }
     }
+    if (UpdateActivityHack) {
+      UpdateActivityHack(id);
+    }
   } else if (key[0] == 't') {
     // Assignment.
     var parts = key.match(/t\.([^.]*)\.([^.]*)(\.([^.]*))?/);
@@ -207,6 +263,24 @@ var HandleUpdateFromStateserver = function(key, value) {
         exclusive = gStateServer.parse_boolean(value);
       }
       UpdateAssignment(uid, aid, when, active, exclusive);
+    }
+  } else if (key[0] == 'd') {
+    // Duration.
+    var parts = key.match(/d\.([^.]*)\.([^.]*)(\.([^.]*))?/);
+    if (parts && parts.length == 5) {
+      var uid = parts[1];
+      var aid = parts[2];
+      var field = parts[4];
+
+      InternalAddPerson(uid, null);
+      InternalUpdateActivity(aid, null);
+
+      var length;
+
+      if (field == null || field == 'length') {
+        length = value;
+      }
+      UpdateDuration(uid, aid, length, false);
     }
   }
 };
@@ -287,7 +361,9 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
   UpdateAssignment(user.id, activity.id, when, active, exclusive);
 
   // If this assignment is exclusive of all other exclusive assignments,
-  // update those other assignments to be inactive.
+  // update those other assignments to be inactive
+  // and increment their durations while updating stateserver with
+  // the new durations.
   if (IsActiveAssignment(user.id, activity.id) &&
       IsExclusiveAssignment(user.id, activity.id)) {
     for (a in gLastSeenTime[user.id]) {
@@ -295,7 +371,14 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
       if (otherActivity && otherActivity != activity &&
           IsActiveAssignment(user.id, otherActivity.id) &&
           IsExclusiveAssignment(user.id, otherActivity.id)) {
+
+        UpdateDuration(user.id, otherActivity.id, when - gLastSeenTime[user.id][otherActivity.id].when, true);
+
+        var key = 'd.' + user.id + '.' + otherActivity.id;
+        gStateServer.set(key + '.length', gDuration[user.id][otherActivity.id].length);
+
         UpdateStatus(user, otherActivity, null, false, true);
+        
       }
     }
   }

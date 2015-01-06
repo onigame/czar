@@ -3,6 +3,9 @@
 // One function will update the HTML of the big-board showing the status of
 // what each person is working on.
 
+// We also add an additional map, also of the form (activity, person) -> time,
+// that stores the total duration this person worked on this activity.
+
 // x Store the timestamp of last-seen.
 // x Create the popup dialog in HTML and leave it hidden.
 // x Create a widget that shows the names of people to display.  Add a button
@@ -529,6 +532,7 @@ var RedrawTable = function() {
       	  td.className = 'nonexclusive';
       	} else {
       	  td.className = 'nonactive';
+          td.innerHTML = DurationString(user.id, activity.id);
       	}
       }
 
