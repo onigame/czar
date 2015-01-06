@@ -182,8 +182,8 @@ Add activity: <input onchange="AddActivity(this);"><br>
   <tr>
     <td>Second puzzle</td>
     <td></td>
-    <td class=nonactive>1:12</td>
-    <td class=nonactive>1:07</td>
+    <td class=nonactive>42m</td>
+    <td class=nonactive>1h12m</td>
     <td></td>
     <td class=active style="background-color:#f00">4:38</td>
   </tr>
@@ -225,6 +225,9 @@ Add activity: <input onchange="AddActivity(this);"><br>
       assignments, shown in purple.  Non-exclusive assignments for puzzles will
       be rare -- it would suggest you're actively working on more than
       one puzzle simultaneously.
+  <li>"No longer" (grey) assignments are displayed as a duration, indicating
+      how long that person worked on that assignment.  If you really need
+      to know when they were last seen on that assignment, use the tooltip.
   <li>At the two-hour mark, green starts "decaying" to red, turning
       into full red at 6 hours.  When someone starts losing their
       color, it means we haven't heard from them in a while.

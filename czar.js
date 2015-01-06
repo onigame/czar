@@ -663,11 +663,15 @@ var UpdateActives = function(name) {
   log('UpdateActives for ' + name);
   var actives = [];
   var inactives = [];
+  var inactivesDurations = [];
+  var inactivesWithDurations = [];
   for (u in gUsers) {
     if (gUsers[u].name && IsActiveAssignment(gUsers[u].id, name)) {
       actives.push(gUsers[u].name);
     } else if (gUsers[u].name && LastSeenTime(gUsers[u].id, name)) {
       inactives.push(gUsers[u].name);
+      inactivesDurations.push(DurationString(gUsers[u].id, name));
+      inactivesWithDurations.push(gUsers[u].name + '(' + DurationString(gUsers[u].id, name) + ')');
     }
   }
   var span = document.getElementById(name + '.actives');
@@ -681,9 +685,10 @@ var UpdateActives = function(name) {
       span.title = "There are " + actives.length + " people working on this task: " + actives.join(', ') + ".";
     }
     if (inactives.length == 1) {
-      span.title += " " + inactives[0] + " worked on this task.";
+      span.title += " " + inactives[0] + " worked on this task for " + inactivesDurations[0] + ".";
     } else if (inactives.length > 1) {
-      span.title = " There were " + inactives.length + " people who worked on this task: " + inactives.join(', ');
+      span.title = " There were " + inactives.length + " people who worked on this task: " 
+                             + inactivesWithDurations.join(', ');
     }
   }
 };
