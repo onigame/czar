@@ -70,5 +70,17 @@ var wh2015test_config = {
   team_url: "",
 };
 
+// Configuration for Team Left Out, MIT Mystery Hunt 2015.
+var leftout15_config = {
+  server_url: "http://czar.emagino.net:433/",
+  hunt_id: "mh2015",
+  gapi_client_id: "368612528023-n65vkgeithp9k7ch3nr2e9rubnjqj5ib.apps.googleusercontent.com",
+  doc_folder_id: "0BwXGC8wDbipUNG1sX2FOTTY4ODQ",
+  jobs_to_display: ["Puzzle Czar", "Comm Czar"],
+  hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
+  hunt_info: "user:teamleftout pass:leftierthanthou",
+  team_url: "https://sites.google.com/a/teamleftout.org/mh2014/hunt",
+};
+
 // Modify this to use a different config.
-var config = wh2015test_config
+var config = leftout15_config

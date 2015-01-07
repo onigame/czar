@@ -62,7 +62,7 @@ var gLastServerUpdate = null;
 var gTableFontSize = 80;  // percentage of font-size for the table as
                           // compared to the rest of the document.
 var gNumCellsBetweenBreaks = 5;
-var gNumCellsBetweenHeaders = 25;
+var gNumCellsBetweenHeaders = 30;
 
 var Init = function() {
   stateserver_url = config.server_url + config.hunt_id
@@ -402,23 +402,41 @@ var RedrawTable = function() {
 
       var activity = GetCurrentActivity(user.id);
 
+      var div = document.createElement("div");
+      div.style.verticalAlign = 'top';
+      div.style.whiteSpace = 'nowrap';
+      div.style.fontWeight = 'bold';
+      div.style.textAlign = 'left';
+      div.style.display = 'inline-block';
+      div.style.whiteSpace = 'nowrap';
+      div.style.lineHeight = '1.5';
+      div.style.transformOrigin = '0 0';
+      div.style.transform = 'translate(0,5.5em) rotate(270deg)';
+      div.innerHTML = user.name;
+      div.onclick = BindRenameWidget(div, user);
+
+      var outerdiv = document.createElement("div");
+      outerdiv.style.display = 'inline-block';
+      outerdiv.style.overflow = 'hidden';
+      outerdiv.style.width = '1.3em';
+      outerdiv.style.height = '5.5em';
+
       var td = document.createElement("td");
-      td.style.verticalAlign = 'top';
-      td.style.whiteSpace = 'nowrap';
-      td.style.fontWeight = 'bold';
-      td.style.textAlign = 'center';
-      td.innerHTML = user.name;
-      td.onclick = BindRenameWidget(td, user);
+      outerdiv.appendChild(div);
+      td.appendChild(outerdiv);
+
       if (!activity) {
         td.style.backgroundColor = '#ff0000';
-        td.title = "(NO TASK ASSIGNED)";
+        div.title = "(NO TASK ASSIGNED)";
       } else {
         if (whoami == user.id) {
           td.style.backgroundColor = '#ff6';
         }
-        td.title = "Working on: " + gActivities[activity].name;
+        div.title = "Working on: " + gActivities[activity].name;
       }
+
       tr.appendChild(td);
+
     }
     table.appendChild(tr);
   };
