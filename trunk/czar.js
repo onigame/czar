@@ -513,6 +513,17 @@ var UpdateActivityHack = function(aid) {
   UpdateJobsToDisplay();
 };
 
+var UpdatePersonHack = function(uid) {
+  for (a in gActivities) {
+    if (LastSeenTime(uid, a)) {
+      UpdateActives(a);
+    }
+  }
+  UpdateAssignButtons();
+  UpdateMyStatus();
+  UpdateJobsToDisplay();
+};
+
 var UpdateMyStatus = function() {
   var mystatus = document.getElementById("mystatus");
   var whoami = document.getElementById('whoami');
@@ -665,6 +676,9 @@ var UpdateActives = function(name) {
   var inactives = [];
   var inactivesDurations = [];
   var inactivesWithDurations = [];
+  if (name == "p6713") {
+    var h = 4;
+  }
   for (u in gUsers) {
     if (gUsers[u].name && IsActiveAssignment(gUsers[u].id, name)) {
       actives.push(gUsers[u].name);
@@ -833,6 +847,11 @@ var send_value = function(form, field, value) {
 
 // Called on every update of a key=value pair.
 var on_server = function(key, value) {
+
+  if (key.match(/u30.name/)) {
+    console.log(key + " " + value);
+  }
+
   var dot = key.indexOf(".");
   if (dot >= 0) {
     // Keys, apparently, have two parts: the part before the . and the part
@@ -845,6 +864,7 @@ var on_server = function(key, value) {
 
   // For notifications.
   Notifications.HandleUpdateFromStateserver(key, value);
+
 };
 
 

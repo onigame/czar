@@ -85,6 +85,9 @@ var HasActiveUsers = function(activity_name) {
 // the global scope, so, just set it to your own callable and we'll invoke it.
 var UpdateActivityHack = null;
 
+// same, but for users.
+var UpdatePersonHack = null;
+
 var UpdateAssignment = function(user, activity, when, active, exclusive) {
   if (when == null && active == null && exclusive == null) {
     // Delete this assignment.
@@ -114,6 +117,9 @@ var UpdateAssignment = function(user, activity, when, active, exclusive) {
   if (UpdateActivityHack) {
     UpdateActivityHack(activity);
   }
+  if (UpdatePersonHack) {
+    UpdatePersonHack(user);
+  }
 };
 
 var UpdateDuration = function(user, activity, length, isAddition) {
@@ -142,6 +148,9 @@ var UpdateDuration = function(user, activity, length, isAddition) {
 
   if (UpdateActivityHack) {
     UpdateActivityHack(activity);
+  }
+  if (UpdatePersonHack) {
+    UpdatePersonHack(user);
   }
 };
 
@@ -245,8 +254,8 @@ var HandleUpdateFromStateserver = function(key, value) {
         ForgetPerson(key.substring(0, dot));
       }
     }
-    if (UpdateActivityHack) {
-      UpdateActivityHack(id);
+    if (UpdatePersonHack) {
+      UpdatePersonHack(id);
     }
   } else if (key[0] == 't') {
     // Assignment.
@@ -306,7 +315,7 @@ var InternalAdd = function(id, name, Type, storage) {
   } else {
     o = new Type(id, name);
     storage[o.id] = o;
-  }
+ }
 
   if (id < 0) {
     // Created a new object; store this data with stateserver.
@@ -396,7 +405,7 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
   if ((when == null) && IsExclusiveAssignment(user.id, activity.id)) {
     UpdateDuration(user.id, activity.id, 
           (new Date()).valueOf() - gLastSeenTime[user.id][activity.id].when, true);
-    var key = 'd.' + user.id + '.' + otherActivity.id;
+    var key = 'd.' + user.id + '.' + activity.id;
     gStateServer.set(key + '.length', gDuration[user.id][activity.id].length);
   }
 
