@@ -379,8 +379,6 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
 
   // If this assignment is exclusive of all other exclusive assignments,
   // update those other assignments to be inactive
-  // and increment their durations while updating stateserver with
-  // the new durations.
   if (IsActiveAssignment(user.id, activity.id) &&
       IsExclusiveAssignment(user.id, activity.id)) {
     for (a in gLastSeenTime[user.id]) {
@@ -388,26 +386,29 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
       if (otherActivity && otherActivity != activity &&
           IsActiveAssignment(user.id, otherActivity.id) &&
           IsExclusiveAssignment(user.id, otherActivity.id)) {
-
-        UpdateDuration(user.id, otherActivity.id, when - gLastSeenTime[user.id][otherActivity.id].when, true);
-
-        var key = 'd.' + user.id + '.' + otherActivity.id;
-        gStateServer.set(key + '.length', gDuration[user.id][otherActivity.id].length);
-
         UpdateStatus(user, otherActivity, null, false, true);
-        
       }
     }
   }
 
   // If this was an unassignment (probably because a puzzle was 
   // marked solved), add the appropriate time to the Duration.
-  if ((when == null) && IsExclusiveAssignment(user.id, activity.id)) {
+  // Also do this if this was a setting of active to false with a non-zero time 
+  // (because "No longer" was selected on Who).
+  if ((when == null || (active == false && when != 0)) 
+        && IsExclusiveAssignment(user.id, activity.id)) {
     UpdateDuration(user.id, activity.id, 
           (new Date()).valueOf() - gLastSeenTime[user.id][activity.id].when, true);
     var key = 'd.' + user.id + '.' + activity.id;
     gStateServer.set(key + '.length', gDuration[user.id][activity.id].length);
   }
+  // However, if "Never" was selected on Who, then remove the Duration entirely.
+  if ((when == 0 && active == false && exclusive == true)) {
+    UpdateDuration(user.id, activity.id, 0, false);
+    var key = 'd.' + user.id + '.' + activity.id;
+    gStateServer.set(key + '.length', null);
+  }
+
 
   // Update stateserver with this information.
   var key = 't.' + user.id + '.' + activity.id;
