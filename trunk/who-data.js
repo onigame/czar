@@ -31,6 +31,7 @@ var DurationString = function(user, activity) {
       return hrs + 'h' + Math.floor((length - hrs*3600000)/60000) + 'm';
     }
   }
+  return "(N/A)";
 };
 
 var IsExclusiveAssignment = function(user, activity) {

@@ -419,7 +419,7 @@ var RedrawTable = function() {
       outerdiv.style.display = 'inline-block';
       outerdiv.style.overflow = 'hidden';
       outerdiv.style.width = '1.3em';
-      outerdiv.style.height = '5.5em';
+      outerdiv.style.height = '5.7em';
 
       var td = document.createElement("td");
       outerdiv.appendChild(div);

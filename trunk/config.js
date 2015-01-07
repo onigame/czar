@@ -79,8 +79,8 @@ var leftout15_config = {
   jobs_to_display: ["Puzzle Czar", "Comm Czar"],
   hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
   hunt_info: "user:teamleftout pass:leftierthanthou",
-  team_url: "https://sites.google.com/a/teamleftout.org/mh2014/hunt",
+  team_url: "https://sites.google.com/a/teamleftout.org/mh2015/hunt",
 };
 
 // Modify this to use a different config.
-var config = wh2015test_config
+var config = leftout15_config
