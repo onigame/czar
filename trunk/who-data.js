@@ -72,6 +72,13 @@ var GetCurrentActivity = function(userid) {
   return null;
 };
 
+var HasActiveUsers = function(activity_name) {
+  for (u in gUsers) {
+    if (IsActiveAssignment(gUsers[u].id, name)) return true;
+  }
+  return false;
+};
+
 // UpdateActivityHack is a hook for anyone who wants to be called when
 // an activity or an assignment has changed  UpdateActivityHack is defined in
 // the global scope, so, just set it to your own callable and we'll invoke it.
@@ -381,6 +388,15 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
         
       }
     }
+  }
+
+  // If this was an unassignment (probably because a puzzle was 
+  // marked solved), add the appropriate time to the Duration.
+  if ((when == null) && IsExclusiveAssignment(user.id, activity.id)) {
+    UpdateDuration(user.id, activity.id, 
+          (new Date()).valueOf() - gLastSeenTime[user.id][activity.id].when, true);
+    var key = 'd.' + user.id + '.' + otherActivity.id;
+    gStateServer.set(key + '.length', gDuration[user.id][activity.id].length);
   }
 
   // Update stateserver with this information.
