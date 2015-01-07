@@ -701,7 +701,7 @@ var UpdateActives = function(name) {
     if (inactives.length == 1) {
       span.title += " " + inactives[0] + " worked on this task for " + inactivesDurations[0] + ".";
     } else if (inactives.length > 1) {
-      span.title = " There were " + inactives.length + " people who worked on this task: " 
+      span.title += " There were " + inactives.length + " people who worked on this task: " 
                              + inactivesWithDurations.join(', ');
     }
   }
