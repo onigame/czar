@@ -62,7 +62,9 @@ var gLastServerUpdate = null;
 var gTableFontSize = 80;  // percentage of font-size for the table as
                           // compared to the rest of the document.
 var gNumCellsBetweenBreaks = 5;
-var gNumCellsBetweenHeaders = 30;
+var gNumColumnsBetweenHeaders = 60;
+var gNumRowsBetweenHeaders = 25;
+var gShowHeadersAtEnd = true;
 
 var Init = function() {
   stateserver_url = config.server_url + config.hunt_id
@@ -468,7 +470,7 @@ var RedrawTable = function() {
       continue;
     }
     
-    if (num_rows % gNumCellsBetweenHeaders == 0) {
+    if (num_rows % gNumRowsBetweenHeaders == 0) {
       // Every 30 activities show the header row again.
       AddHeaderRow();
     } else if (num_rows % gNumCellsBetweenBreaks == 0) {
@@ -518,7 +520,7 @@ var RedrawTable = function() {
     for (var u = 0; u < sorted_users.length; u++) {
       var user = gUsers[sorted_users[u]];
 
-      if (u % gNumCellsBetweenHeaders == 0) {
+      if (u % gNumColumnsBetweenHeaders == 0) {
         AddActivityCell();
       } else if (u % gNumCellsBetweenBreaks == 0) {
         AddVerticalGap();
@@ -553,12 +555,21 @@ var RedrawTable = function() {
           td.innerHTML = DurationString(user.id, activity.id);
       	}
       }
+      td.style.fontFamily = '"Helvetica Narrow","Arial Narrow",Tahoma,Arial,Helvetica,sans-serif';
+      td.style.letterSpacing = '0px';
+      td.style.fontSize = '80%';
 
       td.onclick = BindShowUpdateWidget(td, user, activity);
       tr.appendChild(td);
     }
+    if (gShowHeadersAtEnd) {
+      AddActivityCell();
+    }
 
     table.appendChild(tr);
+  }
+  if (gShowHeadersAtEnd) {
+    AddHeaderRow();
   }
 
   d.innerHTML = ''

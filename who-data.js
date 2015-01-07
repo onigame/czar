@@ -28,7 +28,7 @@ var DurationString = function(user, activity) {
       return Math.floor(length/60000) + 'm';
     } else {
       var hrs = Math.floor(length/3600000);
-      return hrs + 'h' + Math.floor((length - hrs*3600000)/60000) + 'm';
+      return hrs + 'h' + Math.floor((length - hrs*3600000)/60000);
     }
   }
   return "(N/A)";
