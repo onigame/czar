@@ -64,7 +64,7 @@ var wh2015test_config = {
   hunt_id: "wh2015test",
   gapi_client_id: "368612528023-smkrhidhace7o0gsvta4mjk6mpcgjflk.apps.googleusercontent.com",
   doc_folder_id: "0BwXGC8wDbipUbWs5YXo0b1hKdm8",
-  jobs_to_display: [],
+  jobs_to_display: ["Love", "Marriage"],
   hunt_url: "http://www.pandamagazine.com/island2/index.php?f=PlayPB2",
   hunt_info: "",
   team_url: "",
@@ -83,4 +83,4 @@ var leftout15_config = {
 };
 
 // Modify this to use a different config.
-var config = leftout15_config
+var config = wh2015test_config
