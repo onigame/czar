@@ -407,7 +407,8 @@ var the_form_html =
   "<input type=text name=status size=50 style='width:32em'>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
-      "title='Nobody is working on this task.'>(0p)</span>" +
+      "class=actives>(0p)</span>" +
+//      "title='Nobody is working on this task.'>(0p)</span>" +
   "<input type=submit id=@NAME@.assignbutton value='WhoRU?'" +
       " style='background-color:#888;color:#555;font-size:80%;border:2px outset;width:5em'" +
       " title='Please tell me who you are (upper-left).'>" +
@@ -481,6 +482,15 @@ var make_form = function(name) {
   bind_link(form, "puzzle", "Click to enter puzzle URL");
   // Link to the spreadsheet.
   bind_link(form, "sheet", "Click to enter spreadsheet URL");
+
+  // Deal with the tooltip.
+  //"<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
+  $("#" + name + "\\.actives").tooltip({
+    items: "#" + name + "\\.actives",
+    content: function() {
+      return GetActives(name);
+    }
+  });
 
   UpdateActives(name);
 
@@ -670,15 +680,13 @@ var UpdateJobsToDisplay = function() {
   }
 };
 
-var UpdateActives = function(name) {
-  log('UpdateActives for ' + name);
+var GetActives = function(name) {
+  log('GetActives for ' + name);
   var actives = [];
   var inactives = [];
   var inactivesDurations = [];
   var inactivesWithDurations = [];
-  if (name == "p6713") {
-    var h = 4;
-  }
+
   for (u in gUsers) {
     if (gUsers[u].name && IsActiveAssignment(gUsers[u].id, name)) {
       actives.push(gUsers[u].name);
@@ -688,22 +696,40 @@ var UpdateActives = function(name) {
       inactivesWithDurations.push(gUsers[u].name + '(' + DurationString(gUsers[u].id, name) + ')');
     }
   }
+
+  var result = "";
+  if (actives.length == 0) {
+    result = "Nobody is working on this task.";
+  } else if (actives.length == 1) {
+    result = actives[0] + " is the only person working on this task.";
+  } else {
+    result = actives.length + " people are working on this task:<br>&nbsp;&nbsp;" 
+                 + actives.join('<br>&nbsp;&nbsp;') + ".";
+  }
+
+  if (inactives.length == 1) {
+    result += "<br>" + inactives[0] + " worked on this task for " + inactivesDurations[0] + ".";
+  } else if (inactives.length > 1) {
+    result += "<br>" + inactives.length + " people worked on this task:<br>&nbsp;&nbsp;" 
+                             + inactivesWithDurations.join('<br>&nbsp;&nbsp;');
+  }
+
+//  result += "<br>" + (new Date()).valueOf();  // for debugging
+
+  return result;
+};
+
+var UpdateActives = function(name) {
+  log('UpdateActives for ' + name);
+  var actives = [];
+  for (u in gUsers) {
+    if (gUsers[u].name && IsActiveAssignment(gUsers[u].id, name)) {
+      actives.push(gUsers[u].name);
+    }
+  }
   var span = document.getElementById(name + '.actives');
   if (span) {
     span.innerHTML = '(' + actives.length + 'p)';
-    if (actives.length == 0) {
-      span.title = "Nobody is working on this task.";
-    } else if (actives.length == 1) {
-      span.title = actives[0] + " is the only person working on this task.";
-    } else {
-      span.title = "There are " + actives.length + " people working on this task: " + actives.join(', ') + ".";
-    }
-    if (inactives.length == 1) {
-      span.title += " " + inactives[0] + " worked on this task for " + inactivesDurations[0] + ".";
-    } else if (inactives.length > 1) {
-      span.title += " There were " + inactives.length + " people who worked on this task: " 
-                             + inactivesWithDurations.join(', ');
-    }
   }
 };
 
@@ -848,10 +874,6 @@ var send_value = function(form, field, value) {
 // Called on every update of a key=value pair.
 var on_server = function(key, value) {
 
-  if (key.match(/u30.name/)) {
-    console.log(key + " " + value);
-  }
-
   var dot = key.indexOf(".");
   if (dot >= 0) {
     // Keys, apparently, have two parts: the part before the . and the part
@@ -928,6 +950,11 @@ var UpdateTagsSelector = function() {
 /////////// end Tag Manipulation
 
 var start_czar = function() {
+
+  // Turn on JqueryUI tooltips.
+  $(document).tooltip();
+  $(".selector").tooltip("[title]",".actives");
+
   stateserver_url = config.server_url + config.hunt_id
   gStateServer = stateserver.open(stateserver_url, on_server);
   document.getElementById('whoami').onchange = WhoAmIChanged;
