@@ -683,6 +683,8 @@ var UpdateJobsToDisplay = function() {
 var GetActives = function(name) {
   log('GetActives for ' + name);
   var actives = [];
+  var activesDurations = [];
+  var activesWithDurations = [];
   var inactives = [];
   var inactivesDurations = [];
   var inactivesWithDurations = [];
@@ -690,6 +692,8 @@ var GetActives = function(name) {
   for (u in gUsers) {
     if (gUsers[u].name && IsActiveAssignment(gUsers[u].id, name)) {
       actives.push(gUsers[u].name);
+      activesDurations.push(LastSeenDurationString(gUsers[u].id, name));
+      activesWithDurations.push(gUsers[u].name + '(' + LastSeenDurationString(gUsers[u].id, name) + ')');
     } else if (gUsers[u].name && LastSeenTime(gUsers[u].id, name)) {
       inactives.push(gUsers[u].name);
       inactivesDurations.push(DurationString(gUsers[u].id, name));
@@ -701,10 +705,10 @@ var GetActives = function(name) {
   if (actives.length == 0) {
     result = "Nobody is working on this task.";
   } else if (actives.length == 1) {
-    result = actives[0] + " is the only person working on this task.";
+    result = actives[0] + " has been working on this task for " + activesDurations[0] + ".";
   } else {
     result = actives.length + " people are working on this task:<br>&nbsp;&nbsp;" 
-                 + actives.join('<br>&nbsp;&nbsp;') + ".";
+                 + activesWithDurations.join('<br>&nbsp;&nbsp;');
   }
 
   if (inactives.length == 1) {
