@@ -22,6 +22,8 @@ var LastSeenTime = function(user, activity) {
 var LastSeenDurationString = function(user, activity) {
   if (gLastSeenTime[user] && gLastSeenTime[user][activity]) {
     var length = (new Date()).valueOf() - gLastSeenTime[user][activity].when;
+    if (gDuration[user] && gDuration[user][activity])
+      length += gDuration[user][activity].length;
     if (length < 60000) {
       return Math.floor(length/1000) + 's';
     } else if (length < 3600000) {
@@ -389,6 +391,17 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
   log('UpdateStatus(' +
       [user.id, activity.id, when, active, exclusive].join(', ') +
       ')');
+
+  // If this assignment is a refresh on the same (exclusive) assignment,
+  // add the time to the duration.
+  if (active == true && when != null
+      && GetCurrentActivity(user.id) == activity.id) {
+    UpdateDuration(user.id, activity.id, 
+          when - gLastSeenTime[user.id][activity.id].when, true);
+    var key = 'd.' + user.id + '.' + activity.id;
+    gStateServer.set(key + '.length', gDuration[user.id][activity.id].length);
+    
+  }
 
   UpdateAssignment(user.id, activity.id, when, active, exclusive);
 
