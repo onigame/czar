@@ -19,6 +19,21 @@ var LastSeenTime = function(user, activity) {
   }
 };
 
+var LastSeenDurationString = function(user, activity) {
+  if (gLastSeenTime[user] && gLastSeenTime[user][activity]) {
+    var length = (new Date()).valueOf() - gLastSeenTime[user][activity].when;
+    if (length < 60000) {
+      return Math.floor(length/1000) + 's';
+    } else if (length < 3600000) {
+      return Math.floor(length/60000) + 'm';
+    } else {
+      var hrs = Math.floor(length/3600000);
+      return hrs + 'h' + Math.floor((length - hrs*3600000)/60000);
+    }
+  }
+  return "(N/A)";
+};
+
 var DurationString = function(user, activity) {
   if (gDuration[user] && gDuration[user][activity]) {
     var length = gDuration[user][activity].length;
