@@ -576,7 +576,56 @@ var UpdateMyStatus = function() {
   }
 };
 
-var MakeJobForm = function(job_id, job_name) {
+var MakeJobForm = function(job_num, job_name) {
+  if ($("#job" + job_num)) {
+    log('Warning: MakeJobForm called when exists: ' + job_num + ' ' + job_name);
+  }
+  
+  var form = document.createElement("form");
+  form.name = "job" + job_num;
+  form.id = "job" + job_num;
+  form.class = "jobform";
+  form.innerHTML = "<b>" + job_name + ":</b><span id='job" + job_num + "users'></span>"
+         + "<input type=submit id='job" + job_num + "button'/>";
+  form.onsubmit = function() {
+    return false;
+  }
+ 
+  $("#jobs").append(form);
+
+  var jobbutton = $("#job" + job_num + "button");
+  jobbutton.css("fontSize", '80%');
+  jobbutton.css("border", '2px outset');
+  jobbutton.click(function() {
+    var whoami = document.getElementById('whoami');
+    var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+    if (uid == "") {
+      alert("Please tell me who you are first! (upper-left of page)");
+    } else {
+      var activity = GetActivityByName(config.jobs_to_display[job_num]);
+      if (!activity) {
+        activity = InternalUpdateActivity(-1, job_name);
+      }
+      if (IsActiveAssignment(uid, activity.id)) {
+        $(".ui-tooltip").remove();
+        UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
+            false, true);          
+      } else {
+        $(".ui-tooltip").remove();
+        // Start the job
+        UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
+            true, false);
+      }
+    }
+  });
+}
+
+var UpdateJobForm = function(job_num, job_name) {
+  if ($("#job" + job_num).length == 0) {
+    // form doesn't exist, create it.
+    MakeJobForm(job_num, job_name);
+  }
+
   var whoami = document.getElementById('whoami');
   var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
   var user_list = null;
@@ -597,69 +646,37 @@ var MakeJobForm = function(job_id, job_name) {
     user_list = '<b><font color="red">NONE</font></b>';
   }
 
-  var html = "<form name=@ID@ id=@ID@ class=jobform>" +
-             "  <b>@JOB@</b>: @USERS@<input type=submit id=@ID@.jobbutton>" +
-             "</form>";
-  html = html.replace(/@JOB@/g, job_name);
-  html = html.replace(/@ID@/g, job_id);
-  html = html.replace(/@USERS@/g, user_list);
+  $("#job" + job_num + "users").html(user_list);
 
-  var tmp = document.getElementById("tmp");
-  tmp.innerHTML = html;
 
-  var jobbutton = document.getElementById(job_id + ".jobbutton");
-  jobbutton.style.fontSize = '80%';
-  jobbutton.style.border = '2px outset';
-  jobbutton.onclick = function() {
-    if (uid == "") {
-      alert("Please tell me who you are first! (upper-left of page)");
-    } else {
-      if (!activity) {
-        activity = InternalUpdateActivity(-1, job_name);
-      }
-      if (IsActiveAssignment(uid, activity.id)) {
-        $(".ui-tooltip").remove();
-        UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
-            false, true);          
-      } else {
-        $(".ui-tooltip").remove();
-        // Start the job
-        UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
-            true, false);
-      }
-    }
-  };
+
+  var jobbutton = $("#job" + job_num + "button");
   var now = (new Date()).valueOf();
   if (!uid) {
     // Disabled the buttons.
-    jobbutton.style.backgroundColor = "#888";
-    jobbutton.style.color = "#555";
-    jobbutton.value = "WhoRU?";
-    jobbutton.title = "Please tell me who you are (upper-left)."
+    jobbutton.css("backgroundColor", "#888");
+    jobbutton.css("color", "#555");
+    jobbutton.prop("value", "WhoRU?");
+    jobbutton.prop("title", "Please tell me who you are (upper-left).");
   } else if (activity && IsActiveAssignment(uid, activity.id)) {
     if (IsExclusiveAssignment(uid, activity.id)) {
       // Exclusive and Active == "green" on who
-      jobbutton.style.backgroundColor = "#0F0";
-      jobbutton.style.color = "#000";
+      jobbutton.css("backgroundColor", "#0F0");
+      jobbutton.css("color", "#000");
     } else {
       // Non-exclusive, but assigned == "purple" on who
-      jobbutton.style.backgroundColor = "#C3F";
-      jobbutton.style.color = "#000";      
+      jobbutton.css("backgroundColor", "#C3F");
+      jobbutton.css("color", "#000");
     }
-    jobbutton.value = "Stop";
-    jobbutton.title = "Click here to indicate that you are leaving this job.";
+    jobbutton.prop("value", "Stop");
+    jobbutton.prop("title", "Click here to indicate that you are leaving this job.");
   } else {
     // not engaged == "gray" on who
-    jobbutton.style.backgroundColor = "#EEE";
-    jobbutton.style.color = "#000";
-    jobbutton.value = "Start";
-    jobbutton.title = "Click here to indicate you are starting this job.";
+    jobbutton.css("backgroundColor", "#EEE");
+    jobbutton.css("color", "#000");
+    jobbutton.prop("value", "Start");
+    jobbutton.prop("title", "Click here to indicate you are starting this job.");
   }
-  var form = tmp.firstChild;
-  form.onsubmit = function() {
-    return false;
-  }
-  return form;
 }
 
 var UpdateJobsToDisplay = function() {
@@ -668,16 +685,9 @@ var UpdateJobsToDisplay = function() {
     return;
   }
   
-  var jobs = document.getElementById("jobs");
-  while (jobs.hasChildNodes() ) {
-    jobs.removeChild(jobs.lastChild);
-  }
-
   for (j in config.jobs_to_display) {
-    var job_id = "job" + j;
     var job_name = config.jobs_to_display[j];
-    form = MakeJobForm(job_id, job_name);
-    document.getElementById("jobs").appendChild(form);
+    UpdateJobForm(j, job_name);
   }
 };
 
