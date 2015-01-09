@@ -408,7 +408,6 @@ var the_form_html =
   "<input type=text id=@NAME@.tags name=tags size=20>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
       "class=actives>(0p)</span>" +
-//      "title='Nobody is working on this task.'>(0p)</span>" +
   "<input type=submit id=@NAME@.assignbutton value='WhoRU?'" +
       " style='background-color:#888;color:#555;font-size:80%;border:2px outset;width:5em'" +
       " title='Please tell me who you are (upper-left).'>" +
@@ -598,7 +597,7 @@ var MakeJobForm = function(job_id, job_name) {
     user_list = '<b><font color="red">NONE</font></b>';
   }
 
-  var html = "<form name=@ID@ id=@ID@>" +
+  var html = "<form name=@ID@ id=@ID@ class=jobform>" +
              "  <b>@JOB@</b>: @USERS@<input type=submit id=@ID@.jobbutton>" +
              "</form>";
   html = html.replace(/@JOB@/g, job_name);
@@ -619,9 +618,11 @@ var MakeJobForm = function(job_id, job_name) {
         activity = InternalUpdateActivity(-1, job_name);
       }
       if (IsActiveAssignment(uid, activity.id)) {
+        $(".ui-tooltip").remove();
         UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
             false, true);          
       } else {
+        $(".ui-tooltip").remove();
         // Start the job
         UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
             true, false);
