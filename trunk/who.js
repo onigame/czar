@@ -414,6 +414,7 @@ var RedrawTable = function() {
       div.style.lineHeight = '1.5';
       div.style.transformOrigin = '0 0';
       div.style.transform = 'translate(0,5.5em) rotate(270deg)';
+      div.style.zIndex = '50';
       div.innerHTML = user.name;
       div.onclick = BindRenameWidget(div, user);
 
