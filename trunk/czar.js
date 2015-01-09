@@ -520,6 +520,7 @@ var UpdateActivityHack = function(aid) {
   UpdateAssignButtons();
   UpdateMyStatus();
   UpdateJobsToDisplay();
+  UpdateActivitiesToDisplay();
 };
 
 var UpdatePersonHack = function(uid) {
@@ -531,6 +532,7 @@ var UpdatePersonHack = function(uid) {
   UpdateAssignButtons();
   UpdateMyStatus();
   UpdateJobsToDisplay();
+  UpdateActivitiesToDisplay();
 };
 
 var UpdateMyStatus = function() {
@@ -607,11 +609,9 @@ var MakeJobForm = function(job_num, job_name) {
         activity = InternalUpdateActivity(-1, job_name);
       }
       if (IsActiveAssignment(uid, activity.id)) {
-        $(".ui-tooltip").remove();
         UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
             false, true);          
       } else {
-        $(".ui-tooltip").remove();
         // Start the job
         UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
             true, false);
@@ -651,7 +651,6 @@ var UpdateJobForm = function(job_num, job_name) {
 
 
   var jobbutton = $("#job" + job_num + "button");
-  var now = (new Date()).valueOf();
   if (!uid) {
     // Disabled the buttons.
     jobbutton.css("backgroundColor", "#888");
@@ -677,7 +676,7 @@ var UpdateJobForm = function(job_num, job_name) {
     jobbutton.prop("value", "Start");
     jobbutton.prop("title", "Click here to indicate you are starting this job.");
   }
-}
+};
 
 var UpdateJobsToDisplay = function() {
   if (config.jobs_to_display == null ||
@@ -688,6 +687,96 @@ var UpdateJobsToDisplay = function() {
   for (j in config.jobs_to_display) {
     var job_name = config.jobs_to_display[j];
     UpdateJobForm(j, job_name);
+  }
+};
+
+var MakeActivityForm = function(activity_num, activity_name) {
+  if ($("#activity" + activity_num)) {
+    log('Warning: MakeActivityForm called when exists: ' + activity_num + ' ' + activity_name);
+  }
+  
+  var form = document.createElement("form");
+  form.name = "activity" + activity_num;
+  form.id = "activity" + activity_num;
+  form.class = "activityform";
+  form.innerHTML = "<input type=submit id='activity" + activity_num + "button'/>";
+  form.onsubmit = function() {
+    return false;
+  }
+ 
+  $("#jobs").append(form);
+
+  var activitybutton = $("#activity" + activity_num + "button");
+  activitybutton.css("fontSize", '80%');
+  activitybutton.css("border", '2px outset');
+  activitybutton.click(function() {
+    var whoami = document.getElementById('whoami');
+    var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+    if (uid == "") {
+      alert("Please tell me who you are first! (upper-left of page)");
+    } else {
+      var activity = GetActivityByName(config.activities_to_display[activity_num]);
+      if (!activity) {
+        activity = InternalUpdateActivity(-1, activity_name);
+      }
+      if (IsActiveAssignment(uid, activity.id)) {
+        alert("To stop " + activity_name + " you must choose a new exclusive activity.");
+      } else {
+        // Start the activity
+        UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
+            true, true);
+      }
+    }
+  });
+}
+
+var UpdateActivityForm = function(activity_num, activity_name) {
+  if ($("#activity" + activity_num).length == 0) {
+    // form doesn't exist, create it.
+    MakeActivityForm(activity_num, activity_name);
+  }
+
+  var activitybutton = $("#activity" + activity_num + "button");
+  var activity = GetActivityByName(config.activities_to_display[activity_num]);
+
+  var whoami = document.getElementById('whoami');
+  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+  if (!uid) {
+    // Disabled the buttons.
+    activitybutton.css("backgroundColor", "#888");
+    activitybutton.css("color", "#555");
+    activitybutton.prop("value", "WhoRU?");
+    activitybutton.prop("title", "Please tell me who you are (upper-left).");
+  } else if (activity && IsActiveAssignment(uid, activity.id)) {
+    if (IsExclusiveAssignment(uid, activity.id)) {
+      // Exclusive and Active == "green" on who
+      activitybutton.css("backgroundColor", "#0F0");
+      activitybutton.css("color", "#000");
+    } else {
+      // Non-exclusive, but assigned == "purple" on who
+      activitybutton.css("backgroundColor", "#C3F");
+      activitybutton.css("color", "#000");
+    }
+    activitybutton.prop("value", "Currently " + activity_name);
+    activitybutton.prop("title", "Choose a puzzle or other activity to leave this.");
+  } else {
+    // not engaged == "gray" on who
+    activitybutton.css("backgroundColor", "#EEE");
+    activitybutton.css("color", "#000");
+    activitybutton.prop("value", "Begin " + activity_name);
+    activitybutton.prop("title", "Click here to indicate you are " + activity_name + ".");
+  }
+};
+
+var UpdateActivitiesToDisplay = function() {
+  if (config.activities_to_display == null ||
+      config.activities_to_display.length == 0) {
+    return;
+  }
+  
+  for (j in config.activities_to_display) {
+    var job_name = config.activities_to_display[j];
+    UpdateActivityForm(j, job_name);
   }
 };
 
@@ -758,6 +847,7 @@ var WhoAmIChanged = function() {
   UpdateAssignButtons();
   UpdateMyStatus();
   UpdateJobsToDisplay();
+  UpdateActivitiesToDisplay();
 };
 
 var UpdateAssignButtons = function() {
