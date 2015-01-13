@@ -77,7 +77,7 @@ var leftout15_config = {
   gapi_client_id: "368612528023-n65vkgeithp9k7ch3nr2e9rubnjqj5ib.apps.googleusercontent.com",
   doc_folder_id: "0BwXGC8wDbipUNG1sX2FOTTY4ODQ",
   jobs_to_display: ["Puzzle Czar", "Comm Czar"],
-  activities_to_display: ["Away", "Sleeping"],
+  activities_to_display: ["Away", "Sleeping", "Mothing"],
   hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
   hunt_info: "user:teamleftout pass:leftierthanthou",
   team_url: "https://sites.google.com/a/teamleftout.org/mh2015/hunt",
