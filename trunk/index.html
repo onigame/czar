@@ -3,7 +3,8 @@
 <title>Czar</title>
 <style>
 
-body { background: #FFFFFF; color: #000000; font: 100% sans-serif; }
+body { margin: 0px; background: #FFFFFF; color: #000000; font: 100% sans-serif; }
+div#globalPadding { padding: 8px; }
 div.internal { display: none; }
 
 form a { font-size: 80%; margin-right: 10px; }
@@ -26,6 +27,7 @@ input.empty { color: #888; }
 input.focused { border: 1px solid #AAA !important }
 input.inflight { border: 1px solid #BCF !important }
 
+span.tootltip_wrap { position: relative; }
 span.tooltip input { margin-right: 0; font-size: 80% }
 span.tooltip { 
   position: absolute;
@@ -71,9 +73,22 @@ soundManager.onload = function() { };
 <script src="https://apis.google.com/js/client.js?onload=loadGoogleApis">
 </script>
 
+<script type="text/javascript">
+console.log("config is ", config);
+  if (config.chat_js) {
+    config.chat_js = 'http://static.' + config.chat_domain + '/' + config.chat_js;
+    if (config.chat_cachebuster) {
+      config.chat_js += "?v=" + config.chat_cachebuster;
+    }
+    document.write("<script src=\"" + config.chat_js +"\"><" + "/script>\n");
+  }
+</script>
+
 </head>
 
 <body onload="start_czar()">
+<div id="globalWrapper" style="width: 100%">
+<div id="globalPadding">
 
 <img src=czar.jpeg style="float: left; margin-right: 10; margin-bottom: 15;">
 <div id=jobs style="float: right; text-align: right"></div>
@@ -87,8 +102,9 @@ soundManager.onload = function() { };
     Who are you? <select id="whoami">
       <option id="whoami_sortkey_aaaaa" value="">Nobody</option>
       <option id="whoami_sortkey_zzzzz" value="">Name not here?  Go to 'who'
-	and add yourself!</option>
+      	and add yourself!</option>
     </select>
+    <input type="text" style="display:none" id="whatamidoing">
   </span>
   <br>
   <span id="mystatus"></span>
@@ -213,5 +229,7 @@ soundManager.onload = function() { };
 </DD>
 </span>
 
+</div>
+</div>
 </body>
 </html>

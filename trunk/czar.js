@@ -9,6 +9,19 @@ var gStateServer = null;
 // enqueue only one "please call sort_forms sometime soon" at a time.
 var the_sort_timeout = null;
 
+// Added for chat functionality.
+// http://stackoverflow.com/questions/2856513/how-can-i-trigger-an-onchange-event-manually
+var synthesize_change_event = function(element) {
+  if ("createEvent" in document) {
+    var evt = document.createEvent("HTMLEvents");
+    evt.initEvent("change", false, true);
+    element.dispatchEvent(evt);
+  } else {
+    element.fireEvent("onchange");
+  }
+}
+// END added for chat
+
 var on_blur = function(event) {
   if (this.className == "dirty") {
     if (this.value == this.czar_oldvalue)
@@ -343,18 +356,10 @@ var bind_link = function(form, name, prompt) {
   var show_tip  = function() {
     timeout = null;
 
-    var elem = link;
-    var x = y = 0;
-    while (elem) {
-      x += elem.offsetLeft;
-      y += elem.offsetTop;
-      elem = elem.offsetParent;
-    }
-
     tooltip.style.visibility = "visible";
     tooltip.style.zIndex = 1;
-    tooltip.style.left = x + 5;
-    tooltip.style.top = y + 10;
+    tooltip.style.left = 5;
+    tooltip.style.top = 10;
   }
 
   var hide_tip  = function() {
@@ -400,10 +405,14 @@ var the_form_html =
   "<form name=@NAME@>" +
   "<input type=hidden id=@NAME@.docid name=docid>" +
   "<input type=text name=label size=35 style='font-weight: bold'>" +
-  "<a class=missing target=@NAME@.puzzle id=@NAME@.puzzle>puzzle</a>" +
-  "<span class=tooltip><input type=text name=puzzle size=30></span>" +
-  "<a class=missing target=@NAME@.sheet id=@NAME@.sheet>sheet</a>" +
-  "<span class=tooltip><input type=text name=sheet size=30></span>" +
+  "<span class=tootltip_wrap>" +
+    "<a class=missing target=@NAME@.puzzle id=@NAME@.puzzle>puzzle</a>" +
+    "<span class=tooltip><input type=text name=puzzle size=30></span>" +
+  "</span>" +
+  "<span class=tootltip_wrap>" +
+    "<a class=missing target=@NAME@.sheet id=@NAME@.sheet>sheet</a>" +
+    "<span class=tooltip><input type=text name=sheet size=30></span>" +
+  "</span>" +
   "<input type=text name=status size=50 style='width:32em'>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
@@ -443,6 +452,7 @@ var add_user_to_whoami = function(whoami, user_key, user_name) {
   // Check the document cookies -- is this user_key the current user?
   if (user_key == cookies.get('whoami')) {
     option.selected = true;
+    synthesize_change_event(whoami);
     UpdateAssignButtons();
   }
 };
@@ -565,6 +575,11 @@ var UpdateMyStatus = function() {
     mystatus.innerHTML = "";
     if (activity) {
       mystatus.innerHTML += "Current activity: <b>" + activity + "</b><br>";
+      var whatdo = document.getElementById('whatamidoing');
+      if (whatdo && whatdo.value != activity) {
+        whatdo.value = activity;
+        synthesize_change_event(whatdo);
+      }
     } else {
       mystatus.innerHTML += '<b><font color="red">You are not assigned to ' +
         'an activity!  Please select a puzzle below or select an exclusive ' +
