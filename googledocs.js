@@ -8,7 +8,7 @@ function loadGoogleApis() {
 
 function checkAuth() {
   gapi.auth.authorize({client_id: config.gapi_client_id,
-    scope: scopes, immediate: true}, handleAuthResult);
+    scope: scopes, immediate: true}, handleAuthResultSilent);
 }
 
 function handleAuthClick() {
@@ -17,19 +17,23 @@ function handleAuthClick() {
   return false;
 }
 
-function handleAuthResult(authResult) {
+function handleAuthResultSilent(authResult) {
+  handleAuthResult(authResult, true);
+}
+
+function handleAuthResult(authResult, silent) {
   if (authResult && !authResult.error) {
     if (debug) console.log('Authentication successful.');
-    checkFolderAccess();
+    checkFolderAccess(silent);
   } else {
-    if (authResult && authResult.error) {
+    if (authResult && authResult.error && !silent) {
       alert("Authentication failed: " + authResult.error);
     }
     handleNotLoggedIn();
   }
 }
 
-function checkFolderAccess() {
+function checkFolderAccess(silent) {
   gapi.client.load('drive', 'v2', function() {
     var request = gapi.client.request({
       'path': '/drive/v2/files/' + config.doc_folder_id,
@@ -40,10 +44,12 @@ function checkFolderAccess() {
         if (debug) console.log('Verified access to shared folder.');
         handleLoggedIn();
       } else {
-        alert('Access to shared folder denied!\nAsk someone else on the team with access to add you.\n\n' +
+        if (!silent) {
+          alert('Access to shared folder denied!\nAsk someone else on the team with access to add you.\n\n' +
             '\nDetails: ' + resp.error.code + ': ' + resp.error.message);
+        }
         handleNotLoggedIn();
-      }  
+      }
     });
   });
 } 
