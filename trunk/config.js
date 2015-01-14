@@ -72,15 +72,19 @@ var wh2015test_config = {
 
 // Configuration for Team Left Out, MIT Mystery Hunt 2015.
 var leftout15_config = {
-  server_url: "http://czar.emagino.net:433/",
+  server_url: "http://czar.teamleftout.org:433/",
   hunt_id: "mh2015",
-  gapi_client_id: "368612528023-n65vkgeithp9k7ch3nr2e9rubnjqj5ib.apps.googleusercontent.com",
+//  gapi_client_id: "368612528023-n65vkgeithp9k7ch3nr2e9rubnjqj5ib.apps.googleusercontent.com",
+  gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
   doc_folder_id: "0BwXGC8wDbipUNG1sX2FOTTY4ODQ",
   jobs_to_display: ["Puzzle Czar", "Comm Czar"],
   activities_to_display: ["Away", "Sleeping", "Mothing"],
   hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
   hunt_info: "user:teamleftout pass:leftierthanthou",
   team_url: "https://sites.google.com/a/teamleftout.org/mh2015/hunt",
+  chat_domain: 'x.czar.teamleftout.org',
+  chat_js: 'static/loadstub.js',
+  chat_cachebuster: '1',
 };
 
 // Modify this to use a different config.
