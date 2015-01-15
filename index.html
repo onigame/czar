@@ -75,7 +75,12 @@ soundManager.onload = function() { };
 
 <script type="text/javascript">
 console.log("config is ", config);
-  if (config.chat_js) {
+
+//  For a while iOS wasn't compatible with chat.
+//  var deviceNoChat = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  var deviceNoChat = false;
+
+  if (config.chat_js && !(deviceNoChat)) {
     config.chat_js = 'http://static.' + config.chat_domain + '/' + config.chat_js;
     if (config.chat_cachebuster) {
       config.chat_js += "?v=" + config.chat_cachebuster;
