@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>Czar</title>
+<style>
+
+body { margin: 0px; background: #FFFFFF; color: #000000; font: 100% sans-serif; }
+div#globalPadding { padding: 8px; }
+div.internal { display: none; }
+
+form a { font-size: 80%; margin-right: 10px; }
+form a.missing { color: #888888; text-decoration: none; }
+form a.invalid { color: #FF0000; text-decoration: line-through; }
+form.marked a.missing { text-decoration: line-through; }
+form { margin: 0; }
+form.deleted { display: none; }
+form.marked * { text-decoration: line-through; }
+form.marked input { color: #000000; }
+form.marked input.countdown { color: #AA0000; text-decoration: none; }
+
+div#items > form.shaded { background: #DDD; }
+div#items > form.shaded * { background: #DDD; }
+div#items > form.shaded input { background: #DDD; border-color: #DDD }
+
+input { font: 100% sans-serif; border: 1px solid #FFF; margin-right: 10px; }
+input.dirty { border: 1px solid #77F !important }
+input.empty { color: #888; }
+input.focused { border: 1px solid #AAA !important }
+input.inflight { border: 1px solid #BCF !important }
+
+span.tootltip_wrap { position: relative; }
+span.tooltip input { margin-right: 0; font-size: 80% }
+span.tooltip { 
+  position: absolute;
+  visibility: hidden;
+  padding: 3 3 3 3;
+  background: #FFF; border: 1px solid #888;
+}
+
+.ui-tooltip-content {
+  font-size: 60%;
+}
+
+#sm2-container {
+ width: 1px;
+ height: 1px;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+<script language="JavaScript" src="config.js"></script>
+<script language="JavaScript" src="json2.js"></script>
+<script language="JavaScript" src="stateserver.js"></script>
+<script language="JavaScript" src="log.js"></script>
+<script language="JavaScript" src="cookie.js"></script>
+<script language="JavaScript" src="tags.js"></script>
+<script language="JavaScript" src="who-data.js"></script>
+<script language="JavaScript" src="notifications.js"></script>
+<script language="JavaScript" src="czar.js"></script>
+<script language="JavaScript" src="googledocs.js"></script>
+
+<!-- load Google APIs -->
+<script src="https://apis.google.com/js/client.js?onload=loadGoogleApis">
+</script>
+
+</head>
+
+<body onload="start_czar(true)">
+
+<div id=jobs style="float: right; text-align: right"></div>
+<div style="margin-left: 10">
+  <h2 style="margin-top: 0"><a href="index.html">Czar</a> Mobile</h2>
+  <!-- id is "aaaaa" to make it sort before most users.  --->
+  <span id='whoami.selector'>
+    <!-- The whoami select element gets auto-populated by XXX -->
+    Who are you? <select id="whoami">
+      <option id="whoami_sortkey_aaaaa" value="">Nobody</option>
+    </select>
+    <input type="text" style="display:none" id="whatamidoing">
+  </span>
+  <br>
+  <span id="mystatus"></span>
+  <br>
+  <a id="hunt_url" target="_blank" href="">Hunt Site</a>
+  <a id="team_url" target="_blank" href="">Team site</a>
+</div>
+<br clear=left>
+
+<hr>
+<!-- visible puzzles -->
+<div id=items></div>
+
+<!-- nonvisible puzzles -->
+<div id=unsorted class=internal></div>
+
+<div id=tmp class=internal></div>
+
+</body>
+</html>
