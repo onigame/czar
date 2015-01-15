@@ -56,17 +56,21 @@ function checkFolderAccess(silent) {
 
 function handleLoggedIn() {
   logged_in = true;
-  document.forms.create.style.display = "inline";
-  bind_input(document.forms.create.label, "Click to enter new puzzle name");
-  document.forms.create.label.czar_autosubmit = false;
-  document.forms.create.onsubmit = on_submit_create;
+  if (!onMobileSite) {
+    document.forms.create.style.display = "inline";
+    bind_input(document.forms.create.label, "Click to enter new puzzle name");
+    document.forms.create.label.czar_autosubmit = false;
+    document.forms.create.onsubmit = on_submit_create;
+  }
   document.getElementById("auth_button").style.display = "none";
 }
 
 function handleNotLoggedIn() {
   logged_in = false;
-  document.forms.create.style.display = "none";
-  document.getElementById("auth_button").style.display = "inline";
+  if (!onMobileSite) {
+    document.forms.create.style.display = "none";
+    document.getElementById("auth_button").style.display = "inline";
+  }
 }
 
 function createSpreadsheet(title, callback) {

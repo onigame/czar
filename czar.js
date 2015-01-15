@@ -9,6 +9,9 @@ var gStateServer = null;
 // enqueue only one "please call sort_forms sometime soon" at a time.
 var the_sort_timeout = null;
 
+// Are we on the low-load mobile site?
+var onMobileSite = false;
+
 // Added for chat functionality.
 // http://stackoverflow.com/questions/2856513/how-can-i-trigger-an-onchange-event-manually
 var synthesize_change_event = function(element) {
@@ -149,6 +152,7 @@ var MaybeHandleSolvedPuzzle = function(puzzle_id, new_tags) {
       inactives.push(gUsers[u].name);
     }
   }
+ 
   var info_message = '<div style="font-size:60%">';
   if (actives.length > 0) info_message += '<br>Active Solvers: ' + actives.join(', ');
   if (inactives.length > 0) info_message += '<br>Previous Solvers: ' + inactives.join(', ');
@@ -159,7 +163,7 @@ var MaybeHandleSolvedPuzzle = function(puzzle_id, new_tags) {
 			'puzzle');
   } else {
     Notifications.Send('We just solved a meta:<br>' + gActivities[puzzle_id].name + info_message,
-			'meta');
+ 		'meta');
   }
   
   // Unassign all users assigned to this puzzle.
@@ -1004,13 +1008,53 @@ var on_server = function(key, value) {
   // From who-data.js.
   HandleUpdateFromStateserver(key, value);
 
-  // For notifications.
-  Notifications.HandleUpdateFromStateserver(key, value);
+  // For notifications -- but not if on mobile site.
+  if (!onMobileSite) {
+    Notifications.HandleUpdateFromStateserver(key, value);
+  }
 
 };
 
 
 /////////// Tag Manipulation
+
+var filter_unsolved_puzzles = function() {
+  // Hide solved puzzles.
+
+  log('filter_unsolved_puzzles called');
+
+  var odd = 1;
+  // Examine each puzzle being displayed.  Take action only if all the
+  // selected tags appear in the puzzle as well.  Note that "no tags selected"
+  // selects all puzzles.
+  for (var node=document.getElementById("items").firstChild; 
+       node != null; node=node.nextSibling) {
+    if (node.className == "deleted") continue;  // skip over deleted forms.
+
+    var tags = document.getElementById(node.name + ".tags").value.split(',');
+    var solved = false;
+    for (var i = 0; i < tags.length; i++) {
+      if (tags[i] == 'solved') {
+        solved = true;
+        break;
+      }
+    }
+    if (solved) {
+      node.style.display = "none";
+    } else {
+      node.style.display = "block";
+    }
+    if (node.style.display == "block") {
+      if (odd) {
+        node.classList.add("shaded");
+      } else {
+        node.classList.remove("shaded");
+      }
+      odd = !odd;
+    }
+  }
+};
+
 
 var filter_tags = function() {
   // Selectively hide puzzles based on their tags.
@@ -1050,6 +1094,12 @@ var UpdateTagsSelector = function() {
 
   log('UpdateTagsSelector called.');
 
+  // There is no tag selector on the Mobile Site, so just refilter the puzzles.
+  if (onMobileSite) {
+    filter_unsolved_puzzles();
+    return;
+  }
+
   ResetTags();
 
   // Iterate through the list of puzzles, in order that they appear (items,
@@ -1069,7 +1119,9 @@ var UpdateTagsSelector = function() {
 
 /////////// end Tag Manipulation
 
-var start_czar = function() {
+var start_czar = function(onM) {
+
+  onMobileSite = onM;
 
   // Turn on JqueryUI tooltips.
   $(document).tooltip();
@@ -1079,7 +1131,7 @@ var start_czar = function() {
   gStateServer = stateserver.open(stateserver_url, on_server);
   document.getElementById('whoami').onchange = WhoAmIChanged;
   document.getElementById('hunt_url').href = config.hunt_url;
-  document.getElementById('hunt_info').innerHTML = config.hunt_info;
+  if (!onMobileSite) document.getElementById('hunt_info').innerHTML = config.hunt_info;
   document.getElementById('team_url').href = config.team_url;
   Notifications.Init(gStateServer);
 }
