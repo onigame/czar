@@ -84,7 +84,7 @@ var leftout15_config = {
   team_url: "https://sites.google.com/a/teamleftout.org/mh2015/hunt",
   chat_domain: 'x.czar.teamleftout.org',
   chat_js: 'static/loadstub.js',
-  chat_cachebuster: '2',
+  chat_cachebuster: '4',
 };
 
 // Modify this to use a different config.
