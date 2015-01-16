@@ -360,7 +360,9 @@ var bind_link = function(form, name, prompt) {
   var show_tip  = function() {
     timeout = null;
 
-    tooltip.style.visibility = "visible";
+    if (!onMobileSite) {
+      tooltip.style.visibility = "visible";
+    }
     tooltip.style.zIndex = 1;
     tooltip.style.left = 5;
     tooltip.style.top = 10;
@@ -423,7 +425,7 @@ var the_form_html =
       "class=actives>(0p)</span>" +
   "<input type=submit id=@NAME@.assignbutton value='WhoRU?'" +
       " style='background-color:#888;color:#555;font-size:80%;border:2px outset;width:5em'" +
-      " title='Please tell me who you are (upper-left).'>" +
+      ">" +
   "</form>";
 
 
@@ -498,12 +500,14 @@ var make_form = function(name) {
 
   // Deal with the tooltip.
   //"<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
-  $("#" + name + "\\.actives").tooltip({
-    items: "#" + name + "\\.actives",
-    content: function() {
-      return GetActives(name);
-    }
-  });
+  if (!onMobileSite) {
+    $("#" + name + "\\.actives").tooltip({
+      items: "#" + name + "\\.actives",
+      content: function() {
+        return GetActives(name);
+      }
+    });
+  };
 
   UpdateActives(name);
 
@@ -695,6 +699,10 @@ var UpdateJobForm = function(job_num, job_name) {
     jobbutton.prop("value", "Start");
     jobbutton.prop("title", "Click here to indicate you are starting this job.");
   }
+
+  if (onMobileSite) {
+    jobbutton.prop("title","");
+  }
 };
 
 var UpdateJobsToDisplay = function() {
@@ -784,6 +792,10 @@ var UpdateActivityForm = function(activity_num, activity_name) {
     activitybutton.css("color", "#000");
     activitybutton.prop("value", "Begin " + activity_name);
     activitybutton.prop("title", "Click here to indicate you are " + activity_name + ".");
+  }
+
+  if (onMobileSite) {
+    activitybutton.prop("title", "");
   }
 };
 
@@ -913,6 +925,10 @@ var UpdateAssignButtons = function() {
       assignbutton.title = "Click here to indicate you are moving to this puzzle."
     }
 
+    if (onMobileSite) {
+      $("#" + itemList.childNodes[i].name + "\\.assignbutton").prop("title","");
+    }
+
   }
 };
 
@@ -982,6 +998,10 @@ var on_value = function(key, field, value) {
     }
   }
 
+  if (onMobileSite) {
+    $("#" + form.name + "\\.assignbutton").prop("title","");
+  }
+
   UpdateAssignButtons();
 }
 
@@ -1043,6 +1063,9 @@ var filter_unsolved_puzzles = function() {
       node.style.display = "none";
     } else {
       node.style.display = "block";
+      // this if is actually redundant; this procedure is only called
+      // when onMobileSite is true.  But in the future we might call
+      // in other situations.
     }
     if (node.style.display == "block") {
       if (odd) {
