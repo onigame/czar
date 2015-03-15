@@ -1,0 +1,1 @@
+Czar was originally written by Dan Egnor for Team Left Out playing in the MIT Mystery Hunt.  A management tool was wanted for dealing with people in multiple locations working on puzzles.
