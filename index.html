@@ -2,7 +2,6 @@
 <head>
 <title>Czar</title>
 <style>
-
 body { margin: 0px; background: #FFFFFF; color: #000000; font: 100% sans-serif; }
 div#globalPadding { padding: 8px; }
 div.internal { display: none; }
@@ -45,11 +44,12 @@ span.tooltip {
  height: 1px;
 }
 </style>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+
 <script language="JavaScript" src="config.js"></script>
-<script language="JavaScript" src="soundmanager2-nodebug-jsmin.js"></script>
 <script language="JavaScript" src="json2.js"></script>
 <script language="JavaScript" src="stateserver.js"></script>
 <script language="JavaScript" src="log.js"></script>
@@ -60,33 +60,8 @@ span.tooltip {
 <script language="JavaScript" src="czar.js"></script>
 <script language="JavaScript" src="googledocs.js"></script>
 
-<!-- configure soundmanager2 -->
-<script type="text/javascript">
-soundManager.url = 'swf';
-soundManager.useHTML5Audio = true;
-soundManager.useFlashBlock = true;
-soundManager.debugMode = false;
-soundManager.onload = function() { };
-</script>
-
 <!-- load Google APIs -->
 <script src="https://apis.google.com/js/client.js?onload=loadGoogleApis">
-</script>
-
-<script type="text/javascript">
-console.log("config is ", config);
-
-//  For a while iOS wasn't compatible with chat.
-//  var deviceNoChat = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  var deviceNoChat = false;
-
-  if (config.chat_js && !(deviceNoChat)) {
-    config.chat_js = 'http://static.' + config.chat_domain + '/' + config.chat_js;
-    if (config.chat_cachebuster) {
-      config.chat_js += "?v=" + config.chat_cachebuster;
-    }
-    document.write("<script src=\"" + config.chat_js +"\"><" + "/script>\n");
-  }
 </script>
 
 </head>

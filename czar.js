@@ -3,27 +3,14 @@
 // on the host HTML page.
 
 // Data is stored in stateserver as form.field = value.
-
 var gStateServer = null;
+
 // A timer for sort_forms.  Really, though, it's a mutex to ensure we
 // enqueue only one "please call sort_forms sometime soon" at a time.
 var the_sort_timeout = null;
 
 // Are we on the low-load mobile site?
 var onMobileSite = false;
-
-// Added for chat functionality.
-// http://stackoverflow.com/questions/2856513/how-can-i-trigger-an-onchange-event-manually
-var synthesize_change_event = function(element) {
-  if ("createEvent" in document) {
-    var evt = document.createEvent("HTMLEvents");
-    evt.initEvent("change", false, true);
-    element.dispatchEvent(evt);
-  } else {
-    element.fireEvent("onchange");
-  }
-}
-// END added for chat
 
 var on_blur = function(event) {
   if (this.className == "dirty") {
@@ -458,7 +445,6 @@ var add_user_to_whoami = function(whoami, user_key, user_name) {
   // Check the document cookies -- is this user_key the current user?
   if (user_key == cookies.get('whoami')) {
     option.selected = true;
-    synthesize_change_event(whoami);
     UpdateAssignButtons();
   }
 };
@@ -586,7 +572,6 @@ var UpdateMyStatus = function() {
       var whatdo = document.getElementById('whatamidoing');
       if (whatdo && whatdo.value != activity) {
         whatdo.value = activity;
-        synthesize_change_event(whatdo);
       }
     } else {
       mystatus.innerHTML += '<b><font color="red">You are not assigned to ' +
@@ -670,8 +655,6 @@ var UpdateJobForm = function(job_num, job_name) {
   }
 
   $("#job" + job_num + "users").html(user_list);
-
-
 
   var jobbutton = $("#job" + job_num + "button");
   if (!uid) {
@@ -1143,7 +1126,6 @@ var UpdateTagsSelector = function() {
 /////////// end Tag Manipulation
 
 var start_czar = function(onM) {
-
   onMobileSite = onM;
 
   // Turn on JqueryUI tooltips.

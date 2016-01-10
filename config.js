@@ -1,12 +1,20 @@
-// Configuration for localhost testing.
+// For "gapi_client_id" values, visit the Google Developers Console:
+// https://console.developers.google.com/apis/credentials?project=api-project-368612528023
+// You may need permission; ask one of onigame/egnor/rbragg as needed.
+// (You could also make your own independent project and keys.)
+
+// Configuration for localhost testing:
+//   ./stateserver.py :8888            # serve stateserver on port 8888
+//   python -m SimpleHTTPSErver 8080   # Serve HTML on port 8080
+//   ... now go to http://localhost:8080/
 var localhost_config = {
   server_url: "http://localhost:8888/",
   hunt_id: "localtest",
-  gapi_client_id: "368612528023.apps.googleusercontent.com",
-  doc_folder_id: "0B5i1K9hv1-e6VEc0QW9LTHhWVUU",
+  gapi_client_id: "368612528023.apps.googleusercontent.com",  // localhost:8080
+  doc_folder_id: "0B5i1K9hv1-e6VEc0QW9LTHhWVUU",  // "Czar Test Folder"
   jobs_to_display: ["Puzzle Czar", "Comm Czar"],
   hunt_url: "http://en.wikipedia.org/wiki/Puzzlehunt",
-  hunt_info: "no login necessary",
+  hunt_info: "LOCALHOST TEST",
   team_url: "http://en.wikipedia.org/wiki/Team",
 };
 
@@ -74,7 +82,6 @@ var wh2015test_config = {
 var leftout15_config = {
   server_url: "http://czar.teamleftout.org:433/",
   hunt_id: "mh2015",
-//  gapi_client_id: "368612528023-n65vkgeithp9k7ch3nr2e9rubnjqj5ib.apps.googleusercontent.com",
   gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
   doc_folder_id: "0BwXGC8wDbipUNG1sX2FOTTY4ODQ",
   jobs_to_display: ["Puzzle Czar", "Comm Czar"],
@@ -87,5 +94,19 @@ var leftout15_config = {
   chat_cachebuster: '4',
 };
 
+// Configuration for Team Left Out, MIT Mystery Hunt 2016.
+var leftout16_config = {
+  server_url: "http://czar.teamleftout.org:433/",
+  hunt_id: "mh2016",
+  gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
+  doc_folder_id: "0B7WUjr1PseBmajBZcDhYcjFQR2s",
+  jobs_to_display: ["Puzzle Czar", "Comm Czar"],
+  activities_to_display: ["Away", "Sleeping", "Mothing"],
+  hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
+  hunt_info: "Unknown yet!",
+  team_url: "https://sites.google.com/a/teamleftout.org/mh2016/hunt",
+}
+
 // Modify this to use a different config.
-var config = leftout15_config
+// var config = localhost_config
+var config = leftout16_config
