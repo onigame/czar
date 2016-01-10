@@ -145,12 +145,7 @@ var Notifications = {
   },
 
   _PlaySound: function(file_name) {
-    if (!(file_name in this._sounds_loaded)) {
-      if (soundManager.createSound(file_name, file_name)) {
-        this._sounds_loaded[file_name] = 1;
-      }
-    }
-    soundManager.play(file_name);
+    new Audio(file_name).play()
   },
   
   _Dismiss: function(div) {
