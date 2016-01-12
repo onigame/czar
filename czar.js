@@ -188,6 +188,16 @@ var on_submit_create = function() {
       }
     }
 
+    // Convert the label into a Slack-compatible channel name.
+    // [A-Z] => [a-z]; [a-z0-9_-] are kept; [.] becomes [_]; others become [-].
+    // TODO(egnor): Should this logic be in the slacksheet page, instead?
+    var slack_channel = "puz-" + label.toLowerCase()
+    slack_channel = slack_channel.replace(/[^0-9a-z]*[._][^0-9a-z]*/g, "_")
+    slack_channel = slack_channel.replace(/[^0-9a-z_][^0-9a-z_]*/g, "-")
+    slack_channel = slack_channel.replace(/^[_-]*/g, "")
+    slack_channel = slack_channel.substring(0, 21)
+    slack_channel = slack_channel.replace(/[_-]*$/g, "")
+
     if (label) {
       var name = null;
       // p is for puzzle.
@@ -195,6 +205,11 @@ var on_submit_create = function() {
       while (document.forms[name]);
 
       if (createSpreadsheet(label, function(id, url) {
+        if (config.sheet_url_wrapper) {
+          encoded_url = encodeURIComponent(url)
+          url = config.sheet_url_wrapper.replace(/@URL@/g, encoded_url)
+          url = url.replace(/@CHANNEL@/g, encodeURIComponent(slack_channel))
+        }
         send_value(name, "docid", id);
         send_value(name, "sheet", url);
       })) {
@@ -417,7 +432,6 @@ var the_form_html =
 
 
 var add_user_to_whoami = function(whoami, user_key, user_name) {
-
   log("adding " + user_key + " " + user_name + " to whoami");
 
   // Create a canonical name used for sorting.  We hide this

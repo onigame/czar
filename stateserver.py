@@ -4,6 +4,7 @@ import BaseHTTPServer
 import cgi
 import json  # New in python 2.6.
 import os
+import signal
 import socket
 import SocketServer
 import sys
@@ -334,6 +335,7 @@ if __name__ == "__main__":
     sys.stderr.write("usage: cd /state/dir && stateserver.py [host]:port\n")
     sys.exit(2)
 
+  signal.signal(signal.SIGINT, signal.SIG_DFL)
   host, port = sys.argv[1].split(":")
   server = Server((host, int(port)), Handler)
   print "Listening on http://%s:%s/" % (host or socket.gethostname(), port)

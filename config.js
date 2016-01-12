@@ -18,6 +18,18 @@ var localhost_config = {
   team_url: "http://en.wikipedia.org/wiki/Team",
 };
 
+var czartest_config = {
+  server_url: "http://ofb.net:8888/",
+  hunt_id: "czartest",
+  gapi_client_id: "368612528023-h585b3do0p04h52dmodnmibqv3v2i799.apps.googleusercontent.com",
+  doc_folder_id: "0B5i1K9hv1-e6VEc0QW9LTHhWVUU",  // "Czar Test Folder"
+  jobs_to_display: ["Puzzle Czar", "Comm Czar"],
+  hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
+  hunt_info: "TEST CZAR INSTANCE",
+  team_url: "https://sites.google.com/a/teamleftout.org/mh2016/hunt",
+  sheet_url_wrapper: "http://hawku.com/leftout/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@",
+};
+
 // Configuration for Team Left Out, MIT Mystery Hunt 2013.
 var leftout13_config = {
   server_url: "http://czar.emagino.net:433/",
@@ -109,4 +121,5 @@ var leftout16_config = {
 
 // Modify this to use a different config.
 // var config = localhost_config
-var config = leftout16_config
+// var config = leftout16_config
+var config = czartest_config
