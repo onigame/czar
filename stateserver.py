@@ -93,7 +93,7 @@ class Channel:
         version = self.__version + 1
         if self.__update(key, value, version, version):
           self.__file.write(("%d\t%s\t%s\n" % (
-              version, json.write(key), json.write(value))).encode("utf-8"))
+              version, json.dumps(key), json.dumps(value))).encode("utf-8"))
 
       self.__file.flush()
 
@@ -142,7 +142,7 @@ class Channel:
 
         while update:
           create, modify = update.create_version, update.modify_version
-          key, value = json.write(update.key), json.write(update.value)
+          key, value = json.dumps(update.key), json.dumps(update.value)
           if create < modify and create > start_version:
             data.append("%d:%d\t%s\t%s\n" % (create, modify, key, value))
           else:
@@ -219,7 +219,7 @@ class Channel:
         if modify <= self.__version:
           raise ValueError("Out of order in %s: %s" % (self.__filename, line))
         self.__version = modify
-        self.__update(json.read(key), json.read(value), create, modify)
+        self.__update(json.loads(key), json.loads(value), create, modify)
       print "Read %d keys: %s" % (len(self.__updates_by_key), self.__filename)
     except Exception, e:
       self.__file = None
@@ -297,7 +297,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
       jsonp = args.get("jsonp", "")
       old_version = int(args.get("v", 0))
       timeout = int(args.get("time", 0))
-      update = json.read(args.get("set", "null"))
+      update = json.loads(args.get("set", "null"))
     except Exception, e:
       print "*** Invalid args (%s):" % e, args
       self.send_error(400, str(e))
@@ -308,7 +308,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
       if type(update) is dict:
         channel.set(update)
       elif update is not None:
-        self.send_error(400, "Not a map: " + json.write(update))
+        self.send_error(400, "Not a map: " + json.dumps(update))
         return
       new_version, data = channel.get(old_version, timeout)
     except Exception, e:
@@ -316,7 +316,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
       raise
 
     if jsona: jsona = "%s," % jsona
-    output = "%s(%s%d,%s)\n" % (jsonp, jsona, new_version, json.write(data))
+    output = "%s(%s%d,%s)\n" % (jsonp, jsona, new_version, json.dumps(data))
     self.send_response(200)
     self.send_header("Content-type", "text/javascript; charset=utf-8")
     self.send_header("Pragma", "no-cache")
