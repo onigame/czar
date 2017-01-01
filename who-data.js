@@ -1,6 +1,10 @@
 // Methods and classes to store and modify the data used by the Who page.
 // This data is used by the Czar page, too.
 
+var WhoDataDebug = function() {
+  if (0 && window.console) window.console.log.apply(window.console, arguments);
+}
+
 var Assignment = function(when, active, exclusive) {
   this.when = when == null ? 0 : when;
   this.active = active == null ? false : active;
@@ -218,7 +222,7 @@ var gDuration = {};
 
 
 var HandleUpdateFromStateserver = function(key, value) {
-  log('From stateserver: [' + key + '] = [' + value + ']');
+  WhoDataDebug("HandleUpdateFromStateserver(" + key + ", " + value + ")");
 
   // p####.field................ Puzzle.
   // x####.field................ Puzzle (deprecated).
@@ -387,10 +391,8 @@ var UpdateTags = function(id, taglist) {
 
 var UpdateStatus = function(user, activity, when, active, exclusive) {
   // Record that user has worked on activity at the given time.
-
-  log('UpdateStatus(' +
-      [user.id, activity.id, when, active, exclusive].join(', ') +
-      ')');
+  WhoDataDebug('UpdateStatus(' +
+      [user.id, activity.id, when, active, exclusive].join(', ') + ')');
 
   // If this assignment is a refresh on the same (exclusive) assignment,
   // add the time to the duration.

@@ -1,6 +1,9 @@
 var scopes = 'https://www.googleapis.com/auth/drive';
 var logged_in = false;
-var debug = true;
+
+function gdocsDebug(var_args) {
+  if (0 && window.console) window.console.log.apply(window.console, arguments);
+}
 
 function loadGoogleApis() {
   window.setTimeout(checkAuth, 1);
@@ -23,7 +26,7 @@ function handleAuthResultSilent(authResult) {
 
 function handleAuthResult(authResult, silent) {
   if (authResult && !authResult.error) {
-    if (debug) console.log('Authentication successful.');
+    gdocsDebug('Authentication successful.');
     checkFolderAccess(silent);
   } else {
     if (authResult && authResult.error && !silent) {
@@ -41,7 +44,7 @@ function checkFolderAccess(silent) {
       });
     request.execute(function(resp) {
       if (!resp.error) {
-        if (debug) console.log('Verified access to shared folder.');
+        gdocsDebug('Verified access to shared folder.');
         handleLoggedIn();
       } else {
         if (!silent) {
@@ -90,7 +93,7 @@ function createSpreadsheet(title, callback) {
     });
     request.execute(function(resp) {
       if (!resp.error) {
-        if (debug) console.log('Created spreadsheet: ' + title);
+        gdocsDebug('Created spreadsheet: ' + title);
         callback(resp.id, resp.alternateLink);
       } else {
         alert('Spreadsheet not created!\nError ' + resp.error.code + ': ' + resp.error.message);
@@ -115,7 +118,7 @@ function renameSpreadsheet(id, title) {
     });
     request.execute(function(resp) {
       if (!resp.error) {
-        if (debug) console.log('Renamed spreadsheet: ' + title);
+        gdocsDebug('Renamed spreadsheet: ' + title);
       } else {
         alert('Spreadsheet not renamed!\nError ' + resp.error.code + ': ' + resp.error.message);
       }

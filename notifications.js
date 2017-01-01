@@ -39,7 +39,6 @@ var Notifications = {
     var posted = parseInt(value.substring(0, hash));
     var message = value.substring(hash+1);
 
-    log('Notification [' + message + '] @ ' + posted);
     this._MaybeDisplayNotification(posted, message, type);
   },
 
@@ -57,23 +56,17 @@ var Notifications = {
     // Notifications are shown for only one minute.  Don't show stale
     // notifications.
     var now = (new Date()).valueOf();
-    if (posted + 60*1000 < now) {
-      log('Stale notification.');
-      return;
-    }
+    if (posted + 60*1000 < now) return;
 
     // Store a list of notifications in a cookie.  This cookie will prevent
     // us from showing the same notification twice (say, czar, then click to
     // the who page).
     var notifications = cookies.get('notifications');
-    log('notifications is ' + notifications);
     if (notifications) {
       notifications = notifications.split(',');
-      log('notifications is now ' + notifications + ' and posted is ' + posted);
       if (notifications.indexOf(String(posted)) != -1) {
         // We've already seen this notification; pass.
-        log('Seen this notification before.');
-	      return;
+	return;
       } else {
         // Append this notification to those seen.
         notifications[notifications.length] = posted;

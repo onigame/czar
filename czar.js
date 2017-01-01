@@ -12,6 +12,10 @@ var the_sort_timeout = null;
 // Are we on the low-load mobile site?
 var onMobileSite = false;
 
+var czarDebug = function() {
+  if (0 && window.console) window.console.log.apply(window.console, arguments);
+}
+
 var on_blur = function(event) {
   if (this.className == "dirty") {
     if (this.value == this.czar_oldvalue)
@@ -95,7 +99,7 @@ var on_submit_edit = function() {
 };
 
 var MaybeRecolorSheet = function(puzzle_id, new_tags) {
-  log('MaybeRecolorSheet(' + puzzle_id + ', ' + new_tags + ')');
+  czarDebug('MaybeRecolorSheet(' + puzzle_id + ', ' + new_tags + ')');
   var tags = new_tags.split(',');
   if (tags.indexOf('nosheet') != -1) {
     document.getElementById(puzzle_id + ".sheet").style.color = "#FF0000";
@@ -108,7 +112,7 @@ var MaybeRecolorSheet = function(puzzle_id, new_tags) {
 
 var gSolvedPuzzles = [];
 var MaybeHandleSolvedPuzzle = function(puzzle_id, new_tags) {
-  log('MaybeHandleSolvedPuzzle(' + puzzle_id + ', ' + new_tags + ')');
+  czarDebug('MaybeHandleSolvedPuzzle(' + puzzle_id + ', ' + new_tags + ')');
 
   // Is "solved" one of the tags mentioned?
   var tags = new_tags.split(',');
@@ -431,18 +435,18 @@ var the_form_html =
   "</form>";
 
 
-var add_user_to_whoami = function(whoami, user_key, user_name) {
-  log("adding " + user_key + " " + user_name + " to whoami");
+var add_user_to_whoami = function(whoami, key, name) {
+  czarDebug("add_user_to_whoami(" + whoami + ", " + key + ", " + name);
 
   // Create a canonical name used for sorting.  We hide this
   // in the "id" tag of the option.
-  var canon_name = "whoami_sortkey_" + user_name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  var canon_name = "whoami_" + name.toLowerCase().replace(/[^a-z0-9]+/g, "");
 
   // Create an option element for the new user.
   var option = document.createElement('option');
-  option.appendChild(document.createTextNode(user_name));
+  option.appendChild(document.createTextNode(name));
   option.id = canon_name;
-  option.value = user_key;
+  option.value = key;
 
   // Insert new option at its appropriately-sorted position.
   var i = 0;
@@ -456,8 +460,8 @@ var add_user_to_whoami = function(whoami, user_key, user_name) {
     whoami.insertBefore(option, whoami.childNodes[i]);
   }
 
-  // Check the document cookies -- is this user_key the current user?
-  if (user_key == cookies.get('whoami')) {
+  // Check the document cookies -- is this key the current user?
+  if (key == cookies.get('whoami')) {
     option.selected = true;
     UpdateAssignButtons();
   }
@@ -465,21 +469,20 @@ var add_user_to_whoami = function(whoami, user_key, user_name) {
 
 var make_form = function(name) {
   // Makes a new form to represent a single puzzle.
-
   var tmp = document.getElementById("tmp");
   tmp.innerHTML = the_form_html.replace(/@NAME@/g, name);
 
   // deal with the assign button.
   var assignbutton = document.getElementById(name + '.assignbutton');
   assignbutton.onclick = function() {
-    log('assignbutton for ' + name + ' clicked');
+    czarDebug("assignbutton.onclick for name=" + name);
     var whoami = document.getElementById('whoami');
     var uid = whoami.options[whoami.selectedIndex].value;
     if (uid == "") {
-      log('no valid name');
+      czarDebug('assignbutton.onclick: No whoami value');
       alert("Please tell me who you are first! (upper-left of page)");
     } else {
-      log('assigning uid ' + uid);
+      czarDebug('assignbutton.onclick: Setting uid=' + uid);
       UpdateStatus(gUsers[uid], gActivities[name],
                    (new Date()).valueOf(), true, null);
     }
@@ -601,10 +604,6 @@ var UpdateMyStatus = function() {
 };
 
 var MakeJobForm = function(job_num, job_name) {
-  if ($("#job" + job_num)) {
-    log('Warning: MakeJobForm called when exists: ' + job_num + ' ' + job_name);
-  }
-  
   var form = document.createElement("form");
   form.name = "job" + job_num;
   form.id = "job" + job_num;
@@ -715,10 +714,6 @@ var UpdateJobsToDisplay = function() {
 };
 
 var MakeActivityForm = function(activity_num, activity_name) {
-  if ($("#activity" + activity_num)) {
-    log('Warning: MakeActivityForm called when exists: ' + activity_num + ' ' + activity_name);
-  }
-  
   var form = document.createElement("form");
   form.name = "activity" + activity_num;
   form.id = "activity" + activity_num;
@@ -809,7 +804,7 @@ var UpdateActivitiesToDisplay = function() {
 };
 
 var GetActives = function(name) {
-  log('GetActives for ' + name);
+  czarDebug("GetActives(" + name + ")");
   var actives = [];
   var activesDurations = [];
   var activesWithDurations = [];
@@ -852,7 +847,7 @@ var GetActives = function(name) {
 };
 
 var UpdateActives = function(name) {
-  log('UpdateActives for ' + name);
+  czarDebug('UpdateActives(' + name + ")");
   var actives = [];
   for (u in gUsers) {
     if (gUsers[u].name && IsActiveAssignment(gUsers[u].id, name)) {
@@ -1038,7 +1033,7 @@ var on_server = function(key, value) {
 var filter_unsolved_puzzles = function() {
   // Hide solved puzzles.
 
-  log('filter_unsolved_puzzles called');
+  czarDebug('filter_unsolved_puzzles()');
 
   var odd = 1;
   // Examine each puzzle being displayed.  Take action only if all the
@@ -1079,7 +1074,7 @@ var filter_unsolved_puzzles = function() {
 var filter_tags = function() {
   // Selectively hide puzzles based on their tags.
 
-  log('filter_tags called');
+  czarDebug('filter_tags()');
 
   var selected = GetSelectedTags();
 
@@ -1112,7 +1107,7 @@ var UpdateTagsSelector = function() {
   // Called when any puzzle has had its tags field changed.  Updates the
   // list of tags at the top of the page.
 
-  log('UpdateTagsSelector called.');
+  czarDebug('UpdateTagsSelector()');
 
   // There is no tag selector on the Mobile Site, so just refilter the puzzles.
   if (onMobileSite) {
@@ -1126,8 +1121,7 @@ var UpdateTagsSelector = function() {
   // rather than unsorted).
   for (var node=document.getElementById("items").firstChild; 
        node != null; node=node.nextSibling) {
-
-    log('node.name is [' + node.name + ']');
+    czarDebug('8UpdateTagsSelector: node.name=' + node.name);
 
     UpdateTagCounts(document.getElementById(node.name + ".tags").value);
     MaybeRecolorSheet(node.name, document.getElementById(node.name + ".tags").value);

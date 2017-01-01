@@ -465,10 +465,7 @@ var RedrawTable = function() {
     var show_activity = ((tags_match && !selected_tags.invert) ||
 			 (!tags_match && selected_tags.invert));
 
-    if (!show_activity) {
-      log('Not showing activity ' + activity.name);
-      continue;
-    }
+    if (!show_activity) continue;
     
     if (num_rows % gNumRowsBetweenHeaders == 0) {
       // Every 30 activities show the header row again.
