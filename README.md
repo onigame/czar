@@ -51,16 +51,19 @@ or other purposes).
 ## Running it yourself
 
 1. Check out this code directory somewhere a Web server can serve.
+   
+   (You can always use `python -m SimpleHTTPServer 8080` to start
+   serving the current directory on port 8080.)
 
 2. Run the stateserver. You can just run it in this directory:
 
-   `./stateserver.py :8888`
+    ./stateserver.py :8888`
 
 3. Edit `config.js`. Create your own config block, or modify an existing one.
    Set the `var config = ...` at the bottom to point to that block.
 
    (See [below](#google-drive-api) for notes about `gapi_client_id`
-   and `doc_folder_id`.)
+   and `doc_folder_id` in the config block.)
 
 4. Load `index.html` in a browser. You should get an initially empty Czar
    instance to which you can make entries and edits. Make sure the data is
