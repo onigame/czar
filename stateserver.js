@@ -4,8 +4,6 @@
 // Individual "channels" (databases) are opened separately; when a channel is
 // opened, every key/value in the channel is retrieved. Changes may be sent
 // to the server; callbacks are invoked for changes received from the server.
-//
-// Multiple channels may be open at once, but this is not necessary or common.
 // Internally, channels use script-tag-insertion long-polling, have no same-site
 // restrictions, and automatically retry and reconnect as necessary.
 //
@@ -14,26 +12,28 @@
 //   <script language="JavaScript" src="json2.js"></script>
 //   <script language="JavaScript" src="stateserver.js"></script>
 //
-// Then, within your Javascript, open a channel:
+// Then, within your Javascript, open a channel to a running stateserver.py:
 //
-//   var callback = function(key, value) {
+//   channel = stateserver.open("http://some.url:1234/your.channel");
+//
+// Register for updates on that channel:
+//
+//   channel.addListener(function(key, value) {
 //     ... do something with update ...
-//   };
-//   channel = stateserver.open("http://some.url:1234/your.channel", callback);
+//   });
 //
-// The server/port must be a running stateserver.py. Once a connection is
-// established to the server, your callback will be invoked in succession for
-// all existing key/value pairs in the channel. It will be invoked later for
-// any changes made by any client (including this one).
+// Once a connection is established to the server, registered listeners will
+// be called for all existing key/value pairs in the channel. They will also be
+// invoked later for any changes made by any client (including this one).
 //
-// The object returned by stateserver.open() can be used to make updates:
+// Make updates using the channel object:
 //
 //   channel.set(some_key, some_value);
 //
 // Keys must be strings; values can be any legal JSON value (strings, numbers,
 // null, lists, or maps of JSON values). Updates will be reflected by the
-// server and the callback re-invoked on all clients, including this one (which
-// may be used as confirmation that it made it to the server).
+// server and listener callbacks invoked for all clients, including this one
+// (which may be used as confirmation that it made it to the server).
 //
 // Setting null as a key's value deletes the key. When a key is deleted, the
 // callback is invoked with the key's name and a null value.
@@ -46,13 +46,13 @@
 //
 //   channel.close()
 //
-// After being closed, the server will no longer be polled for updates, and the
-// channel's callback will not be invoked.
+// After being closed, the server will no longer be polled for updates, and
+// listener callbacks will no longer be invoked.
 
 var stateserver = {
   R: [],
 
-  open: function(url, callback) {
+  open: function(url) {
     var head_tag = document.getElementsByTagName("head")[0];
     var script_tag = null;
     var timeout_id = null;
@@ -61,8 +61,9 @@ var stateserver = {
     var request_version = 0;
     var queued_data = null;
     var sent_data = null;
- 
-    var reset = function() {
+    var listeners = [];
+
+    var reset_request = function() {
       if (script_tag != null) head_tag.removeChild(script_tag);
       script_tag = null;
 
@@ -73,7 +74,7 @@ var stateserver = {
     }
 
     var send_request = function() {
-      reset();
+      reset_request();
 
       if (sent_data == null) {
         sent_data = queued_data;
@@ -116,7 +117,8 @@ var stateserver = {
         current_version = version;
         request_version += 1;
         send_request();
-        for (var key in obj) callback(key, obj[key]);
+        var copy = listeners.slice(0), num = listeners.length;
+        for (var i = 0; i < num; ++i) for (k in obj) copy[i](k, obj[k]);
       } else {
         send_request();
       }
@@ -135,10 +137,21 @@ var stateserver = {
         }
       },
 
+      addListener: function(callback) {
+        listeners.push(callback);
+      },
+
+      removeListener: function(callback) {
+        var i;
+        while ((i = listeners.indexOf(callback)) >= 0) listeners.splice(i);
+      },
+
       close: function() {
-        reset();
+        reset_request();
+        request_version = null;
         queued_data = null;
         sent_data = null;
+        listeners = [];
       },
     };
   }

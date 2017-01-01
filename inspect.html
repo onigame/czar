@@ -127,7 +127,8 @@ var on_submit_connect = function(form) {
   while (tbody.hasChildNodes()) tbody.removeChild(tbody.firstChild);
 
   log("connecting to: " + url);
-  the_server = stateserver.open(url, on_server);
+  the_server = stateserver.open(url);
+  the_server.addListener(on_server);
   return false;
 }
 

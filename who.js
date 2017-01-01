@@ -68,7 +68,8 @@ var gShowHeadersAtEnd = true;
 
 var Init = function() {
   UpdateTagsSelector();
-  gStateServer = stateserver.open(config.stateserver_url, function(key, value) {
+  gStateServer = stateserver.open(config.stateserver_url);
+  gStateServer.addListener(function(key, value) {
       HandleUpdateFromStateserver(key, value);
       Notifications.HandleUpdateFromStateserver(key, value);
       gLastServerUpdate = new Date();

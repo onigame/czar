@@ -1140,7 +1140,8 @@ var start_czar = function(onM) {
   $(document).tooltip();
   $(".selector").tooltip("[title]",".actives");
 
-  gStateServer = stateserver.open(config.stateserver_url, on_server);
+  gStateServer = stateserver.open(config.stateserver_url);
+  gStateServer.addListener(on_server);
   document.getElementById('whoami').onchange = WhoAmIChanged;
   document.getElementById('hunt_url').href = config.hunt_url;
   if (!onMobileSite) document.getElementById('hunt_info').innerHTML = config.hunt_info;
