@@ -22,12 +22,6 @@
 // all existing key/value pairs in the channel.  It will be invoked later for
 // any changes made by any client (including this one).
 //
-// If the URL host includes a "*" -- e.g. "http://czar*.ofb.net:8888/mydata" --
-// the * will be replaced with numbers to avoid the two-connection-per-host
-// problem that otherwise blocks updates as stale connections slowly time out.
-// This requires that all such hostnames are valid for the server, which
-// implies that you should have a wildcard DNS record (as *.ofb.net does).
-//
 // The object returned by stateserver.open() can be used to make updates:
 //
 //   channel.set(some_key, some_value);
@@ -62,9 +56,8 @@ var stateserver = {
     var script_tag = null;
     var timeout_id = null;
     var slot = stateserver.R.length;
-    var saved_tokens = [];
-    var current_token = null;
     var current_version = 0;
+    var request_version = 0;
     var queued_data = null;
     var sent_data = null;
  
@@ -76,7 +69,6 @@ var stateserver = {
       timeout_id = null;
 
       delete stateserver.R[slot];
-      current_token = null;
     }
 
     var send_request = function() {
@@ -89,17 +81,13 @@ var stateserver = {
       }
       queued_data = null;
 
-      current_token = saved_tokens.pop();
-      if (!current_token) current_token = Math.floor(Math.random() * 10000) + 1;
-      var request_url = url.replace(/\*/, current_token);
-
       var slotref = "stateserver.R[" + slot + "]";
       var jsonp = encodeURIComponent("if (" + slotref + ") " + slotref);
-      request_url += "?v=" + current_version;
+      request_url = url + "?v=" + current_version;
+      request_url += "&jsona=" + request_version;
       request_url += "&jsonp=" + jsonp;
-      request_url += "&jsona=" + current_token;
-      // Is Chrome not honoring the cache headers?  Add an extra CGI arg
-      // to change the URL.
+
+      // Add an extra CGI argument to change the URL, forcing cache bypass.
       request_url += "&now=" + (new Date()).valueOf();
 
       if (sent_data != null) {
@@ -109,23 +97,23 @@ var stateserver = {
         request_url += "&time=20";
       }
 
+      stateserver.R[slot] = receive_data;
+
       script_tag = document.createElement("script");
       script_tag.type = "text/javascript";
       script_tag.src = request_url;
       head_tag.insertBefore(script_tag, head_tag.firstChild);
 
       timeout_id = window.setTimeout(send_request, 30000);
-
-      stateserver.R[slot] = receive_data;
     };
 
-    var receive_data = function(token, version, obj) {
-      saved_tokens.push(token);
-      if (token != current_token) return;
+    var receive_data = function(jsona, version, obj) {
+      if (jsona != request_version) return;  // Obsolete request.
 
       sent_data = null;
       if (version > current_version) {
         current_version = version;
+        request_version += 1;
         send_request();
         for (var key in obj) callback(key, obj[key]);
       } else {
@@ -139,6 +127,7 @@ var stateserver = {
       set: function(key, value) {
         if (queued_data == null) queued_data = {};
         queued_data[key] = value;
+        request_version += 1;
         if (timeout_id != null) {
           window.clearTimeout(timeout_id);
           timeout_id = window.setTimeout(send_request, 0);
