@@ -1,2 +1,4 @@
 *.state
 *.pyc
+.*.swp
+*~
