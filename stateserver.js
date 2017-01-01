@@ -2,8 +2,12 @@
 // Provides real-time synchronized access to key-value JSON storage.
 //
 // Individual "channels" (databases) are opened separately; when a channel is
-// opened, every key/value in the channel is retrieved.  Changes may be sent
+// opened, every key/value in the channel is retrieved. Changes may be sent
 // to the server; callbacks are invoked for changes received from the server.
+//
+// Multiple channels may be open at once, but this is not necessary or common.
+// Internally, channels use script-tag-insertion long-polling, have no same-site
+// restrictions, and automatically retry and reconnect as necessary.
 //
 // To use, import the JSON library followed by this file:
 //
@@ -17,9 +21,9 @@
 //   };
 //   channel = stateserver.open("http://some.url:1234/your.channel", callback);
 //
-// The server/port must be a running stateserver.py.  Once a connection is
+// The server/port must be a running stateserver.py. Once a connection is
 // established to the server, your callback will be invoked in succession for
-// all existing key/value pairs in the channel.  It will be invoked later for
+// all existing key/value pairs in the channel. It will be invoked later for
 // any changes made by any client (including this one).
 //
 // The object returned by stateserver.open() can be used to make updates:
@@ -27,26 +31,23 @@
 //   channel.set(some_key, some_value);
 //
 // Keys must be strings; values can be any legal JSON value (strings, numbers,
-// null, lists, or maps of JSON values).  Updates will be reflected by the
+// null, lists, or maps of JSON values). Updates will be reflected by the
 // server and the callback re-invoked on all clients, including this one (which
 // may be used as confirmation that it made it to the server).
 //
-// Setting null as a key's value deletes the key.  When a key is deleted, the
+// Setting null as a key's value deletes the key. When a key is deleted, the
 // callback is invoked with the key's name and a null value.
 //
 // If multiple updates to the same key happen in succession, only the most
 // recent value is guaranteed to be sent to any given client (intermediate
 // values may be skipped).
 //
-// When a channel is no longer needed, it must be closed:
+// If a channel is no longer needed, it may be closed:
 //
 //   channel.close()
 //
 // After being closed, the server will no longer be polled for updates, and the
-// channel's callback will not be invoked.  Clients may have multiple channels
-// open at once, though this is not necessary or common.  Internally, channels
-// use script-tag-insertion long-polling, have no same-site restrictions, and
-// automatically retry and reconnect as necessary.
+// channel's callback will not be invoked.
 
 var stateserver = {
   R: [],
