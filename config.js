@@ -19,9 +19,10 @@ var localhost_config = {
 };
 
 var czartest_config = {
-  server_url: "http://ofb.net:8888/",
+  server_url: "http://czartest.ofb.net:8888/",
   hunt_id: "czartest",
-  gapi_client_id: "368612528023-h585b3do0p04h52dmodnmibqv3v2i799.apps.googleusercontent.com",
+  gapi_client_id: "100113902549-umetccnfbpm0irmivj03lknl7lbq08j0.apps.googleusercontent.com",
+  // gapi_client_id: "368612528023-h585b3do0p04h52dmodnmibqv3v2i799.apps.googleusercontent.com",
   doc_folder_id: "0B5i1K9hv1-e6VEc0QW9LTHhWVUU",  // "Czar Test Folder"
   jobs_to_display: ["Puzzle Czar", "Comm Czar"],
   hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
