@@ -67,9 +67,8 @@ var gNumRowsBetweenHeaders = 25;
 var gShowHeadersAtEnd = true;
 
 var Init = function() {
-  stateserver_url = config.server_url + config.hunt_id
   UpdateTagsSelector();
-  gStateServer = stateserver.open(stateserver_url, function(key, value) {
+  gStateServer = stateserver.open(config.stateserver_url, function(key, value) {
       HandleUpdateFromStateserver(key, value);
       Notifications.HandleUpdateFromStateserver(key, value);
       gLastServerUpdate = new Date();

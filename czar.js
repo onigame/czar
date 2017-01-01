@@ -1146,8 +1146,7 @@ var start_czar = function(onM) {
   $(document).tooltip();
   $(".selector").tooltip("[title]",".actives");
 
-  stateserver_url = config.server_url + config.hunt_id
-  gStateServer = stateserver.open(stateserver_url, on_server);
+  gStateServer = stateserver.open(config.stateserver_url, on_server);
   document.getElementById('whoami').onchange = WhoAmIChanged;
   document.getElementById('hunt_url').href = config.hunt_url;
   if (!onMobileSite) document.getElementById('hunt_info').innerHTML = config.hunt_info;
