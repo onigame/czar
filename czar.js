@@ -143,7 +143,7 @@ var MaybeHandleSolvedPuzzle = function(puzzle_id, new_tags) {
       inactives.push(gUsers[u].name);
     }
   }
- 
+
   var info_message = '<div style="font-size:60%">';
   if (actives.length > 0) info_message += '<br>Active Solvers: ' + actives.join(', ');
   if (inactives.length > 0) info_message += '<br>Previous Solvers: ' + inactives.join(', ');
@@ -156,7 +156,7 @@ var MaybeHandleSolvedPuzzle = function(puzzle_id, new_tags) {
     Notifications.Send('We just solved a meta:<br>' + gActivities[puzzle_id].name + info_message,
  		'meta');
   }
-  
+
   // Unassign all users assigned to this puzzle.
   for (u in gUsers) {
     if (IsActiveAssignment(gUsers[u].id, puzzle_id)) {

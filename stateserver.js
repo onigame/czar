@@ -150,14 +150,6 @@ var stateserver = {
         queued_data = null;
         sent_data = null;
       },
-
-      make_boolean: function(v) {
-        if (v) { return 't'; } else { return 'f'; }
-      },
-
-      parse_boolean: function(v) {
-        return v == 't';
-      },
     };
   }
 };

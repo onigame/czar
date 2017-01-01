@@ -124,15 +124,9 @@ var UpdateAssignment = function(user, activity, when, active, exclusive) {
     gLastSeenTime[user][activity] = new Assignment(when, active, exclusive);
   } else {
     // Update existing object.
-    if (when != null) {
-      gLastSeenTime[user][activity].when = when;
-    }
-    if (active != null) {
-      gLastSeenTime[user][activity].active = active;
-    }
-    if (exclusive != null) {
-      gLastSeenTime[user][activity].exclusive = exclusive;
-    }
+    if (when != null) gLastSeenTime[user][activity].when = when;
+    if (active != null) gLastSeenTime[user][activity].active = active;
+    if (exclusive != null) gLastSeenTime[user][activity].exclusive = exclusive;
   }
 
   if (UpdateActivityHack) {
@@ -296,9 +290,9 @@ var HandleUpdateFromStateserver = function(key, value) {
       if (field == null || field == 'when') {
         when = value;
       } else if (field == 'active') {
-        active = gStateServer.parse_boolean(value);
+        active = value;
       } else if (field == 'exclusive') {
-        exclusive = gStateServer.parse_boolean(value);
+        exclusive = value;
       }
       UpdateAssignment(uid, aid, when, active, exclusive);
     }
@@ -443,12 +437,8 @@ var UpdateStatus = function(user, activity, when, active, exclusive) {
   // Update stateserver with this information.
   var key = 't.' + user.id + '.' + activity.id;
   if (when != null) gStateServer.set(key + '.when', when);
-  if (active != null) {
-    gStateServer.set(key + '.active', gStateServer.make_boolean(active));
-  }
-  if (exclusive != null) {
-    gStateServer.set(key + '.exclusive', gStateServer.make_boolean(exclusive));
-  }
+  if (active != null) gStateServer.set(key + '.active', Boolean(active));
+  if (exclusive != null) gStateServer.set(key + '.exclusive', Boolean(exclusive));
 };
 
 var MakeAgoString = function(now, then) {
