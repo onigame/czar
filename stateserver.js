@@ -7,9 +7,8 @@
 // Internally, channels use script-tag-insertion long-polling, have no same-site
 // restrictions, and automatically retry and reconnect as necessary.
 //
-// To use, import the JSON library followed by this file:
+// To use, import this file into the page:
 //
-//   <script language="JavaScript" src="json2.js"></script>
 //   <script language="JavaScript" src="stateserver.js"></script>
 //
 // Then, within your Javascript, open a channel to a running stateserver.py:

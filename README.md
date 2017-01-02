@@ -27,10 +27,6 @@ or other purposes).
 
 - `stateserver.js` - Javascript client library for accessing stateserver data.
 
-- `json2.js` - Javascript JSON library (from http://www.json.org/js.html).
-
-  Used by stateserver.js, and must be included by the page first.
-
 - `inspect.html` - Inspector and diagnostic tool for stateserver channels.
 
   Development tool to show raw key/value data from stateserver.
