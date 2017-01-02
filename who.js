@@ -71,11 +71,10 @@ var Init = function() {
   gStateServer = stateserver.open(config.stateserver_url);
   gStateServer.addListener(function(key, value) {
       HandleUpdateFromStateserver(key, value);
-      Notifications.HandleUpdateFromStateserver(key, value);
       gLastServerUpdate = new Date();
       RedrawTableSoon();
     });
-  Notifications.Init(gStateServer);
+  notifier.start(gStateServer);
   RedrawTable();
   SchedulePeriodicRedrawTable();
 };
