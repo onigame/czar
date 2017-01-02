@@ -562,10 +562,6 @@ var UpdateMyStatus = function() {
     mystatus.innerHTML = "";
     if (activity) {
       mystatus.innerHTML += "Current activity: <b>" + activity + "</b><br>";
-      var whatdo = document.getElementById('whatamidoing');
-      if (whatdo && whatdo.value != activity) {
-        whatdo.value = activity;
-      }
     } else {
       mystatus.innerHTML += '<b><font color="red">You are not assigned to ' +
         'an activity!  Please select a puzzle below or select an exclusive ' +
