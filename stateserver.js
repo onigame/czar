@@ -24,8 +24,9 @@
 // Once a connection is established to the server, registered listeners will
 // be called for all existing key/value pairs in the channel. They will also be
 // invoked later for any changes made by any client (including this one).
+// Listeners may be removed with channel.removeListener(your_function).
 //
-// Make updates using the channel object:
+// Transmit changes using the channel object:
 //
 //   channel.set(some_key, some_value);
 //
@@ -41,12 +42,8 @@
 // recent value is guaranteed to be sent to any given client (intermediate
 // values may be skipped).
 //
-// If a channel is no longer needed, it may be closed:
-//
-//   channel.close()
-//
-// After being closed, the server will no longer be polled for updates, and
-// listener callbacks will no longer be invoked.
+// Unneeded channels may be closed with channel.close(). After being closed,
+// server polling stops, and listener callbacks will no longer be invoked.
 
 var _stateserver_slots = [];
 
