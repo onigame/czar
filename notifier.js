@@ -43,15 +43,16 @@ var notifier = {
         for (u in (puzzle.people || [])) if (names[u]) solvers.push(names[u]);
 
         solvers.sort();
-        var body = "Solved";
+        var body = "Solved!";
         for (var i = 0; i < solvers.length; ++i) {
-          var sep = i == 0 ? " by " : i < solvers.length - 1 ? ", " : " and ";
+          var sep = !i ? " (" : i < solvers.length - 1 ? ", " : " and ";
           body = body + sep + solvers[i];
+          if (i == solvers.length - 1) body = body + ")";
         }
 
         new Notification(puzzle.label, {
             icon: "/images/cross_transparent.png",
-            body: body + "!",
+            body: body,
             tag: puzzle.id,  // One notification for multiple windows.
           }).onclick = function() { window.focus(); };
       }
