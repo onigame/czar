@@ -9,7 +9,7 @@
 //
 // To use, import this file into the page:
 //
-//   <script language="JavaScript" src="stateserver.js"></script>
+//   <script src="stateserver.js"></script>
 //
 // Then, within your Javascript, open a channel to a running stateserver.py:
 //
