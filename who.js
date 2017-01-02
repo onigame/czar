@@ -68,13 +68,13 @@ var gShowHeadersAtEnd = true;
 
 var Init = function() {
   UpdateTagsSelector();
-  gStateServer = stateserver.open(config.stateserver_url);
+  gStateServer = open_stateserver(config.stateserver_url);
   gStateServer.addListener(function(key, value) {
       HandleUpdateFromStateserver(key, value);
       gLastServerUpdate = new Date();
       RedrawTableSoon();
     });
-  notifier.start(gStateServer);
+  start_notifier(gStateServer);
   RedrawTable();
   SchedulePeriodicRedrawTable();
 };
