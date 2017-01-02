@@ -10,8 +10,8 @@
 
 var notifier = {
   start: function(channel) {
-    var items = {};
-    var names = {};
+    var items = {};  // Puzzle and activity status, by ID (a### or p###).
+    var names = {};  // User and activity name, by ID (a### or u###).
 
     // Prompts the user to allow (or explicitly block) web notifications,
     // and returns true once they're allowed.
@@ -37,10 +37,7 @@ var notifier = {
           function() { channel.set(puzzle.id + ".notified", puzzle.notified); },
           solved ? 5 * 1000 : 0);  // Delay when the puzzle *is* solved.
 
-      //
-      // Web notifications (text window).
-      // 
-
+      // Web notifications (text window) for solved puzzles.
       if (solved && checkNotificationPermission()) {
         var solvers = [];
         for (u in (puzzle.people || [])) if (names[u]) solvers.push(names[u]);
@@ -59,10 +56,7 @@ var notifier = {
           }).onclick = function() { window.focus(); };
       }
 
-      //
-      // Audio (applause, etc).
-      //
-
+      // Audio (applause, etc) for solved puzzles.
       if (solved && window.Audio) {
         var applause = new window.Audio("/sounds/applause.mp3");
         if (tags.split(",").indexOf("meta") < 0) {
