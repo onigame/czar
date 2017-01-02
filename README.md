@@ -27,7 +27,7 @@ or other purposes).
 
 - `stateserver.js` - Javascript client library for accessing stateserver data.
 
-- `inspect.html` - Inspector and diagnostic tool for stateserver channels.
+- `stateserver_inspect.html` - Development tool to inspect stateserver channels.
 
   Development tool to show raw key/value data from stateserver.
 
@@ -65,8 +65,8 @@ or other purposes).
    instance to which you can make entries and edits. Make sure the data is
    being sent to the server -- try simultaneous viewing in two browser windows.
 
-5. Load `inspect.html` in a browser. Enter the URL of your stateserver
-   (the same one you put in your edited config.js). Look at the key/value
+5. Load `stateserver_inspect.html` in a browser. Enter the URL of your
+   stateserver (the same one you put in config.js). Look at the key/value
    pairs. Try modifying some of them -- the modifications should be
    reflected in the running Czar instances.
 
