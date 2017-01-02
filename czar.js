@@ -1106,11 +1106,11 @@ var start_czar = function(onM) {
   $(document).tooltip();
   $(".selector").tooltip("[title]",".actives");
 
-  gStateServer = open_stateserver(config.stateserver_url);
+  gStateServer = openStateserver(config.stateserver_url);
   gStateServer.addListener(on_server);
   document.getElementById('whoami').onchange = WhoAmIChanged;
   document.getElementById('hunt_url').href = config.hunt_url;
   if (!onMobileSite) document.getElementById('hunt_info').innerHTML = config.hunt_info;
   document.getElementById('team_url').href = config.team_url;
-  start_notifier(gStateServer);
+  startNotifier(gStateServer);
 }

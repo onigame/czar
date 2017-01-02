@@ -2,13 +2,13 @@
 // sounds and system notifications (https://notifications.spec.whatwg.org/)
 // for significant events.
 //
-// Import this file, and call start_notifier() with a stateserver channel:
+// Import this file, and call startNotifier() with a stateserver channel:
 //
-//   start_notifier(my_stateserver_channel);
+//   startNotifier(my_stateserver_channel);
 //
 // (Do this just after the channel is opened.) No further interaction is needed.
 
-var start_notifier = function(channel) {
+var startNotifier = function(channel) {
   var items = {};  // Puzzle and activity status, by ID (a### or p###).
   var names = {};  // User and activity name, by ID (a### or u###).
 

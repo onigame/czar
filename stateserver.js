@@ -13,7 +13,7 @@
 //
 // Then, within your Javascript, open a channel to a running stateserver.py:
 //
-//   channel = open_stateserver("http://some.url:1234/your.channel");
+//   channel = openStateserver("http://some.url:1234/your.channel");
 //
 // Register for updates on that channel:
 //
@@ -45,13 +45,13 @@
 // Unneeded channels may be closed with channel.close(). After being closed,
 // server polling stops, and listener callbacks will no longer be invoked.
 
-var _stateserver_slots = [];
+var stateserverSlots = [];
 
-var open_stateserver = function(url) {
+var openStateserver = function(url) {
   var head_tag = document.getElementsByTagName("head")[0];
   var script_tag = null;
   var timeout_id = null;
-  var slot = _stateserver_slots.length;
+  var slot = stateserverSlots.length;
   var current_version = 0;
   var request_version = 0;
   var queued_data = null;
@@ -65,7 +65,7 @@ var open_stateserver = function(url) {
     if (timeout_id != null) window.clearTimeout(timeout_id);
     timeout_id = null;
 
-    delete _stateserver_slots[slot];
+    delete stateserverSlots[slot];
   }
 
   var send_request = function() {
@@ -78,7 +78,7 @@ var open_stateserver = function(url) {
     }
     queued_data = null;
 
-    var slotref = "_stateserver_slots[" + slot + "]";
+    var slotref = "stateserverSlots[" + slot + "]";
     var jsonp = encodeURIComponent("if (" + slotref + ") " + slotref);
     request_url = url + "?v=" + current_version;
     request_url += "&jsona=" + request_version;
@@ -94,7 +94,7 @@ var open_stateserver = function(url) {
       request_url += "&time=20";
     }
 
-    _stateserver_slots[slot] = receive_data;
+    stateserverSlots[slot] = receive_data;
 
     script_tag = document.createElement("script");
     script_tag.type = "text/javascript";
@@ -132,13 +132,11 @@ var open_stateserver = function(url) {
       }
     },
 
-    addListener: function(callback) {
-      listeners.push(callback);
-    },
+    addListener: function(callback) { listeners.push(callback); },
 
     removeListener: function(callback) {
-      var i;
-      while ((i = listeners.indexOf(callback)) >= 0) listeners.splice(i);
+      var i = listeners.indexOf(callback);
+      if (i >= 0) listeners.splice(i);
     },
 
     close: function() {
