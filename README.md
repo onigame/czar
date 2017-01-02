@@ -53,7 +53,7 @@ or other purposes).
 
 2. Run the stateserver. You can just run it in this directory:
 
-    ./stateserver.py :8888`
+   `./stateserver.py :8888`
 
 3. Edit `config.js`. Create your own config block, or modify an existing one.
    Set the `var config = ...` at the bottom to point to that block.
