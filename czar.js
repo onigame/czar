@@ -175,7 +175,7 @@ var on_submit_create = function() {
     slack_channel = slack_channel.replace(/[^0-9a-z]*[._][^0-9a-z]*/g, "_")
     slack_channel = slack_channel.replace(/[^0-9a-z_][^0-9a-z_]*/g, "-")
     slack_channel = slack_channel.replace(/^[_-]*/g, "")
-    slack_channel = slack_channel.substring(0, 21)
+    slack_channel = slack_channel.substring(0, 20)
     slack_channel = slack_channel.replace(/[_-]*$/g, "")
 
     if (label) {
