@@ -16,10 +16,10 @@ var czartest_config = {
   doc_folder_id: "0B5i1K9hv1-e6VEc0QW9LTHhWVUU",  // "Czar Test Folder"
   template_doc_id: "1-fo_BrxgngvleyL2I9t91q4jNvcMUAzDHx9fp0nBvIo",
   jobs_to_display: ["Puzzle Czar", "Comm Czar"],
-  hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
+  hunt_url: "http://en.wikipedia.org/wiki/Puzzlehunt",
   hunt_info: "TEST CZAR INSTANCE",
-  team_url: "https://sites.google.com/a/teamleftout.org/mh2016/hunt",
-  sheet_url_wrapper: "http://hawku.com/leftout/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@",
+  team_url: "http://en.wikipedia.org/wiki/Team",
+  sheet_url_wrapper: "/czarchat/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@",
 };
 
 // Configuration for W&T, Puzzle Boat 2.

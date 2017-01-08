@@ -1,3 +1,4 @@
 [submodule "czarchat"]
 	path = czarchat
 	url = https://gitlab.com/grahac/czarchat.git
+	fetchRecurseSubmodules = true
