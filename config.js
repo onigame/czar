@@ -19,7 +19,7 @@ var czartest_config = {
   hunt_url: "http://en.wikipedia.org/wiki/Puzzlehunt",
   hunt_info: "TEST CZAR INSTANCE",
   team_url: "http://en.wikipedia.org/wiki/Team",
-  sheet_url_wrapper: "/czarchat/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@",
+  sheet_url_wrapper: "/czarchat/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
 };
 
 // Configuration for W&T, Puzzle Boat 2.

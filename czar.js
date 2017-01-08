@@ -188,6 +188,7 @@ var on_submit_create = function() {
         if (config.sheet_url_wrapper) {
           encoded_url = encodeURIComponent(url)
           url = config.sheet_url_wrapper.replace(/@URL@/g, encoded_url)
+          url = url.replace(/@TITLE@/g, encodeURIComponent(label))
           url = url.replace(/@CHANNEL@/g, encodeURIComponent(slack_channel))
         }
         send_value(name, "docid", id);
