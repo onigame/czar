@@ -1,0 +1,65 @@
+<html>
+<head>
+<title>Czar Google Access Test</title>
+<meta name="viewpoint" content="width=device-width, initial-scale=1">
+
+<script src="https://apis.google.com/js/api.js" async defer></script>
+<script src="googleaccess.js"></script>
+<script src="config.js"></script>
+<script>
+var start = function() {
+  var goog = startGoogleAccess(config);
+  document.getElementById("signoutButton").onclick = goog.signOut;
+  goog.addListener(function() {
+    var ue = goog.getUserEmail();
+    document.getElementById("user").textContent = ue ? ue : "(nobody)";
+  });
+
+  document.getElementById("createForm").onsubmit = function() {
+    var link = document.getElementById("createResult");
+    link.textContent = "...";
+    delete link.href;
+    var title = document.getElementById("createTitle").value;
+    goog.createSheet(
+        title, function (docid, url) {
+          link.textContent = docid;
+          link.href = url;
+          document.getElementById("renameId").value = docid;
+          document.getElementById("renameTitle").value = title;
+        });
+    return false;
+  }
+
+  document.getElementById("renameForm").onsubmit = function() {
+    goog.renameSheet(
+        document.getElementById("renameId").value,
+        document.getElementById("renameTitle").value);
+    return false;
+  }
+}
+</script>
+</head>
+
+<body onload="start()">
+Hello world!
+<button id="signoutButton">Sign Out</button>
+Signed in: <span id="user">(nobody)</span>
+</body>
+
+<hr>
+
+<form id="createForm">
+Create title: <input type="text" id="createTitle"></input>
+<input value="Go" type="submit"></input>
+<a target="sheet" id="createResult"></a>
+</form>
+
+<hr>
+
+<form id="renameForm">
+Rename docid: <input type="text" id="renameId"></input>
+new title: <input type="text" id="renameTitle"></input>
+<input value="Go" type="submit"></input>
+</form>
+
+</html>

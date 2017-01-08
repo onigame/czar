@@ -63,18 +63,16 @@ span.tooltip {
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
 
+<script src="https://apis.google.com/js/api.js" async defer></script>
+
 <script src="config.js"></script>
 <script src="stateserver.js"></script>
 <script src="cookie.js"></script>
 <script src="tags.js"></script>
 <script src="who-data.js"></script>
 <script src="notifier.js"></script>
+<script src="googleaccess.js"></script>
 <script src="czar.js"></script>
-<script src="googledocs.js"></script>
-
-<!-- load Google APIs -->
-<script src="https://apis.google.com/js/client.js?onload=loadGoogleApis">
-</script>
 
 </head>
 
@@ -106,8 +104,7 @@ span.tooltip {
 </div>
 <br clear=left>
 
-<button id=auth_button name=auth_button style="display: inline" onclick="handleAuthClick();">Authenticate with Google to enter a new puzzle</button>
-<form id=create name=create style="margin-bottom: 10; display: none">
+<form id=create name=create style="margin-bottom: 10">
 <input type=text name=label size=30 style='font-weight: bold'>
 </form>
 

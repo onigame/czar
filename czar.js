@@ -2,8 +2,11 @@
 // for the puzzle name, status, etc.  <form>s are stored in a hidden div
 // on the host HTML page.
 
-// Data is stored in stateserver as form.field = value.
+// The stateserver connection (see stateserver.js).
 var gStateServer = null;
+
+// Access to Google Docs (see googleaccess.js).
+var gGoogleAccess = null;
 
 // A timer for sort_forms.  Really, though, it's a mutex to ensure we
 // enqueue only one "please call sort_forms sometime soon" at a time.
@@ -75,11 +78,8 @@ var on_submit_edit = function() {
           send_value(this, "deadline", new Date().getTime() + 20000);
         } else if (input.value) {
           docid = this["docid"].value;
-          if (!docid || renameSpreadsheet(docid, input.value)) {
-            send_value(this, input, input.value);
-          } else {
-            input.value = input.czar_oldvalue;
-          }
+          if (docid) gGoogleAccess.renameSheet(docid, input.value);
+          send_value(this, input, input.value);
         }
       } else {
         if (input.name == "tags") {
@@ -184,7 +184,7 @@ var on_submit_create = function() {
       do name = "p" + Math.floor(Math.random() * 10000);
       while (document.forms[name]);
 
-      if (createSpreadsheet(label, function(id, url) {
+      gGoogleAccess.createSheet(label, function(id, url) {
         if (config.sheet_url_wrapper) {
           encoded_url = encodeURIComponent(url)
           url = config.sheet_url_wrapper.replace(/@URL@/g, encoded_url)
@@ -192,18 +192,16 @@ var on_submit_create = function() {
         }
         send_value(name, "docid", id);
         send_value(name, "sheet", url);
-      })) {
-        send_value(name, "label", label);
-        if (puzurl) {
-          send_value(name, "puzzle", puzurl);
-        }
-        var form = document.forms[name];
-        if (this.label.className != "dirty")
-          form.label.className = "inflight";
-  
-        sort_forms();
-        form.status.focus();
-      }
+      });
+
+      send_value(name, "label", label);
+      if (puzurl) send_value(name, "puzzle", puzurl);
+
+      var form = document.forms[name];
+      if (this.label.className != "dirty")
+        form.label.className = "inflight";
+      sort_forms();
+      form.status.focus();
     }
   }
   return false;
@@ -1106,11 +1104,20 @@ var start_czar = function(onM) {
   $(document).tooltip();
   $(".selector").tooltip("[title]",".actives");
 
+  gGoogleAccess = startGoogleAccess(config);
+
   gStateServer = openStateserver(config.stateserver_url);
   gStateServer.addListener(on_server);
+  startNotifier(gStateServer);
+
   document.getElementById('whoami').onchange = WhoAmIChanged;
   document.getElementById('hunt_url').href = config.hunt_url;
   if (!onMobileSite) document.getElementById('hunt_info').innerHTML = config.hunt_info;
   document.getElementById('team_url').href = config.team_url;
-  startNotifier(gStateServer);
+
+  if (document.forms.create) {
+    bind_input(document.forms.create.label, "Click to enter new puzzle name");
+    document.forms.create.label.czar_autosubmit = false;
+    document.forms.create.onsubmit = on_submit_create;
+  }
 }
