@@ -451,9 +451,9 @@ var make_form = function(name) {
   var assignbutton = document.getElementById(name + '.assignbutton');
   assignbutton.onclick = function() {
     czarDebug("assignbutton.onclick for name=" + name);
-    var whoami = document.getElementById('whoami');
-    var uid = whoami.options[whoami.selectedIndex].value;
-    if (uid == "") {
+    var s = document.getElementById('whoami');
+    var uid = s.selectedIndex >= 0 ? s.options[s.selectedIndex].value : null;
+    if (!uid) {
       czarDebug('assignbutton.onclick: No whoami value');
       alert("Please tell me who you are first! (upper-left of page)");
     } else {
@@ -533,8 +533,8 @@ var UpdatePersonHack = function(uid) {
 
 var UpdateMyStatus = function() {
   var mystatus = document.getElementById("mystatus");
-  var whoami = document.getElementById('whoami');
-  var uid = whoami.options[whoami.selectedIndex].value;
+  var s = document.getElementById('whoami');
+  var uid = s.selectedIndex >= 0 ? s.options[s.selectedIndex].value : null;
   if (!uid) {
     mystatus.style.backgroundColor = "#eee";
     mystatus.style.color = "#333";
@@ -591,9 +591,9 @@ var MakeJobForm = function(job_num, job_name) {
   jobbutton.css("fontSize", '80%');
   jobbutton.css("border", '2px outset');
   jobbutton.click(function() {
-    var whoami = document.getElementById('whoami');
-    var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
-    if (uid == "") {
+    var s = document.getElementById('whoami');
+    var uid = s.selectedIndex >= 0 ? s.options[s.selectedIndex].value : null;
+    if (!uid) {
       alert("Please tell me who you are first! (upper-left of page)");
     } else {
       var activity = GetActivityByName(config.jobs_to_display[job_num]);
@@ -618,8 +618,6 @@ var UpdateJobForm = function(job_num, job_name) {
     MakeJobForm(job_num, job_name);
   }
 
-  var whoami = document.getElementById('whoami');
-  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
   var user_list = null;
   var activity = GetActivityByName(config.jobs_to_display[j]);
   if (activity) {
@@ -641,6 +639,8 @@ var UpdateJobForm = function(job_num, job_name) {
   $("#job" + job_num + "users").html(user_list);
 
   var jobbutton = $("#job" + job_num + "button");
+  var s = document.getElementById('whoami');
+  var uid = s.selectedIndex >= 0 ? s.options[s.selectedIndex].value : null;
   if (!uid) {
     // Disabled the buttons.
     jobbutton.css("backgroundColor", "#888");
@@ -700,9 +700,9 @@ var MakeActivityForm = function(activity_num, activity_name) {
   activitybutton.css("fontSize", '80%');
   activitybutton.css("border", '2px outset');
   activitybutton.click(function() {
-    var whoami = document.getElementById('whoami');
-    var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
-    if (uid == "") {
+    var s = document.getElementById('whoami');
+    var uid = s.selectedIndex >= 0 ? s.options[s.selectedIndex].value : null;
+    if (!uid) {
       alert("Please tell me who you are first! (upper-left of page)");
     } else {
       var activity = GetActivityByName(config.activities_to_display[activity_num]);
@@ -729,8 +729,8 @@ var UpdateActivityForm = function(activity_num, activity_name) {
   var activitybutton = $("#activity" + activity_num + "button");
   var activity = GetActivityByName(config.activities_to_display[activity_num]);
 
-  var whoami = document.getElementById('whoami');
-  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+  var s = document.getElementById('whoami');
+  var uid = s.selectedIndex >= 0 ? s.options[s.selectedIndex].value : null;
   if (!uid) {
     // Disabled the buttons.
     activitybutton.css("backgroundColor", "#888");
@@ -833,8 +833,8 @@ var UpdateActives = function(name) {
 
 var WhoAmIChanged = function() {
   // Store this user identity in a cookie.
-  var whoami = document.getElementById('whoami');
-  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+  var s = document.getElementById('whoami');
+  var uid = s.selectedIndex >= 0 ? s.options[s.selectedIndex].value : null;
   cookies.set('whoami', uid);
 
   // Update the "Do this" buttons on each puzzle.
@@ -845,8 +845,8 @@ var WhoAmIChanged = function() {
 };
 
 var UpdateAssignButtons = function() {
-  var whoami = document.getElementById('whoami');
-  var uid = document.getElementById('whoami').options[whoami.selectedIndex].value;
+  var s = document.getElementById('whoami');
+  var uid = s.selectedIndex >= 0 ? s.options[s.selectedIndex].value : null;
 
   // We don't really have a great way of iterating through all
   // the puzzles on the page without just looking at the HTML DOM.
