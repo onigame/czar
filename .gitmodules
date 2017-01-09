@@ -1,5 +1,5 @@
 [submodule "czarchat"]
 	path = czarchat
 	url = https://gitlab.com/grahac/czarchat.git
-  branch = master
+	branch = master
 	fetchRecurseSubmodules = true
