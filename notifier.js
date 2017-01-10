@@ -9,8 +9,8 @@
 // (Do this just after the channel is opened.) No further interaction is needed.
 
 var startNotifier = function(channel) {
-  var items = {};  // Puzzle and activity status, by ID (a### or p###).
-  var names = {};  // User and activity name, by ID (a### or u###).
+  var items = {};  // Puzzle status, by ID (a### or p###).
+  var names = {};  // User name, by ID (a### or u###).
 
   // Prompts the user to allow (or explicitly block) web notifications,
   // and returns true once they're allowed.
@@ -68,41 +68,6 @@ var startNotifier = function(channel) {
     }
   };
 
-  // Deliver notifications as appropriate for activity/role status changes.
-  //   activity - activity status (collected by the channel listener below).
-  var checkActivity = function(activity) {
-    var name = names[activity.id];
-    if (!name) return;
-
-    var active = [];
-    for (u in (activity.people || []))
-      if (activity.people[u] && names[u]) active.push(names[u]);
-    active.sort();
-
-    var text = name + ": ";
-    if (active.length == 0) {
-      text = text + "(nobody)";
-    } else {
-      for (var i = 0; i < active.length; ++i) {
-        var sep = i == 0 ? "" : i < active.length - 1 ? ", " : " and ";
-        text = text + sep + active[i];
-      }
-    }
-
-    // Only notify when an activity's membership is seen *changing*.
-    // Note, the last_text property is only local (not sent to the server).
-    if (!activity.last_text) activity.last_text = text;
-    if (activity.last_text == text) return;
-    activity.last_text = text;
-
-    if (checkNotificationPermission()) {
-      new Notification(text, {
-          icon: "/images/czar_small.jpeg",
-          tag: activity.id,
-        }).onclick = function() { window.focus(); };
-    }
-  }
-
   checkNotificationPermission();  // Prompt for permissions at startup.
 
   channel.addListener(function(key, value) {
@@ -119,16 +84,14 @@ var startNotifier = function(channel) {
       }
     }
 
-    // User assignment to puzzles *and* activities.
-    if ((m = key.match(/^t\.(u\d+)\.([ap]\d+)\.active$/))) {
+    // User assignment to puzzles.
+    if ((m = key.match(/^t\.(u\d+)\.(p\d+)\.active$/))) {
       var item = (items[m[2]] = items[m[2]] || {id: m[2]});
       item.people = item.people || {}; 
       item.people[m[1]] = value;
-      if (m[2].startsWith("a"))
-        window.setTimeout(function() { checkActivity(item); }, 0);
     }
 
-    // Names of users *and* activities.
-    if ((m = key.match(/^([au]\d+)\.name$/))) names[m[1]] = value;
+    // Names of users.
+    if ((m = key.match(/^(u\d+)\.name$/))) names[m[1]] = value;
   });
 };
