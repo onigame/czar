@@ -90,6 +90,7 @@ var leftout17_config = {
   hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
   hunt_info: "Unknown yet!",
   team_url: "https://sites.google.com/a/teamleftout.org/mh2017/hunt",
+  sheet_url_wrapper: "/czarchat/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
 };
 
 // Modify this to use a different config.
