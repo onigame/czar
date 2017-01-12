@@ -564,8 +564,10 @@ var UpdateMyStatus = function() {
     } else {
       mystatus.innerHTML += '<b><font color="red">You are not assigned to ' +
         'an activity!  Please select a puzzle below or select an exclusive ' +
-        'non-puzzle activity on <a href="who.html">Who</a>.<br>Consult with ' +
-        'your local Puzzle Czar if you are unsure what you should be doing.' +
+        'non-puzzle activity on <a href="who.html">Who</a>.<br>Default ' +
+        'strategy: (1) Try to find the aha on puzzles with the \'needsaha\' ' +
+        'tag. <br>(2) Work on any puzzles with the \'priority\' tag. <br>(3) ' +
+        'Work on any puzzle you like.  Your Puzzle Czar may have more advice.' +
         '</font></b><br>';
     }
     if (job) {
