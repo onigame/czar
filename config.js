@@ -67,18 +67,6 @@ var sums2016_config = {
   team_url: "",
 };
 
-// Configuration for Team Left Out, MIT Mystery Hunt 2016.
-var leftout16_config = {
-  stateserver_url: "http://czar.teamleftout.org:433/mh2016",
-  gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
-  doc_folder_id: "0B7WUjr1PseBmajBZcDhYcjFQR2s",
-  jobs_to_display: ["Puzzle Czar", "Comm Czar"],
-  activities_to_display: ["Away", "Sleeping", "Mothing"],
-  hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
-  hunt_info: "Unknown yet!",
-  team_url: "https://sites.google.com/a/teamleftout.org/mh2016/hunt",
-};
-
 // Configuration for Team Left Out, MIT Mystery Hunt 2017.
 var leftout17_config = {
   stateserver_url: "http://czar.teamleftout.org:433/mh2017",
@@ -93,5 +81,19 @@ var leftout17_config = {
   sheet_url_wrapper: "/czarchat/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
 };
 
+// Configuration for Team Left Out, MIT Mystery Hunt 2018.
+var leftout18_config = {
+  stateserver_url: "http://czar.teamleftout.org:433/mh2018",
+  gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
+  doc_folder_id: "1_t7GcS_PAnAZs1GfWv0C8wEzBas1nk1c",
+  template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
+  jobs_to_display: ["Puzzle Czar", "Comm Czar"],
+  activities_to_display: ["Away", "Sleeping", "Mothing"],
+  hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
+  hunt_info: "Unknown yet!",
+  team_url: "https://sites.google.com/a/teamleftout.org/mh2018/hunt",
+  sheet_url_wrapper: "/czarchat/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
+};
+
 // Modify this to use a different config.
-var config = leftout17_config
+var config = leftout18_config
