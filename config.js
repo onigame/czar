@@ -83,7 +83,7 @@ var leftout17_config = {
 
 // Configuration for Team Left Out, MIT Mystery Hunt 2018.
 var leftout18_config = {
-  stateserver_url: "http://czar.teamleftout.org:433/mh2018",
+  stateserver_url: "https://czar.teamleftout.org/stateserver/mh2018",
   gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
   doc_folder_id: "1_t7GcS_PAnAZs1GfWv0C8wEzBas1nk1c",
   template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
@@ -92,7 +92,7 @@ var leftout18_config = {
   hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
   hunt_info: "Unknown yet!",
   team_url: "https://sites.google.com/a/teamleftout.org/mh2018/hunt",
-  sheet_url_wrapper: "/czarchat/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
+  sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
 };
 
 // Modify this to use a different config.
