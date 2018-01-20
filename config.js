@@ -89,8 +89,8 @@ var leftout18_config = {
   template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
   jobs_to_display: ["Puzzle Czar", "Comm Czar"],
   activities_to_display: ["Away", "Sleeping", "Mothing"],
-  hunt_url: "http://www.mit.edu/~puzzle/currhunt.html",
-  hunt_info: "Unknown yet!",
+  hunt_url: "https://head-hunters.org/",
+  hunt_info: "username: teamleftout; password: leftierthanthou",
   team_url: "https://sites.google.com/a/teamleftout.org/mh2018/hunt",
   sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
 };
