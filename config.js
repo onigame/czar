@@ -95,5 +95,19 @@ var leftout18_config = {
   sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
 };
 
+// Configuration for Team Left Out, MIT Mystery Hunt 2019.
+var leftout19_config = {
+  stateserver_url: "https://czar.teamleftout.org/stateserver/mh2019",
+  gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
+  doc_folder_id: "1IM8h1fMcAppP6n1ZTCPSHlcALfkeoyEO",
+  template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
+  jobs_to_display: ["Puzzle Czar", "Comm Czar"],
+  activities_to_display: ["Away", "Sleeping", "Mothing"],
+  hunt_url: "TBD",
+  hunt_info: "TBD",
+  team_url: "https://sites.google.com/a/teamleftout.org/mh2019/",
+  sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
+};
+
 // Modify this to use a different config.
-var config = leftout18_config
+var config = leftout19_config
