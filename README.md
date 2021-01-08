@@ -108,3 +108,5 @@ Czar has the ability to open up a per-puzzle jitsi video chat window when a team
 ```
 video_room_prefix='hard_to_Guess_Prefix'
 ```
+
+People can also manually turn off video by adding the parameter "?no_video=true" to their czar URL 
