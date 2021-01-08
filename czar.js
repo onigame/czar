@@ -458,6 +458,10 @@ var make_form = function(name) {
       alert("Please tell me who you are first! (upper-left of page)");
     } else {
       czarDebug('assignbutton.onclick: Setting uid=' + uid);
+    if (!onMobileSite && config.video_room_prefix) {
+      window.open("video_chat_room.html?room_id=" + config.video_room_prefix  +"." +gActivities[name].id 
+        + "&name=" + escape(gActivities[name].name), "czar_video_chat")
+    }
       UpdateStatus(gUsers[uid], gActivities[name],
                    (new Date()).valueOf(), true, null);
     }

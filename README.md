@@ -102,3 +102,9 @@ up, or whenever you deploy Czar on a new domain.
 6. Optionally, make a folder in Google Drive to contain the spreadsheets.
    The folder's ID is the last part of its Google Drive URL (an alphanumeric
    jumble). Use it for `doc_folder_id` in `config.js`.
+
+## Video Chat
+Czar has the ability to open up a per-puzzle jitsi video chat window when a team member clicks the do this button. This way team members can collaborate on puzzles remotely.  To enable the video chat window, in config.js set the parameter "video_room_prefix" to a unique, hard to guess alphanumeric prefix.
+```
+video_room_prefix='hard_to_Guess_Prefix'
+```
