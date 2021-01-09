@@ -1,0 +1,18 @@
+<html>
+<script src='https://meet.jit.si/external_api.js'></script>
+<h1 id="title">Video Chat Room</h1>
+<div id="meet"></div>
+<script>
+const domain = 'meet.jit.si';
+const urlParams = new URLSearchParams(window.location.search);
+const room = urlParams.get('room_id');
+const name =  urlParams.get('name');
+const options = {
+    roomName: room,
+    parentNode: document.querySelector('#meet')
+};
+
+document.getElementById('title').innerHTML = name
+const api = new JitsiMeetExternalAPI(domain, options);
+</script>
+</html>
