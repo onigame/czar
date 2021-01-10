@@ -2,6 +2,9 @@
 <script src='https://meet.jit.si/external_api.js'></script>
 <h1 id="title">Video Chat Room</h1>
 <div id="meet"></div>
+
+
+
 <script>
 const domain = 'meet.jit.si';
 const urlParams = new URLSearchParams(window.location.search);
@@ -9,10 +12,40 @@ const room = urlParams.get('room_id');
 const name =  urlParams.get('name');
 const options = {
     roomName: room,
-    parentNode: document.querySelector('#meet')
+    parentNode: document.querySelector('#meet'),
+    interfaceConfigOverwrite: {
+      TOOLBAR_BUTTONS: [
+        'microphone', 'camera', 'closedcaptions', 'desktop',  'fullscreen',
+        'fodeviceselection', 'hangup', 'profile',
+        'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+        'videoquality', 'filmstrip',  'feedback', 'stats', 'shortcuts',
+        'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
+    ]
+  }
+
 };
 
 document.getElementById('title').innerHTML = name
 const api = new JitsiMeetExternalAPI(domain, options);
+api.executeCommand('toggleChat');
+
+window.onunload = window.onbeforeunload = function() {
+  const pid = urlParams.get('pid');
+  const uid = urlParams.get('uid');
+
+  if(pid && uid)
+    opener.set_puzzle_inactive(pid, uid)
+}
+
+window.onload = function() {
+  const pid = urlParams.get('pid');
+  const uid = urlParams.get('uid');
+
+  if(pid && uid)
+    opener.set_puzzle_active(pid, uid)
+}
+
 </script>
+
+
 </html>
