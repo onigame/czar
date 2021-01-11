@@ -1,8 +1,14 @@
 <html>
-<script src='https://meet.jit.si/external_api.js'></script>
-<h1 id="title">Video Chat Room</h1>
-<div id="meet"></div>
+<head>
+  <script src='https://meet.jit.si/external_api.js'></script>
+  <link rel="icon" type="image/png" href="images/video_favicon_32x32.png"/>
 
+</head>
+<body>
+<title id="title">Video Chat Room</title>
+<h1 id="header">Video Chat Room</h1>
+<div id="meet"></div>
+</body>
 
 
 <script>
@@ -10,9 +16,11 @@ const domain = 'meet.jit.si';
 const urlParams = new URLSearchParams(window.location.search);
 const room = urlParams.get('room_id');
 const name =  urlParams.get('name');
+
 const options = {
     roomName: room,
     parentNode: document.querySelector('#meet'),
+    configOverwrite: { startWithAudioMuted: true },
     interfaceConfigOverwrite: {
       TOOLBAR_BUTTONS: [
         'microphone', 'camera', 'closedcaptions', 'desktop',  'fullscreen',
@@ -20,14 +28,19 @@ const options = {
         'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
         'videoquality', 'filmstrip',  'feedback', 'stats', 'shortcuts',
         'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
-    ]
+    ], 
+    LANG_DETECTION: false,
+    DEFAULT_REMOTE_DISPLAY_NAME: "Random Puzzler",
+    SHOW_CHROME_EXTENSION_BANNER: false
   }
 
 };
 
+document.getElementById('header').innerHTML = name
 document.getElementById('title').innerHTML = name
 const api = new JitsiMeetExternalAPI(domain, options);
 api.executeCommand('toggleChat');
+api.executeCommand('subject', name);
 
 window.onunload = window.onbeforeunload = function() {
   const pid = urlParams.get('pid');
