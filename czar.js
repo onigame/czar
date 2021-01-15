@@ -567,7 +567,7 @@ var UpdateMyStatus = function() {
 
     mystatus.innerHTML = "";
     if (activity) {
-      mystatus.innerHTML += "Current activity: <b>" + activity + "</b><br>";
+      mystatus.innerHTML += "Current activity: <b>" + activity + "</b>";
     } else {
       mystatus.innerHTML += '<b><font color="red">You are not assigned to ' +
         'an activity!  Please select a puzzle below or select an exclusive ' +
@@ -578,7 +578,7 @@ var UpdateMyStatus = function() {
         '</font></b><br>';
     }
     if (job) {
-      mystatus.innerHTML += "Current job: <b>" + job + "</b><br>";
+      mystatus.innerHTML += "Current job: <b>" + job + "</b>";
     }
   }
 };

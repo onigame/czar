@@ -1,13 +1,29 @@
 <html>
 <head>
-    <script src='https://meet.jit.si/external_api.js'></script>
+    <script src="https://meet.jit.si/external_api.js"></script>
     <link rel="icon" type="image/png" href="images/video_favicon_32x32.png"/>
     <title id="title">Video Chat Room</title>
+    <style>
+        body { padding:0; margin: 0; font-family: sans-serif; }
+        div#meet { position: relative; }
+        div#header {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            width: 50%;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 200%;
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+    </style>
 </head>
 
-<body>
-    <h1 id="header">Video Chat Room</h1>
-    <div id="meet"></div>
+<body id="meet">
+    <div id="header">Video Chat Room</h1>
 </body>
 
 <script>
@@ -15,6 +31,8 @@ const domain = 'meet.jit.si';
 const urlParams = new URLSearchParams(window.location.search);
 const room = urlParams.get('room_id');
 const name = urlParams.get('name');
+const pid = urlParams.get('pid');
+const uid = urlParams.get('uid');
 
 const jitsi_options = {
     roomName: room,
@@ -23,10 +41,10 @@ const jitsi_options = {
     interfaceConfigOverwrite: {
         TOOLBAR_BUTTONS: [
             'microphone', 'camera', 'closedcaptions', 'desktop',  'fullscreen',
-            'fodeviceselection', 'hangup', 'profile', 'livestreaming',
-            'etherpad', 'sharedvideo', 'settings', 'raisehand', 'videoquality',
-            'filmstrip',  'feedback', 'stats', 'shortcuts', 'tileview',
-            'videobackgroundblur', 'download', 'help', 'mute-everyone',
+            'fodeviceselection', 'hangup', 'profile', 'sharedvideo',
+            'settings', 'raisehand', 'videoquality', 'filmstrip',  'feedback',
+            'stats', 'shortcuts', 'tileview', 'videobackgroundblur',
+            'download', 'help', 'mute-everyone',
         ], 
         LANG_DETECTION: false,
         DEFAULT_REMOTE_DISPLAY_NAME: "Random Puzzler",
@@ -34,25 +52,21 @@ const jitsi_options = {
     }
 };
 
-document.getElementById('header').innerHTML = name
-document.getElementById('title').innerHTML = name
+document.getElementById('header').innerText = name
+document.getElementById('title').innerText = name
 const api = new JitsiMeetExternalAPI(domain, jitsi_options);
 api.executeCommand('toggleChat');
 api.executeCommand('subject', name);
+api.addListener("readyToClose", function() { window.close(); });
 
 window.onunload = window.onbeforeunload = function() {
-    const pid = urlParams.get('pid');
-    const uid = urlParams.get('uid');
     if (pid && uid && opener && opener.set_puzzle_inactive)
         opener.set_puzzle_inactive(pid, uid)
 }
 
 window.onload = function() {
-    const pid = urlParams.get('pid');
-    const uid = urlParams.get('uid');
     if (pid && uid && opener && opener.set_puzzle_active)
         opener.set_puzzle_active(pid, uid)
 }
-
 </script>
 </html>
