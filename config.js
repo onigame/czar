@@ -34,6 +34,7 @@ var leftout21_config = {
   hunt_info: "TBD",
   team_url: "https://sites.google.com/a/teamleftout.org/mh2021/",
   sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
+  video_room_prefix: "OzvhGzaoJpo",
 };
 
 // Modify this to use a different config.
