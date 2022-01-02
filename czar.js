@@ -391,7 +391,7 @@ var bind_link = function(form, name, prompt) {
 var the_form_html =
   "<form name=@NAME@>" +
   "<input type=hidden id=@NAME@.docid name=docid>" +
-  "<input type=text name=label size=35 style='font-weight: bold'>" +
+  "<input type=text id=@NAME@.label name=label size=35 style='font-weight: bold'>" +
   "<span class=tootltip_wrap>" +
     "<a class=missing target=@NAME@.puzzle id=@NAME@.puzzle>puzzle</a>" +
     "<span class=tooltip><input type=text name=puzzle size=30></span>" +
@@ -400,7 +400,7 @@ var the_form_html =
     "<a class=missing target=@NAME@.sheet id=@NAME@.sheet>sheet</a>" +
     "<span class=tooltip><input type=text name=sheet size=30></span>" +
   "</span>" +
-  "<input type=text name=status size=50 style='width:32em'>" +
+  "<input type=text id=@NAME@.status name=status size=50 style='width:32em'>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
       "class=actives>(0p)</span>" +
@@ -1099,6 +1099,34 @@ var UpdateTagsSelector = function() {
 
 
 /////////// end Tag Manipulation
+
+var CopyToClipboard = function() {
+  czarDebug('CopyToClipboard()');
+
+  var result = "";
+
+  for (var node=document.getElementById("items").firstChild; 
+       node != null; node=node.nextSibling) {
+    if (node.style.display == "none") { 
+      continue; // Don't put invisible lines in the Clipboard.
+    } 
+    result += document.getElementById(node.name + ".label").value;
+    result += "\t";
+    result += document.getElementById(node.name + ".status").value;
+    result += "\t";
+    result += document.getElementById(node.name + ".tags").value;
+    result += "\n";
+  }
+
+  function listener(e) {
+    e.clipboardData.setData("text/plain", result);
+    e.preventDefault();
+  }
+
+  document.addEventListener("copy", listener);
+  document.execCommand("copy");
+  document.removeEventListener("copy", listener);
+}
 
 var start_czar = function(onM) {
   onMobileSite = onM;
