@@ -458,6 +458,13 @@ var make_form = function(name) {
       alert("Please tell me who you are first! (upper-left of page)");
     } else {
       czarDebug('assignbutton.onclick: Setting uid=' + uid);
+    
+    
+    const video_off = window.location.search && window.location.search.indexOf("no_video") >=0;
+    if (!onMobileSite && config.video_room_prefix && !video_off ) {
+      window.open("video_chat_room.html?room_id=" + config.video_room_prefix  +"." +gActivities[name].id 
+        + "&name=" + encodeURIComponent(gActivities[name].name) + "&uid=" +uid  + "&pid=" + gActivities[name].id, "czar_video_chat")
+    }
       UpdateStatus(gUsers[uid], gActivities[name],
                    (new Date()).valueOf(), true, null);
     }
@@ -560,7 +567,7 @@ var UpdateMyStatus = function() {
 
     mystatus.innerHTML = "";
     if (activity) {
-      mystatus.innerHTML += "Current activity: <b>" + activity + "</b><br>";
+      mystatus.innerHTML += "Current activity: <b>" + activity + "</b>";
     } else {
       mystatus.innerHTML += '<b><font color="red">You are not assigned to ' +
         'an activity!  Please select a puzzle below or select an exclusive ' +
@@ -571,7 +578,7 @@ var UpdateMyStatus = function() {
         '</font></b><br>';
     }
     if (job) {
-      mystatus.innerHTML += "Current job: <b>" + job + "</b><br>";
+      mystatus.innerHTML += "Current job: <b>" + job + "</b>";
     }
   }
 };
@@ -1152,3 +1159,21 @@ var start_czar = function(onM) {
     document.forms.create.onsubmit = on_submit_create;
   }
 }
+
+
+///// used by video to enable/disable activity
+var set_puzzle_inactive = function(puzzle_id, uid){
+    if (uid && IsActiveAssignment(uid, puzzle_id)) {
+        UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
+            false, true);          
+    }
+
+}
+var set_puzzle_active = function(puzzle_id, uid){
+    if (uid && !IsActiveAssignment(uid, puzzle_id)) {
+        UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
+            true, true);          
+    }
+}
+
+

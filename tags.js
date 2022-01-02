@@ -125,17 +125,10 @@ var MakeTagSelector = function(parent, filter_tags) {
   parent.innerHTML = '';
   gTags.sort();
 
-  var span = document.createElement('span');
-  span.style.backgroundColor = '#ffffcc';
-  span.style.border = 'thin solid #ffcc00';
-  parent.style.padding = '10px';
-  span.style.padding = '8px';
-
   var table = document.createElement('table');
   table.style.backgroundColor = '#ffffcc';
   table.style.border = 'thin solid #ffcc00';
-  parent.style.padding = '10px';
-  table.style.padding = '8px';
+  table.style.padding = '4px';
 
   var tr = document.createElement('tr');
   var td = document.createElement('td');

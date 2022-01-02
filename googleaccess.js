@@ -184,7 +184,7 @@ var startGoogleAccess = function(config) {
         console.log("googleaccess: gapi.client.init() failed");
         modal.showButton(checkClient);  // TODO(egnor): Different button?
         modal.setErrorMessage(
-            "Can't access Google", reason.result.error.message);
+            "Can't access Google", reason.details);
       }
 
       // TODO(egnor): How to tell if gapi.load() fails?
