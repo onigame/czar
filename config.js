@@ -11,7 +11,7 @@ var localhost_config = {
 };
 
 var czartest_config = {
-  stateserver_url: "http://czartest.ofb.net:8888/czartest",
+  stateserver_url: "https://czartest.teamleftout.org/stateserver/czartest",
   gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
   doc_folder_id: "0B5i1K9hv1-e6VEc0QW9LTHhWVUU",  // "Czar Test Folder"
   template_doc_id: "1-fo_BrxgngvleyL2I9t91q4jNvcMUAzDHx9fp0nBvIo",
@@ -68,4 +68,4 @@ var leftout23_config = {
 };
 
 // Modify this to use a different config.
-var config = leftout23_config
+var config = leftout23_config;
