@@ -462,7 +462,7 @@ var make_form = function(name) {
     
     const video_off = window.location.search && window.location.search.indexOf("no_video") >=0;
     if (!onMobileSite && config.video_room_prefix && !video_off ) {
-      window.open("video_chat_room.html?room_id=" + config.video_room_prefix  +"." +gActivities[name].id 
+      window.open("video_chat_room.html?room_id=" + config.video_room_prefix + "." + gActivities[name].id 
         + "&name=" + encodeURIComponent(gActivities[name].name) + "&uid=" +uid  + "&pid=" + gActivities[name].id, "czar_video_chat")
     }
       UpdateStatus(gUsers[uid], gActivities[name],
