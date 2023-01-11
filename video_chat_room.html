@@ -45,28 +45,41 @@ window.onload = function() {
   const jitsi_options = {
       roomName: room,
       parentNode: document.querySelector('#meet'),
-      configOverwrite: { startWithAudioMuted: true },
+      configOverwrite: {
+        enableLobbyChat: false,
+        startWithAudioMuted: true,
+        toolbarButtons: [
+          'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+          'fodeviceselection', 'hangup', 'profile', 'sharedvideo',
+          'settings', 'raisehand', 'videoquality', 'filmstrip', 'feedback',
+          'stats', 'shortcuts', 'tileview', 'videobackgroundblur',
+          'download', 'help', 'mute-everyone',
+        ], 
+        welcomePage: { disabled: true },
+      },
       interfaceConfigOverwrite: {
-          TOOLBAR_BUTTONS: [
-              'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
-              'fodeviceselection', 'hangup', 'profile', 'sharedvideo',
-              'settings', 'raisehand', 'videoquality', 'filmstrip', 'feedback',
-              'stats', 'shortcuts', 'tileview', 'videobackgroundblur',
-              'download', 'help', 'mute-everyone',
-          ], 
-          LANG_DETECTION: false,
-          DEFAULT_REMOTE_DISPLAY_NAME: "Random Puzzler",
-          SHOW_CHROME_EXTENSION_BANNER: false
+        TOOLBAR_BUTTONS: [
+          'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+          'fodeviceselection', 'hangup', 'profile', 'sharedvideo',
+          'settings', 'raisehand', 'videoquality', 'filmstrip', 'feedback',
+          'stats', 'shortcuts', 'tileview', 'videobackgroundblur',
+          'download', 'help', 'mute-everyone',
+        ], 
+        LANG_DETECTION: false,
+        DEFAULT_REMOTE_DISPLAY_NAME: "Random Puzzler",
+        SHOW_CHROME_EXTENSION_BANNER: false,
       }
   };
 
   console.log("... starting jit.si", jitsi_options);
   const api = new JitsiMeetExternalAPI('meet.jit.si', jitsi_options);
 
-  console.log("... disabling jit.si chat and setting subject:", name);
-  api.executeCommand('toggleChat');
+  console.log("... setting jit.si room subject:", name);
   api.executeCommand('subject', name);
   api.addListener("readyToClose", function() { window.close(); });
+
+  // Apparently in the current version of Jitsi, chat is _off_ by default.
+  // api.executeCommand('toggleChat');
 }
 
 window.onunload = window.onbeforeunload = function() {
