@@ -20,6 +20,7 @@ var czartest_config = {
   hunt_info: "TEST CZAR INSTANCE",
   team_url: "http://en.wikipedia.org/wiki/Team",
   sheet_url_wrapper: "/czarchat/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
+  video_room_prefix: "%F0%9F%91%88czartest",
 };
 
 // Configuration for Team Left Out, MIT Mystery Hunt 2021.

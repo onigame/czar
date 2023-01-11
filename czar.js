@@ -16,7 +16,7 @@ var the_sort_timeout = null;
 var onMobileSite = false;
 
 var czarDebug = function() {
-  if (0 && window.console) window.console.log.apply(window.console, arguments);
+  if (1 && window.console) window.console.log.apply(window.console, arguments);
 }
 
 var on_blur = function(event) {
@@ -392,14 +392,15 @@ var the_form_html =
   "<form name=@NAME@>" +
   "<input type=hidden id=@NAME@.docid name=docid>" +
   "<input type=text id=@NAME@.label name=label size=35 style='font-weight: bold'>" +
-  "<span class=tootltip_wrap>" +
+  "<span class=tooltip_wrap>" +
     "<a class=missing target=@NAME@.puzzle id=@NAME@.puzzle>puzzle</a>" +
     "<span class=tooltip><input type=text name=puzzle size=30></span>" +
   "</span>" +
-  "<span class=tootltip_wrap>" +
+  "<span class=tooltip_wrap>" +
     "<a class=missing target=@NAME@.sheet id=@NAME@.sheet>sheet</a>" +
     "<span class=tooltip><input type=text name=sheet size=30></span>" +
   "</span>" +
+  "<a href=# id=@NAME@.video>video</a>" +
   "<input type=text id=@NAME@.status name=status size=50 style='width:32em'>" +
   "<input type=text id=@NAME@.tags name=tags size=20>" +
   "<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
@@ -458,13 +459,6 @@ var make_form = function(name) {
       alert("Please tell me who you are first! (upper-left of page)");
     } else {
       czarDebug('assignbutton.onclick: Setting uid=' + uid);
-    
-    
-    const video_off = window.location.search && window.location.search.indexOf("no_video") >=0;
-    if (!onMobileSite && config.video_room_prefix && !video_off ) {
-      window.open("video_chat_room.html?room_id=" + config.video_room_prefix + "." + gActivities[name].id 
-        + "&name=" + encodeURIComponent(gActivities[name].name) + "&uid=" +uid  + "&pid=" + gActivities[name].id, "czar_video_chat")
-    }
       UpdateStatus(gUsers[uid], gActivities[name],
                    (new Date()).valueOf(), true, null);
     }
@@ -483,6 +477,19 @@ var make_form = function(name) {
   // Link to the spreadsheet.
   bind_link(form, "sheet", "Click to enter spreadsheet URL");
 
+  video_link = document.getElementById(name + ".video");
+  video_link.onclick = function(event) {
+    event.preventDefault();  // Don't navigate to # link, do this instead:
+    var s = document.getElementById('whoami');
+    var uid = s.selectedIndex >= 0 ? s.options[s.selectedIndex].value : null;
+    video_url =
+       "video_chat_room.html?room_id=" + config.video_room_prefix + "." +
+       form.name + "&name=" + encodeURIComponent(form.label.value) +
+       "&uid=" + uid + "&pid=" + form.name;
+    czarDebug("video_link.onclick(): opening " + video_url);
+    window.open(video_url, "czar_video_chat");
+  }
+
   // Deal with the tooltip.
   //"<span style='cursor:pointer;cursor:hand;display:inline-block;width:2em' id=@NAME@.actives " +
   if (!onMobileSite) {
@@ -499,14 +506,15 @@ var make_form = function(name) {
   return form;
 }
 
+// Callback for changing the name of a puzzle.
 var on_label_change = function(form, value) {
-  // Callback for changing the name of a puzzle.
-
+  czarDebug("on_label_change(" + form.name + ", " + value + ")");
   if (!value) {
     document.getElementById("items").removeChild(form);
     return;
   }
 
+  // TODO: There are much better ways to do natural sort!
   var pad = function(str, pre, digits) {
     var zero = "00000000000000000000";
     return pre + zero.substr(digits.length) + digits;
@@ -567,18 +575,18 @@ var UpdateMyStatus = function() {
 
     mystatus.innerHTML = "";
     if (activity) {
-      mystatus.innerHTML += "Current activity: <b>" + activity + "</b>";
+      mystatus.innerHTML += "<div>Activity: <b>" + activity + "</b></div>";
     } else {
-      mystatus.innerHTML += '<b><font color="red">You are not assigned to ' +
-        'an activity!  Please select a puzzle below or select an exclusive ' +
+      mystatus.innerHTML += '<div><b><font color="red">You are not assigned ' +
+        'to an activity!  Please select a puzzle below or pick an exclusive ' +
         'non-puzzle activity on <a href="who.html">Who</a>.<br>Default ' +
         'strategy: (1) Try to find the aha on puzzles with the \'needsaha\' ' +
         'tag. <br>(2) Work on any puzzles with the \'priority\' tag. <br>(3) ' +
         'Work on any puzzle you like.  Your Puzzle Czar may have more advice.' +
-        '</font></b><br>';
+        '</font></b><br></div>';
     }
     if (job) {
-      mystatus.innerHTML += "Current job: <b>" + job + "</b>";
+      mystatus.innerHTML += "<div>Current job: <b>" + job + "</b></div>";
     }
   }
 };
@@ -862,7 +870,6 @@ var UpdateAssignButtons = function() {
   var itemList = document.getElementById('items');
   for (var i=0; i < itemList.childNodes.length; ++i) {
     // we should be checking that each item is really a form, but we'll be lazy.
- 
     var assignbuttonName = itemList.childNodes[i].name + ".assignbutton";
     var assignbutton = document.getElementById(assignbuttonName);
     assignbutton.style.fontSize = '80%';
@@ -900,11 +907,12 @@ var UpdateAssignButtons = function() {
     if (onMobileSite) {
       $("#" + itemList.childNodes[i].name + "\\.assignbutton").prop("title","");
     }
-
   }
 };
 
 var on_value = function(key, field, value) {
+  czarDebug("on_value(" + key + ", " + field + ", " + value + ")");
+
   // Called whenever key.field changes value.  key is the id of an HTML
   // form on this page.  field is any key, although some keys have special
   // significance.
@@ -1167,13 +1175,11 @@ var set_puzzle_inactive = function(puzzle_id, uid){
         UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
             false, true);          
     }
-
 }
+
 var set_puzzle_active = function(puzzle_id, uid){
     if (uid && !IsActiveAssignment(uid, puzzle_id)) {
         UpdateStatus(gUsers[uid], activity, (new Date()).valueOf(),
             true, true);          
     }
 }
-
-
