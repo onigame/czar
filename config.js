@@ -30,12 +30,42 @@ var leftout21_config = {
   template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
   jobs_to_display: ["Puzzle Czar"],
   activities_to_display: ["Away", "Sleeping", "Mothing"],
-  hunt_url: "https://yewlabs.mit.edu/",
-  hunt_info: "TBD",
-  team_url: "https://sites.google.com/a/teamleftout.org/mh2021/",
+  hunt_url: "https://perpendicular.institute/",
+  hunt_info: "teamleftout / left1erthanthout",
+  team_url: "https://sites.google.com/teamleftout.org/mh2021/",
   sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
   video_room_prefix: "OzvhGzaoJpo",
 };
 
+// Configuration for Team Left Out, MIT Mystery Hunt 2022.
+var leftout22_config = {
+  stateserver_url: "https://czar.teamleftout.org/stateserver/mh2022",
+  gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
+  doc_folder_id: "1hagdpYEFDgQnMvmVFmhKReOdmeeSevbo",
+  template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
+  jobs_to_display: ["Puzzle Czar"],
+  activities_to_display: ["Away", "Sleeping", "Mothing"],
+  hunt_url: "https://www.starrats.org/",
+  hunt_info: "teamleftout / left1erthanthout",
+  team_url: "https://sites.google.com/view/mh2022/2022-hunt",
+  sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
+  video_room_prefix: "%F0%9F%91%88leftout",
+};
+
+// Configuration for Team Left Out, MIT Mystery Hunt 2023.
+var leftout23_config = {
+  stateserver_url: "https://czar.teamleftout.org/stateserver/mh2023",
+  gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
+  doc_folder_id: "1hagdpYEFDgQnMvmVFmhKReOdmeeSevbo",
+  template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
+  jobs_to_display: ["Puzzle Czar"],
+  activities_to_display: ["Away", "Sleeping", "Mothing"],
+  hunt_url: "https://mitmh2023.com/",
+  hunt_info: "login TBD",
+  team_url: "https://sites.google.com/view/mh2023/",
+  sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
+  video_room_prefix: "%F0%9F%91%88leftout",
+};
+
 // Modify this to use a different config.
-var config = leftout21_config
+var config = leftout23_config
