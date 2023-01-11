@@ -27,46 +27,54 @@
 </body>
 
 <script>
-const domain = 'meet.jit.si';
-const urlParams = new URLSearchParams(window.location.search);
-const room = urlParams.get('room_id');
-const name = urlParams.get('name');
-const pid = urlParams.get('pid');
-const uid = urlParams.get('uid');
+window.onload = function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const room = urlParams.get('room_id');
+  const name = urlParams.get('name');
+  const pid = urlParams.get('pid');
+  const uid = urlParams.get('uid');
 
-const jitsi_options = {
-    roomName: room,
-    parentNode: document.querySelector('#meet'),
-    configOverwrite: { startWithAudioMuted: true },
-    interfaceConfigOverwrite: {
-        TOOLBAR_BUTTONS: [
-            'microphone', 'camera', 'closedcaptions', 'desktop',  'fullscreen',
-            'fodeviceselection', 'hangup', 'profile', 'sharedvideo',
-            'settings', 'raisehand', 'videoquality', 'filmstrip',  'feedback',
-            'stats', 'shortcuts', 'tileview', 'videobackgroundblur',
-            'download', 'help', 'mute-everyone',
-        ], 
-        LANG_DETECTION: false,
-        DEFAULT_REMOTE_DISPLAY_NAME: "Random Puzzler",
-        SHOW_CHROME_EXTENSION_BANNER: false
-    }
-};
+  if (pid && uid && opener && opener.set_puzzle_active) {
+    console.log("... setting puzzle active with pid/uid:", pid, uid);
+    opener.set_puzzle_active(pid, uid)
+  }
 
-document.getElementById('header').innerText = name
-document.getElementById('title').innerText = name
-const api = new JitsiMeetExternalAPI(domain, jitsi_options);
-api.executeCommand('toggleChat');
-api.executeCommand('subject', name);
-api.addListener("readyToClose", function() { window.close(); });
+  document.getElementById('header').innerText = name
+  document.getElementById('title').innerText = name
+
+  const jitsi_options = {
+      roomName: room,
+      parentNode: document.querySelector('#meet'),
+      configOverwrite: { startWithAudioMuted: true },
+      interfaceConfigOverwrite: {
+          TOOLBAR_BUTTONS: [
+              'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+              'fodeviceselection', 'hangup', 'profile', 'sharedvideo',
+              'settings', 'raisehand', 'videoquality', 'filmstrip', 'feedback',
+              'stats', 'shortcuts', 'tileview', 'videobackgroundblur',
+              'download', 'help', 'mute-everyone',
+          ], 
+          LANG_DETECTION: false,
+          DEFAULT_REMOTE_DISPLAY_NAME: "Random Puzzler",
+          SHOW_CHROME_EXTENSION_BANNER: false
+      }
+  };
+
+  console.log("... starting jit.si", jitsi_options);
+  const api = new JitsiMeetExternalAPI('meet.jit.si', jitsi_options);
+
+  console.log("... disabling jit.si chat and setting subject:", name);
+  api.executeCommand('toggleChat');
+  api.executeCommand('subject', name);
+  api.addListener("readyToClose", function() { window.close(); });
+}
 
 window.onunload = window.onbeforeunload = function() {
-    if (pid && uid && opener && opener.set_puzzle_inactive)
-        opener.set_puzzle_inactive(pid, uid)
+  if (pid && uid && opener && opener.set_puzzle_inactive) {
+    console.log("... setting puzzle INactive with pid/uid:", pid, uid);
+    opener.set_puzzle_inactive(pid, uid)
+  }
 }
 
-window.onload = function() {
-    if (pid && uid && opener && opener.set_puzzle_active)
-        opener.set_puzzle_active(pid, uid)
-}
 </script>
 </html>
