@@ -57,7 +57,7 @@ var leftout22_config = {
 var leftout23_config = {
   stateserver_url: "https://czar.teamleftout.org/stateserver/mh2023",
   gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
-  doc_folder_id: "1hagdpYEFDgQnMvmVFmhKReOdmeeSevbo",
+  doc_folder_id: "1_0ODgW07y09YyMdR5RymlPn-rbZvGSQk",
   template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
   jobs_to_display: ["Puzzle Czar"],
   activities_to_display: ["Away", "Sleeping", "Mothing"],
