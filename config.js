@@ -61,12 +61,27 @@ var leftout23_config = {
   template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
   jobs_to_display: ["Puzzle Czar"],
   activities_to_display: ["Away", "Sleeping", "Mothing"],
-  hunt_url: "https://mitmh2023.com/",
-  hunt_info: "login TBD",
+  hunt_url: "https://interestingthings.museum/",
+  hunt_info: "login username : LeftOut ; Team Password : leftierthanthou",
   team_url: "https://sites.google.com/view/mh2023/",
   sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
   video_room_prefix: "%F0%9F%91%88leftout",
 };
 
+// Configuration for Team Left Out, MIT Mystery Hunt 2024.
+var leftout24_config = {
+  stateserver_url: "https://czar.teamleftout.org/stateserver/mh2024",
+  gapi_client_id: "368612528023-s8093hetppbt833d5fr9cegmmvaon9gk.apps.googleusercontent.com",
+  doc_folder_id: "13XWyvIwA7-hXX7JvhnVkp0yY4IkoD2c_",
+  template_doc_id: "13aL5kga4BUCSiaEyfFtwJvubpNrUlvoClyEdaiyEyUQ",
+  jobs_to_display: ["Puzzle Czar", "RC East", "RC West"],
+  activities_to_display: ["Away", "Sleeping", "Mothing"],
+  hunt_url: "https://mitmh2024.com/",
+  hunt_info: "Hunt Info TBD",
+  team_url: "https://sites.google.com/view/mh2024/",
+  sheet_url_wrapper: "https://czarchat.teamleftout.org/czarchat/index.html?channelName=@CHANNEL@&URL=@URL@&title=@TITLE@",
+  video_room_prefix: "%F0%9F%91%88leftout",
+};
+
 // Modify this to use a different config.
-var config = leftout23_config;
+var config = leftout24_config;
